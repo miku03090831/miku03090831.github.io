@@ -1,0 +1,1166 @@
+<!--
+	作者：Sariay
+	时间：2018-09-25
+	描述：There may be a bug, but don't worry, QiLing(器灵) says that it can work normally!
+-->
+<!DOCTYPE html>
+<html class="html-loading">
+		
+
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <title>
+    
+      通过base64编码，向markdown中插入图片 | moe&#39;s blog
+    
+  </title>
+  <meta name="author" content="qh meng">
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+	<!-- favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+
+  <!-- css -->
+  
+<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/Annie.css">
+
+  
+  <!-- jquery -->
+	
+<script src="/js/jquery.min.js"></script>
+
+
+  <!-- leancloud -->
+  
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+<script src="/js/leancloud.js"></script>
+
+<meta name="generator" content="Hexo 5.0.0"></head>
+	<body>
+		<!-- Preloader -->
+
+	<div id="preloader">
+		<div class="pre-container">
+			
+				<div class="spinner">
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
+				</div>
+						
+		</div>
+	</div>
+
+
+<!-- header -->
+<header class="fixbackground" data-img-mode="random" data-normal-src="/img/1.jpg" data-random-max="110" data-random-src="https://sariay.github.io/Random-img/">
+	<div class="mask">
+		<!-- Logo and navigation -->
+		<div class="h-header">
+			<div id="logo">
+				<a href="/">
+						
+						<img src="/img/logo.png" alt="Logo">
+					
+				</a>
+			</div>
+			
+			<div id="navigation-show">
+				<ul>
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home">主页</a>
+		</li>
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive">归档</a>
+		</li>
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories">分类</a>
+		</li>
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags">标签</a>
+		</li>
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about">关于</a>
+		</li>
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery">相册</a>
+		</li>
+	
+
+	
+		<li class="menu-search">
+			<a href="javascript:;" class="popup-trigger">搜索</a>
+		</li>
+	
+</ul>
+			</div>				
+		</div>
+
+		<!-- motto -->
+		<div class="h-body">	
+			
+				<p class="motto"></p>
+			
+		</div>
+		
+		<!-- others: such as time... -->			
+		<div class="h-footer">
+			<a href="javascript:;" id="read-more"><i class="fa fa-angle-double-down" aria-hidden="true"></i>
+			</a>
+
+			
+				<!-- 
+	This is only a demo, please go to "https://time.is" to set your city time! 
+-->
+<style type="text/css">
+	.header-date {
+		font-size: 1.6rem;
+		color: #fff;
+		position: absolute;
+		bottom: 5px;
+		right: 1rem;
+		writing-mode: tb-rl;
+	}	
+	
+	.header-date a {
+		border-bottom: none;
+	}
+
+	@media only screen and (max-width: 768 ) {
+		.header-date {
+			font-size: 1rem;
+		}			
+	}
+</style>
+<div class="header-date">
+	<a target="_blank" href="https://time.is/Beijing" id="time_is_link" rel="nofollow noopener" ></a>
+	<span id="Beijing_z43d"></span>
+</div>
+<script src="//widget.time.is/zh.js"></script>
+<script>
+	time_is_widget.init({
+		Beijing_z43d:{
+			template:"DATE", 
+			date_format:"year年 monthname dnum日"
+		}
+	});
+</script>
+			
+		</div>
+	</div>
+</header>
+
+<div id="navigation-hide">
+	<!-- Progress bar -->
+	<div id="progress-bar"></div>
+
+	<!-- Progress percent -->
+	<div id="progress-percentage"><h1>0.0%</h1></div>
+
+	<div class="toc-switch"><span class="switch-button">目录</span></div>
+
+	<!-- Page title -->
+	<p>
+		
+			当前文章&nbsp;:&nbsp;《通过base64编码，向markdown中插入图片》
+		
+	</p>
+
+	<!-- Nav trigger for navigation-H-->
+	<a class="nav-trigger"><span></span></a>
+</div>
+
+<!-- Navigation in div(id="navigation-H") -->
+<nav class="nav-container" id="cd-nav">
+	<div class="nav-header">
+		<h3>Navigation</h3>
+		<a href="javascript:;" class="nav-close"></a>
+	</div>
+	<div class="nav-body">
+		<ul>
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home">主页</a>
+		</li>
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive">归档</a>
+		</li>
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories">分类</a>
+		</li>
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags">标签</a>
+		</li>
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about">关于</a>
+		</li>
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery">相册</a>
+		</li>
+	
+
+	
+		<li class="menu-search">
+			<a href="javascript:;" class="popup-trigger">搜索</a>
+		</li>
+	
+</ul>
+	</div>
+	<div class="nav-footer">
+		<ul>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-github"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-weibo"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-pinterest"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-instagram"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-twitter"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="/atom.xml" target="_blank">
+				<i class="fa fa-rss"></i>
+			</a>
+		</li>
+			
+</ul>
+
+	</div>
+</nav>
+			
+		<!--main-->
+		<main>
+			<!--
+	时间：2018-11-17
+	描述：
+		插件名称：katelog.min.js
+		插件作者：KELEN
+		插件来源: https://github.com/KELEN/katelog
+-->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
+	 
+
+<div class="layout-post">
+	<div id="layout-post">
+	<div class="article-title">
+		<i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+		
+	<a href="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" itemprop="url">
+		通过base64编码，向markdown中插入图片
+	</a>
+
+	</div>
+
+	<div class="article-meta">
+		<span>
+			<i class="fa fa-calendar"></i>
+			
+
+
+	发布于
+
+	<a href="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" itemprop="url">
+		<time datetime="2019-09-21T15:25:34.000Z" itemprop="datePublished">
+	  		2019-09-21
+	  </time>
+	</a>
+	&nbsp;
+
+
+
+
+
+			
+
+
+
+
+	更新于
+
+	<a href="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" itemprop="url">
+		<time datetime="2019-09-21T15:25:34.000Z" itemprop="dateUpdated">
+	  		2019-09-22
+	  </time>
+	</a> 
+
+
+
+		</span>
+		<span>
+			<i class="fa fa-tags"></i>
+			
+	
+		<a href="/tags/%E6%8A%80%E6%9C%AF/" class=" ">
+			技术
+		</a>
+	
+		
+		</span>
+		
+		
+
+	
+    <span class="leancloud_visitors" id="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/_visitors" data-url="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" data-title="通过base64编码，向markdown中插入图片">
+       	<i class="fa fa-eye"></i>
+       	热度
+        <i class="leancloud_visitors_count" id="leancloud_visitors_count">0</i>
+    </span>
+    
+
+
+
+	
+    <span class="leancloud_likes" id="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/_likes" data-url="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" data-title="通过base64编码，向markdown中插入图片" rel="unlike">
+        <i class="fa fa-heart"></i>
+        喜欢
+        <i class="leancloud_likes_count" id="leancloud_likes_count">0</i>
+    </span>
+
+	</div>
+
+	<div class="article-content" id="article-content">
+		<blockquote>
+<p>前言：开学了比较烦躁。。。更新频率大概率会显著降低，而且内容应该也会偏向算法为主，毕竟这学期要学。不过很烦的一点就是好像还不太能直接把作业的代码发上来，被别人抄袭的话我也会被判作弊。。。懒得吐槽这规则了</p>
+<p>然后这个插入图片的方法是我某天晚上上其他课的时候，把虚拟机搞坏了。。。又不想听课，就闲得无聊就看了一眼这块的内容，意外地发现还蛮简单的</p>
+</blockquote>
+<h3 id="一-base64编码的原理"><a href="#一-base64编码的原理" class="headerlink" title="一. base64编码的原理"></a>一. base64编码的原理</h3><blockquote>
+<p>这一段讲的是原理，不懂的话问题也不大。如果不想看的话可以直接跳到下一段。只是这一段会让你明白何为base64，而不仅仅是如何使用它。</p>
+</blockquote>
+<p>我们都知道图片是二进制文件，而base64就是一种把二进制转换成字符串的编码方式。首先我们要准备一个类似于“字典”的东西，0-63的数字分别对应一个不同的字符。</p>
+<p>然后我们拿出二进制文件中的三个字节（byte），一个字节有八位（bit），这样就有了24位0和1组成的位串。我们把这24位分成四组，每一组有6位，并且每一位上都是0或1，这样的话，把每一组表示的二进制数（6位0或1）换成十进制，则会得到一个0-63的整数，再根据前面的“字典”，我们就把这一组的六位换成了一个字符。前面说分成四组，那么我们就会得到四个字符。</p>
+<p>到这里，我们把二进制文件中的三个字节换成了四个字符，然后我们三个三个的去处理二进制文件的字节，如果到最后剩的字节数不够3，就在末尾补0凑够三个字节（补了多少个字节也会记下来，否则解码时就有歧义了）。</p>
+<p>执行完上面的操作，我们就把一个二进制的文件（不仅限于图片），编码成了字符串（我觉得原理还是挺简单的）</p>
+<h3 id="二-通过base64编码向markdown中插入文件"><a href="#二-通过base64编码向markdown中插入文件" class="headerlink" title="二.通过base64编码向markdown中插入文件"></a>二.通过base64编码向markdown中插入文件</h3><blockquote>
+<p>可能有人好奇了，我现在才讲如何插入图片，并且还说我是刚了解到的，那我之前的图片都是怎么做的。其实我之前都是把图片放到github的仓库里面，然后图片链接就写github仓库里的图片网络地址就可以了。。。相当于把github当免费图床用，那么以后我可能考虑就用base64编码来插图片了</p>
+</blockquote>
+<p>首先我们把图片转换成base64编码，我们这里以python来实现（其他很多语言也可以做到，语言都是次要的）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">sys.stdout=open(<span class="string">&#x27;b64.txt&#x27;</span>,<span class="string">&#x27;w&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">&#x27;壁纸.jpg&#x27;</span>,<span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> fp:</span><br><span class="line">    str=base64.b64encode(fp.read())</span><br><span class="line"></span><br><span class="line">print(str)</span><br></pre></td></tr></table></figure>
+
+<p>这里因为str太长了，控制台输出不下，所以我把他输出到了同一个文件夹下的记事本里面。</p>
+<p>其中，‘壁纸.jpg’是和py文件放在同一文件夹下的一个图片。我们运行上面的代码，然后得到str是一个巨长无比的字符串。。。巨长，巨长无比。你问我有多大，我这个图片可能有一百三十多万个字符。。。那这么长的字符串要插入md文档中肯定是相当影响写作体验的，所以一般都是吧要插的图片给一个id，然后放在末尾，在前面用的时候通过id来调用图片。</p>
+<p>具体调用方法如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">定义：[id]:data:img/jpg;base64,xxx(字符串)</span><br><span class="line">调用：![<span class="string">图片描述</span>][<span class="symbol">id</span>]</span><br></pre></td></tr></table></figure>
+
+<p>那么最后我就放一个例子上来（本来想尝试放上面的那张壁纸的，结果太大了导致编辑markdown文档都很卡就放弃了。。。）</p>
+<p>换一张(之前用过的图)</p>
+<p><img src="data:img/png;base64,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"></p>
+<p>说实话，我到最后突然发现这个方法的实用性一般，因为我觉得一开始的字符串太长了就换了张图，结果后来的也很长，都是几百万个字符的长度的那种。。。然后换了一张小点的图片，几万个字符，还行。图片太大的话，那么长的字符串，typora（我用的markdown编辑器）会卡崩。。。</p>
+<p>所以以后可能还是继续快乐地把github当免费图床，不过小点的图片用base64插入也是可以的（壁纸级的就算了）</p>
+	
+	</div>
+	
+	<div id="current-post-cover" data-scr="/img/cart_cover.jpg"></div>
+
+	<!-- relate post, comment...-->
+	<div class="investment-container">
+		<div class="investment-header">
+			<div class="investment-title-1">
+				<div class="on">相关文章</div>
+				<div>评论</div>
+				<div>分享</div>
+			</div>
+			<div class="investment-title-2">	            
+				
+	<span>
+		<a href="javascript: window.scrollTo(0, 0);">返回顶部</a>
+		
+			<a href="/2019/10/04/%E6%80%BB%E6%9C%89%E4%BA%9B%E4%B8%9C%E8%A5%BF%E7%88%B1%E8%80%8C%E4%B8%8D%E5%BE%97/" title="总有些东西爱而不得" rel="prev">
+				&laquo;上一篇
+			</a>
+		
+		
+			<a href="/2019/09/05/%E5%BB%BA%E7%AB%99%E5%8E%86%E7%A8%8B%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%9B%B4%E6%8D%A2%E4%B8%80%E4%B8%AA%E5%A5%BD%E7%9C%8B%E7%9A%84%E4%B8%BB%E9%A2%98/" title="建站历程(三)——更换一个好看的主题" rel="next">
+				下一篇&raquo;
+			</a>
+			
+	</span>
+
+
+      		
+			</div>	
+		</div>
+		
+		<div class="investment-content">
+			<div class="investment-content-list">
+				
+
+<div class="relate-post">
+	
+		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/03/06/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E6%8C%87%E9%92%88%E4%B8%8E%E6%95%B0%E7%BB%84%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BA%86%E8%A7%A3/" title="c语言中指针与数组的进一步了解">
+								c语言中指针与数组的进一步了解			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								三月 6日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+万万没想到大二下学期了，面向对象这门课上老师竟然一上来又给我们讲指针。更想不到的是大二下学期了，我对指针的认识还是不够深刻。这篇博客就是在我完成了这门课第二节课的两道作业后的思考。
+
+1.数组名与指针的关系我们都知道，数组名的值即是...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/03/06/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E6%8C%87%E9%92%88%E4%B8%8E%E6%95%B0%E7%BB%84%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BA%86%E8%A7%A3/" title="c语言中指针与数组的进一步了解">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="c语言中指针与数组的进一步了解"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/02/15/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9Fhttp%E8%AF%B7%E6%B1%82/" title="使用telnet模拟http请求">
+								使用telnet模拟http请求			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								二月 15日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+去年双11的时候，趁着书打折，几乎是半价入了几本好书。现在想起来看。这几天在看《计算机网络-自顶向下方法》。这本书的讲解非常细致，并且鼓励动手实践。我在看到http报文的时候，按照书上说的试着用telnet模拟了一个请求报文，不过中...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/02/15/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9Fhttp%E8%AF%B7%E6%B1%82/" title="使用telnet模拟http请求">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="使用telnet模拟http请求"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/01/31/%E6%89%8B%E5%86%99%E7%AE%80%E5%8D%95%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2-html-css/" title="手写简单登录界面 html+css">
+								手写简单登录界面 html+css			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								一月 31日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+好长时间没更博客了。。。差点忘了怎么更。。。
+觉得有必要更一下证明我还活着（虽然平时博客也没什么人看。。。）
+主要还是这学期是状态不太好吧，有点忙不过来的感觉。尤其是临近期末那一段时间真的感觉人要没了
+现在觉得写一写网页这样的也挺有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/01/31/%E6%89%8B%E5%86%99%E7%AE%80%E5%8D%95%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2-html-css/" title="手写简单登录界面 html+css">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/background.jpg" alt="手写简单登录界面 html+css"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" title="PAT 1147 & 1155 Heaps & Heap Paths">
+								PAT 1147 & 1155 Heaps & Heap Paths			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十一月 15日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+上次发的关于堆的题有些简单了。这次来点稍微有点意思的题目，这两道题目很是相似，不过倒是没有用到什么堆的特别操作，只是用了堆（数组）的形式去储存数据，用dfs（深度优先搜索）算法，去遍历堆，然后判断这是最大堆还是最小堆。
+
+1155 ...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" title="PAT 1147 & 1155 Heaps & Heap Paths">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/风景图.jpg" alt="PAT 1147 &amp; 1155 Heaps &amp; Heap Paths"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/11/13/%E5%A0%86%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/" title="堆中的路径">
+								堆中的路径			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十一月 13日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+好久没更。。。主要之前不知道写啥，写课外的东西暂时是不太可能了，没什么精力。之前ds的作业也不敢发到博客上来，怕被查重。所以就在pta上面随便找了些题，有些题可能比较简单，就当练手了。
+有些难的作业题花了挺长时间的，可惜不能发上来。...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/11/13/%E5%A0%86%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/" title="堆中的路径">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/备选封面.jpg" alt="堆中的路径"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/06/IP%E7%BD%91%E9%99%85%E5%8D%8F%E8%AE%AE/" title="IP网际协议">
+								IP网际协议			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 6日, 2019				
+							</p>
+							<p class="relate-post-content">
+								背景：TCP/IP协议定义了在因特网上传输的包，称为IP数据报
+IP协议TCP/IP模型中，位于网络层的协议，是整个协议族的核心。所有的TCP，UDP以及ICMP等数据都一IP数据报的格式传输。IP协议提供的数据报传输服务的特点是：不...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/06/IP%E7%BD%91%E9%99%85%E5%8D%8F%E8%AE%AE/" title="IP网际协议">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="IP网际协议"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/06/TCP-IP%E9%93%BE%E8%B7%AF%E5%B1%82/" title="TCP/IP链路层">
+								TCP/IP链路层			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 6日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+本来想今天去把数逻的软件下了的。。结果网速有点慢，所以就先不务正业一会
+上篇把TCP/IP四层模型整体上说完了，那这回来看看四层当中的最底层，链路层（也就是上一篇里面提到的网际接口层）
+另注明，本系列文章为本人在实验楼学习的笔记，课...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/06/TCP-IP%E9%93%BE%E8%B7%AF%E5%B1%82/" title="TCP/IP链路层">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="TCP/IP链路层"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/05/TCP-IP%E6%A8%A1%E5%9E%8B-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" title="TCP/IP模型 基本知识">
+								TCP/IP模型 基本知识			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 5日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+咳咳，上次刚说过多更新数据结构与算法类的博客，但是在把作业题又复习了一遍之后还是闲不下来，于是上网找资源，打算了解一下TCP/IP方面的知识
+上个学期学了一门课，叫无线网络应用，通识课，上课讲的东西很硬核，可惜课程考核很水。。。不得...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/05/TCP-IP%E6%A8%A1%E5%9E%8B-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" title="TCP/IP模型 基本知识">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="TCP/IP模型 基本知识"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/09/05/%E5%BB%BA%E7%AB%99%E5%8E%86%E7%A8%8B%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%9B%B4%E6%8D%A2%E4%B8%80%E4%B8%AA%E5%A5%BD%E7%9C%8B%E7%9A%84%E4%B8%BB%E9%A2%98/" title="建站历程(三)——更换一个好看的主题">
+								建站历程(三)——更换一个好看的主题			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								九月 5日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+唔建站历程系列欠了好久的第三期，也是暂时的最后一期（之后可能换电脑的话会加一期博客迁移）。这一期主要是如何更换主题的。偷个懒，简书上有位作者简要介绍了下如何更换主题，并且我跟他都用的是Annie主题，所以就直接转载了。
+
+本位转载自...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/09/05/%E5%BB%BA%E7%AB%99%E5%8E%86%E7%A8%8B%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%9B%B4%E6%8D%A2%E4%B8%80%E4%B8%AA%E5%A5%BD%E7%9C%8B%E7%9A%84%E4%B8%BB%E9%A2%98/" title="建站历程(三)——更换一个好看的主题">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="建站历程(三)——更换一个好看的主题"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/08/31/%E5%88%9D%E8%AF%86python%E7%9A%84GUI%E5%BA%93PyQt5/" title="初识python的GUI库PyQt5，记一些踩过的坑">
+								初识python的GUI库PyQt5，记一些踩过的坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 31日, 2019				
+							</p>
+							<p class="relate-post-content">
+								简短总结本文内容：我费了好大劲终于配好了PyQt5的环境，然后试着跑了几段代码，能用了！此处打算放个目录（因为前面废话有点多）
+学习了一段时间的python，也想试着去做一点东西了。一般来讲做一个小项目的话也总离不开图形界面的开发（也...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/08/31/%E5%88%9D%E8%AF%86python%E7%9A%84GUI%E5%BA%93PyQt5/" title="初识python的GUI库PyQt5，记一些踩过的坑">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/qt.png" alt="初识python的GUI库PyQt5，记一些踩过的坑"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+		</ul>
+	
+</div>	
+			</div>
+			<div class="investment-content-list">
+				<div class="layout-comment">
+
+	
+
+		
+
+			<!-- gitalk comment -->
+			<!-- show gitalk comment -->
+<div id="gitalk-container"></div>
+
+<!-- gitalk`s css & js -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<link rel="stylesheet" href="/css/comment.css">
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script type="text/javascript">
+	//Thanks O-R
+	//https://github.com/gitalk/gitalk/issues/102#issuecomment-382970552
+	//去除尾部匹配正则数组的字符串  
+	//Remove redundant characters
+	String.prototype.trimEnd = function(regStr) {
+		var result = this;
+		if(regStr == undefined || regStr == null || regStr == "") {
+			return result;
+		}
+		var array = regStr.split(',');
+
+		if(array.length > 0) {
+
+			var c = array.shift();
+			var str = this;
+			var i = str.length;
+			var rg = new RegExp(c);
+			var matchArr = str.match(rg);
+
+			if(matchArr != undefined && matchArr != null && matchArr.length > 0) {
+				var matchStr = matchArr[0].replace(/\\/g, "\\\\").replace(/\*/g, "\\*")
+					.replace(/\+/g, "\\+").replace(/\|/g, "\\|")
+					.replace(/\{/g, "\\{").replace(/\}/g, "\\}")
+					.replace(/\(/g, "\\(").replace(/\)/g, "\\)")
+					.replace(/\^/g, "\\^").replace(/\$/g, "\\$")
+					.replace(/\[/g, "\\[").replace(/\]/g, "\\]")
+					.replace(/\?/g, "\\?").replace(/\,/g, "\\,")
+					.replace(/\./g, "\\.").replace(/\&/g, "\\&");
+				matchStr = matchStr + '$';
+				result = str.replace(new RegExp(matchStr), "");
+			}
+
+			if(array.length > 0) {
+				return result.trimEnd(array.join())
+			} else {
+				return result;
+			}
+		}
+	};
+
+	//Create gitalk
+	var gitalk = new Gitalk({
+		clientID: '1cfceb2c83579f6c4709',
+		clientSecret: '4ac0cd088155f29d5d6f3ea2817cd1ac7b1d5995',
+		//id: window.location.pathname,
+		//id: decodeURI(window.location.pathname),
+		//id: (window.location.pathname).split("/").pop().substring(0, 49),
+		id: decodeURI( md5( location.href.trimEnd('#.*$,\\?.*$,index.html$') ) ),
+		repo: 'Blog-Comment-Repo',
+		owner: 'miku03090831',
+		admin: 'miku03090831',
+		distractionFreeMode: 'true',
+	})
+	gitalk.render('gitalk-container');
+</script>
+
+		
+		
+	
+
+</div>
+			</div>
+			<div class="investment-content-list">
+				<div class="layout-share">
+	
+	
+
+		
+			
+			<!-- socialShare share -->
+			<div class="social-share"></div>
+
+<!--  css & js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+			
+		
+		
+	
+</div>
+
+
+			</div>
+		</div>	
+	</div>
+	</div>
+</div>
+
+
+
+	<!-- leancloud -->
+	<!--
+	时间：2018-11-27
+	描述：
+		文章访问量：visitors
+		文章喜欢量：likes	
+		文章排行榜：topNPost
+		其他得说明：
+			01-Cookie相关的函数 
+				https://blog.csdn.net/somehow1002/article/details/78511541（Author：somehow1002）
+			02-visitors相关的函数 
+				https://blog.csdn.net/u013553529/article/details/63357382（Author：爱博客大伯）
+				https://notes.doublemine.me/2015-10-21-为NexT主题添加文章阅读量统计功能.html（Author：夏末）
+			03-topNPost相关的函数
+				https://hoxis.github.io/hexo-next-read-rank.html（Author：hoxis）
+			04-likes相关的函数，
+				参考了01 & 02进行简单的设计与实现
+-->
+
+
+
+	<script>
+		var appid = 'dX--',
+            appkey = 'dX--';	  
+        AnnieLeancloud(appid, appkey);         
+	</script>
+    
+
+	
+
+
+<!-- show math formula -->
+
+
+
+	 
+	
+<script src="/plugin/clipboard/clipboard.js"></script>
+
+	<script>
+		// Copy code !
+	    function codePreprocessing() {
+	        $("#article-content .highlight").each(function() {
+
+	            $(this).wrap('<div id="post-code"></div>');
+
+	        })
+
+	        $("#article-content #post-code").each(function() {
+
+	            $(this).prepend('<nav class="copy-nav"><span><i class="code-language"></i></span></nav>');
+
+	        })
+
+	        $("#article-content .copy-nav").each(function() {
+	            var temp = $(this).next().attr('class'),
+	                language = ((temp.length > 9) && (temp != null)) ? temp.substr(10) : "none"; //why 9? Need to check language?
+
+	            $(this).find('.code-language').text(language);
+
+	            $(this).append('<span class="copy-btn"><i class="fa fa-copy" aria-hidden="true"></i></span>');
+
+	        });
+	    }
+
+		function codeCopy() {
+		    $('#article-content #post-code').each(function(i) {
+		        var codeCopyId = 'codeCopy-' + i;
+
+		        var codeNode = $(this).find('.code'),
+		            copyButton = $(this).find('.copy-btn');
+
+		        codeNode.attr('id', codeCopyId);
+		        copyButton.attr('data-clipboard-target-id', codeCopyId);
+		    })
+
+		    
+			var clipboard = new ClipboardJS('.copy-btn', {
+					target: function(trigger) {
+						return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+					}
+		      	});
+
+			//pure js
+			function showTooltip(elem, msg) {		   
+				elem.setAttribute('aria-label', msg);
+				elem.setAttribute('class', 'copy-btn copy-status');
+				setTimeout(function() {
+					elem.setAttribute('class', 'copy-btn');
+				}, 2000);
+			}
+
+			clipboard.on('success', function(e) {
+			    e.clearSelection();
+			    console.info('Action:', e.action);		   
+			    console.info('Trigger:', e.trigger);
+			    showTooltip(e.trigger, 'Copied!');
+			    
+			});
+			clipboard.on('error', function(e) {
+			    console.error('Action:', e.action);
+			    console.error('Trigger:', e.trigger);
+			});
+		
+
+		}
+
+		if ($('.layout-post').length) {
+		    codePreprocessing();
+		    codeCopy();
+		} 
+	</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/plugin/fancybox/jquery.fancybox.css">
+
+
+<script src="/plugin/fancybox/jquery.fancybox.js"></script>
+
+
+<script type="text/javascript">
+	var titleID = $('.article-title a'),
+		imageID = $('.article-content img'),
+		videoID = $('.article-content video');
+
+	var postTitle = titleID.text() ? titleID.text() : "No post title!";
+
+	imageID.each(function() {
+		var imgPath = $(this).attr('src'),
+			imgTitle = $(this).attr('alt') ? $(this).attr('alt') : "No image description!";
+
+		//给每个匹配的<img>元素打包, 即添加父元素<a>
+		$(this).wrap('<a data-fancybox="gallery" data-caption=" 《 ' + postTitle + ' 》 ' + imgTitle + ' "  href=" ' + imgPath + ' "> </a>');
+	});
+
+	videoID.each(function() {
+		var videoPath = $(this).attr('src');
+
+		//给每个匹配的<img>元素打包, 即添加父元素<a>
+		$(this).wrap('<a data-fancybox href=" ' + videoPath + ' "> </a>');
+	});
+	//TODO：支持html5 video
+
+	if($('#layout-post').length) {
+		$('[data-fancybox="gallery"]').fancybox({
+			loop: true,
+			buttons: [
+				"zoom",
+				"share",
+				"slideShow",
+				"fullScreen",
+				//"download",
+				"thumbs",
+				"close"
+			],
+			protect: false
+		});
+	}
+</script>
+		</main>
+
+		<!--footer-->
+		<footer>
+	<div class="social">
+		<ul>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-github"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-weibo"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-pinterest"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-instagram"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-twitter"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="/atom.xml" target="_blank">
+				<i class="fa fa-rss"></i>
+			</a>
+		</li>
+			
+</ul>
+
+	</div>
+		
+	<div class="copyright">
+		<p>
+			 
+				&copy;2019 - 2020, content by qh meng. All Rights Reserved.
+			
+			
+			
+
+	<!-- busuanzi -->
+	<!-- busuanzi -->
+
+		
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	
+
+		<span id="busuanzi_container_page_pv">
+	  		本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+		</span>
+
+	
+
+
+
+
+		</p>
+		<p>
+			<a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> Theme <a href="https://github.com/Sariay/hexo-theme-Annie" title="Annie" target="_blank" rel="noopener">Annie</a> by Sariay.
+			<a href="javascript:zh_tran('s');" class="zh_click" id="zh_click_s">简体</a> 
+			<a href="javascript:zh_tran('t');" class="zh_click" id="zh_click_t">繁體</a>				
+		</p>
+	</div>		
+</footer>
+		
+	<!-- set '1' to show motto in all pages! -->
+
+	
+<script src="/plugin/motto/motto.js"></script>
+
+	
+	<script type="text/javascript">
+		$(".motto").html( getMingYanContent() );
+	</script>	
+
+
+
+
+	<!--
+	时间：2018-10-3
+	描述：
+		插件名称：hexo-generator-search-zip
+		插件来源: https://github.com/SuperKieran/hexo-generator-search-zip
+		代码参考：https://github.com/SuperKieran/TKL/blob/master/layout/_partial/search.ejs(Include: js & css)	
+-->
+<div class="popup search-popup local-search-popup" >
+	<div class="local-search-container">
+		<span class="popup-btn-close">
+      		ESC
+   		</span>
+		<div class="local-search-header">
+			<div class="input-prompt">				
+			</div>
+			<input autocomplete="off" placeholder="Search..." type="text" id="local-search-input">
+		</div>
+		<div class="local-search-body">
+			<div id="local-search-output"></div>
+		</div>
+		<div class="local-search-footer">
+			<div class="topN-post">				
+				
+
+   
+	<div id="topN">
+		<div class="topN-title" data-title= "热门文章"></div> 
+	</div>
+	
+    <script>
+        var appid = 'dX--',
+            appkey = 'dX--',
+            limitCount = 10;
+        if( $('#topN').length ){
+            AV.initialize(appid, appkey);
+            var Counter = AV.Object.extend("Counter");  
+            topNPost(Counter, limitCount);
+        }
+    </script>
+   
+								
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="/plugin/search/ziploader.js"></script>
+<script src="/plugin/search/search.js"></script>
+
+
+<script type="text/javascript">
+	var search_path = 'search.json',
+		zip_Path = '/search.zip',
+		version_Path = '/searchVersion.txt',
+		input_Trigger = 'auto',
+		top_N = '2';
+
+	themeLocalSearch({
+		search_path, 
+		zip_Path, 
+		version_Path, 
+		input_Trigger, 
+		top_N
+	});
+</script>
+
+
+<!-- love effect -->
+
+	
+<script src="/plugin/love/love.js"></script>
+
+
+
+<!-- back to top -->
+
+	
+	<div id="totop">
+  		<a href="javascript:;"  name="TOTOP" class="fa fa-arrow-up" ></a>
+	</div>
+
+
+
+
+<!-- site analysis -->
+
+
+	<!-- site-analysis -->
+	
+	
+	
+	
+	
+ 
+
+
+<script src="/plugin/vibrant/vibrant.js"></script>
+<script src="/plugin/chinese/chinese.js"></script>
+<script src="/plugin/imgLazyLoader/yall.min.js"></script>
+<script src="/plugin/imgResize/jquery.resizeimagetoparent.min.js"></script>
+<script src="/plugin/nicescroll/jquery.nicescroll.js"></script>
+<script src="/js/resizediv.js"></script>
+<script src="/js/main.js"></script>
+
+	</body>	
+</html>

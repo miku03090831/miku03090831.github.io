@@ -1,0 +1,1177 @@
+<!--
+	作者：Sariay
+	时间：2018-09-25
+	描述：There may be a bug, but don't worry, QiLing(器灵) says that it can work normally!
+-->
+<!DOCTYPE html>
+<html class="html-loading">
+		
+
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <title>
+    
+      PAT 1147 &amp; 1155 Heaps &amp; Heap Paths | moe&#39;s blog
+    
+  </title>
+  <meta name="author" content="qh meng">
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+	<!-- favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+
+  <!-- css -->
+  
+<link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/css/Annie.css">
+
+  
+  <!-- jquery -->
+	
+<script src="/js/jquery.min.js"></script>
+
+
+  <!-- leancloud -->
+  
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+<script src="/js/leancloud.js"></script>
+
+<meta name="generator" content="Hexo 5.0.0"></head>
+	<body>
+		<!-- Preloader -->
+
+	<div id="preloader">
+		<div class="pre-container">
+			
+				<div class="spinner">
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
+				</div>
+						
+		</div>
+	</div>
+
+
+<!-- header -->
+<header class="fixbackground" data-img-mode="random" data-normal-src="/img/1.jpg" data-random-max="110" data-random-src="https://sariay.github.io/Random-img/">
+	<div class="mask">
+		<!-- Logo and navigation -->
+		<div class="h-header">
+			<div id="logo">
+				<a href="/">
+						
+						<img src="/img/logo.png" alt="Logo">
+					
+				</a>
+			</div>
+			
+			<div id="navigation-show">
+				<ul>
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home">主页</a>
+		</li>
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive">归档</a>
+		</li>
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories">分类</a>
+		</li>
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags">标签</a>
+		</li>
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about">关于</a>
+		</li>
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery">相册</a>
+		</li>
+	
+
+	
+		<li class="menu-search">
+			<a href="javascript:;" class="popup-trigger">搜索</a>
+		</li>
+	
+</ul>
+			</div>				
+		</div>
+
+		<!-- motto -->
+		<div class="h-body">	
+			
+				<p class="motto"></p>
+			
+		</div>
+		
+		<!-- others: such as time... -->			
+		<div class="h-footer">
+			<a href="javascript:;" id="read-more"><i class="fa fa-angle-double-down" aria-hidden="true"></i>
+			</a>
+
+			
+				<!-- 
+	This is only a demo, please go to "https://time.is" to set your city time! 
+-->
+<style type="text/css">
+	.header-date {
+		font-size: 1.6rem;
+		color: #fff;
+		position: absolute;
+		bottom: 5px;
+		right: 1rem;
+		writing-mode: tb-rl;
+	}	
+	
+	.header-date a {
+		border-bottom: none;
+	}
+
+	@media only screen and (max-width: 768 ) {
+		.header-date {
+			font-size: 1rem;
+		}			
+	}
+</style>
+<div class="header-date">
+	<a target="_blank" href="https://time.is/Beijing" id="time_is_link" rel="nofollow noopener" ></a>
+	<span id="Beijing_z43d"></span>
+</div>
+<script src="//widget.time.is/zh.js"></script>
+<script>
+	time_is_widget.init({
+		Beijing_z43d:{
+			template:"DATE", 
+			date_format:"year年 monthname dnum日"
+		}
+	});
+</script>
+			
+		</div>
+	</div>
+</header>
+
+<div id="navigation-hide">
+	<!-- Progress bar -->
+	<div id="progress-bar"></div>
+
+	<!-- Progress percent -->
+	<div id="progress-percentage"><h1>0.0%</h1></div>
+
+	<div class="toc-switch"><span class="switch-button">目录</span></div>
+
+	<!-- Page title -->
+	<p>
+		
+			当前文章&nbsp;:&nbsp;《PAT 1147 &amp; 1155 Heaps &amp; Heap Paths》
+		
+	</p>
+
+	<!-- Nav trigger for navigation-H-->
+	<a class="nav-trigger"><span></span></a>
+</div>
+
+<!-- Navigation in div(id="navigation-H") -->
+<nav class="nav-container" id="cd-nav">
+	<div class="nav-header">
+		<h3>Navigation</h3>
+		<a href="javascript:;" class="nav-close"></a>
+	</div>
+	<div class="nav-body">
+		<ul>
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home">主页</a>
+		</li>
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive">归档</a>
+		</li>
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories">分类</a>
+		</li>
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags">标签</a>
+		</li>
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about">关于</a>
+		</li>
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery">相册</a>
+		</li>
+	
+
+	
+		<li class="menu-search">
+			<a href="javascript:;" class="popup-trigger">搜索</a>
+		</li>
+	
+</ul>
+	</div>
+	<div class="nav-footer">
+		<ul>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-github"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-weibo"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-pinterest"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-instagram"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-twitter"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="/atom.xml" target="_blank">
+				<i class="fa fa-rss"></i>
+			</a>
+		</li>
+			
+</ul>
+
+	</div>
+</nav>
+			
+		<!--main-->
+		<main>
+			<!--
+	时间：2018-11-17
+	描述：
+		插件名称：katelog.min.js
+		插件作者：KELEN
+		插件来源: https://github.com/KELEN/katelog
+-->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
+	 
+
+<div class="layout-post">
+	<div id="layout-post">
+	<div class="article-title">
+		<i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+		
+	<a href="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" itemprop="url">
+		PAT 1147 &amp; 1155 Heaps &amp; Heap Paths
+	</a>
+
+	</div>
+
+	<div class="article-meta">
+		<span>
+			<i class="fa fa-calendar"></i>
+			
+
+
+	发布于
+
+	<a href="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" itemprop="url">
+		<time datetime="2019-11-15T11:29:20.000Z" itemprop="datePublished">
+	  		2019-11-15
+	  </time>
+	</a>
+	&nbsp;
+
+
+
+
+
+			
+
+
+
+
+	更新于
+
+	<a href="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" itemprop="url">
+		<time datetime="2019-11-15T11:29:20.000Z" itemprop="dateUpdated">
+	  		2019-11-15
+	  </time>
+	</a> 
+
+
+
+		</span>
+		<span>
+			<i class="fa fa-tags"></i>
+			
+	
+		<a href="/tags/data-structures-and-algorithms/" class=" ">
+			data structures and algorithms
+		</a>
+	
+		
+		</span>
+		
+		
+
+	
+    <span class="leancloud_visitors" id="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/_visitors" data-url="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" data-title="PAT 1147 & 1155 Heaps & Heap Paths">
+       	<i class="fa fa-eye"></i>
+       	热度
+        <i class="leancloud_visitors_count" id="leancloud_visitors_count">0</i>
+    </span>
+    
+
+
+
+	
+    <span class="leancloud_likes" id="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/_likes" data-url="/2019/11/15/PAT-1147-1155-Heaps-Heap-Paths/" data-title="PAT 1147 & 1155 Heaps & Heap Paths" rel="unlike">
+        <i class="fa fa-heart"></i>
+        喜欢
+        <i class="leancloud_likes_count" id="leancloud_likes_count">0</i>
+    </span>
+
+	</div>
+
+	<div class="article-content" id="article-content">
+		<blockquote>
+<p>上次发的关于堆的题有些简单了。这次来点稍微有点意思的题目，这两道题目很是相似，不过倒是没有用到什么堆的特别操作，只是用了堆（数组）的形式去储存数据，用dfs（深度优先搜索）算法，去遍历堆，然后判断这是最大堆还是最小堆。</p>
+</blockquote>
+<h1 id="1155-Heap-Paths"><a href="#1155-Heap-Paths" class="headerlink" title="1155 Heap Paths"></a>1155 Heap Paths</h1><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>Your job is to check every path in a given complete binary tree, in order to tell if it is a heap or not.</p>
+<h3 id="Input-Specification"><a href="#Input-Specification" class="headerlink" title="Input Specification:"></a>Input Specification:</h3><p>Each input file contains one test case. For each case, the first line gives a positive integer <em>N</em> (1&lt;<em>N</em>≤1,000), the number of keys in the tree. Then the next line contains <em>N</em> distinct integer keys (all in the range of <strong>int</strong>), which gives the level order traversal sequence of a complete binary tree.</p>
+<h3 id="Output-Specification"><a href="#Output-Specification" class="headerlink" title="Output Specification:"></a>Output Specification:</h3><p>For each given tree, first print all the paths from the root to the leaves. Each path occupies a line, with all the numbers separated by a space, and no extra space at the beginning or the end of the line. The paths must be printed in the following order: for each node in the tree, all the paths in its right subtree must be printed before those in its left subtree.</p>
+<p>Finally print in a line <code>Max Heap</code> if it is a max heap, or <code>Min Heap</code> for a min heap, or <code>Not Heap</code> if it is not a heap at all.</p>
+<h3 id="Sample-Input-1"><a href="#Sample-Input-1" class="headerlink" title="Sample Input 1:"></a>Sample Input 1:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">8</span><br><span class="line">98 72 86 60 65 12 23 50</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Output-1"><a href="#Sample-Output-1" class="headerlink" title="Sample Output 1:"></a>Sample Output 1:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">98 86 23</span><br><span class="line">98 86 12</span><br><span class="line">98 72 65</span><br><span class="line">98 72 60 50</span><br><span class="line">Max Heap</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Input-2"><a href="#Sample-Input-2" class="headerlink" title="Sample Input 2:"></a>Sample Input 2:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">8</span><br><span class="line">8 38 25 58 52 82 70 60</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Output-2"><a href="#Sample-Output-2" class="headerlink" title="Sample Output 2:"></a>Sample Output 2:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">8 25 70</span><br><span class="line">8 25 82</span><br><span class="line">8 38 52</span><br><span class="line">8 38 58 60</span><br><span class="line">Min Heap</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Input-3"><a href="#Sample-Input-3" class="headerlink" title="Sample Input 3:"></a>Sample Input 3:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">8</span><br><span class="line">10 28 15 12 34 9 8 56</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Output-3"><a href="#Sample-Output-3" class="headerlink" title="Sample Output 3:"></a>Sample Output 3:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">10 15 8</span><br><span class="line">10 15 9</span><br><span class="line">10 28 34</span><br><span class="line">10 28 12 56</span><br><span class="line">Not Heap</span><br></pre></td></tr></table></figure>
+
+<h2 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h2><p>其实还挺简单的一道题，就如题目所说，题目的输入是完全二叉树的层序遍历，层序遍历和用数组表示完全二叉树是等同的。所以接下来的任务就是走遍完全二叉树的每一条path（当然是借助数组实现），然后看看是不是符合最大/最小堆的要求（父节点永远比子节点大/小）。</p>
+<p>所以问题的核心就在于解决，如何按照path去遍历树。这里我们用的是深度优先搜索的方法（也叫回溯法），即沿着一条路走到尽头，然后回到前一步的岔路口，并且走另一条路。</p>
+<p>深搜基本上是靠递归实现的。下面的代码也没有那么复杂，相信理解起来不会太困难</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">heap</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> Elements[<span class="number">1001</span>];</span><br><span class="line">    <span class="keyword">int</span> Size;</span><br><span class="line">&#125;H;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PrintPath</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> a, <span class="keyword">int</span> dep)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">CheckHeap</span><span class="params">(<span class="keyword">int</span> *p,<span class="keyword">int</span> dep)</span><span class="comment">//return 1 if minheap,-1 if maxheap,otherwise 0</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//这里我思考过如何判断一个数组是不是递增（减）的</span></span><br><span class="line">    <span class="comment">//我先比较前两个元素（题目保证至少有两个输入），然后记录增减性。后面一旦出现不一致的情况，</span></span><br><span class="line">    <span class="comment">//那它就既不是最大堆也不是最小堆</span></span><br><span class="line">    <span class="keyword">int</span> i,flag;</span><br><span class="line">    <span class="keyword">if</span>(p[<span class="number">1</span>]&gt;p[<span class="number">0</span>])</span><br><span class="line">        flag=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        flag=<span class="number">-1</span>;<span class="comment">//这里题目里说了不考虑相等的情况</span></span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">1</span>;i+<span class="number">1</span>&lt;dep;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(flag==<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(p[i+<span class="number">1</span>]&lt;p[i])</span><br><span class="line">            &#123;</span><br><span class="line">                flag=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(flag==<span class="number">-1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(p[i+<span class="number">1</span>]&gt;p[i])</span><br><span class="line">            &#123;</span><br><span class="line">                flag=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> flag;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">int</span> F=<span class="number">-2</span>;<span class="comment">//作为一个全局变量，来看看各条路径是不是增减性一致（最大/小堆要求每条路径的增减性都一致）</span></span><br><span class="line"><span class="comment">//-2代表F没被赋值，-1代表最大堆，0代表什么也不是，1代表最小堆</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n, i, path[<span class="number">1000</span>];</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    H.Size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;H.Elements[++H.Size]);</span><br><span class="line">    &#125;</span><br><span class="line">    PrintPath(path, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span>(F==<span class="number">1</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Min Heap&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(F==<span class="number">-1</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Max Heap&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Not Heap&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//下面是一个深度优先搜索函数，其中dep用来记录搜索到第几层了</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PrintPath</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> a, <span class="keyword">int</span> dep)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (a &gt; H.Size)<span class="comment">//说明此时已经遍历完一条路径了</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//打印路径</span></span><br><span class="line">        <span class="comment">//并且判断是否是堆</span></span><br><span class="line">        <span class="keyword">int</span> i,flag;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; dep; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">0</span>)</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%d&quot;</span>, p[i]);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot; %d&quot;</span>, p[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        flag=CheckHeap(p,dep);<span class="comment">//看一下这条路径的增减性</span></span><br><span class="line">        <span class="keyword">if</span>(F==<span class="number">-2</span>)<span class="comment">//这是第一条路径，直接赋值给F</span></span><br><span class="line">            F=flag;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(F!=flag)<span class="comment">//这不是第一条路径，要和之前的路径对比一下</span></span><br><span class="line">            F=<span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span><span class="comment">//尚未遍历完一整条路径，还需要继续深入</span></span><br><span class="line">    &#123;</span><br><span class="line">        p[dep] = H.Elements[a];</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">2</span> * a + <span class="number">1</span> &lt;= H.Size)<span class="comment">//加这个条件是为了避免一条路径被输出两遍（因为下标超了的时候就会打印路径）</span></span><br><span class="line">            PrintPath(p, <span class="number">2</span> * a + <span class="number">1</span>, dep + <span class="number">1</span>);<span class="comment">//继续走右岔路</span></span><br><span class="line">        PrintPath(p, <span class="number">2</span> * a, dep + <span class="number">1</span>);<span class="comment">//右岔路走完了回到这里，然后走左岔路</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>其实这道题与其说是关于堆的，不如说是关于dfs的一道题。由于担心没有接触过dfs的读者看不懂，所以我加了很多的注释。关于dfs的理解，其实只要画画图，自己跟着程序走一遍，就好理解多了。</p>
+<p>那接下来看下一道题</p>
+<h1 id="1147-Heaps"><a href="#1147-Heaps" class="headerlink" title="1147 Heaps"></a>1147 Heaps</h1><h2 id="题目-1"><a href="#题目-1" class="headerlink" title="题目"></a>题目</h2><p>Your job is to tell if a given complete binary tree is a heap.</p>
+<h3 id="Input-Specification-1"><a href="#Input-Specification-1" class="headerlink" title="Input Specification:"></a>Input Specification:</h3><p>Each input file contains one test case. For each case, the first line gives two positive integers: M (≤ 100), the number of trees to be tested; and N (1 &lt; N ≤ 1,000), the number of keys in each tree, respectively. Then M lines follow, each contains N distinct integer keys (all in the range of <strong>int</strong>), which gives the level order traversal sequence of a complete binary tree.</p>
+<h3 id="Output-Specification-1"><a href="#Output-Specification-1" class="headerlink" title="Output Specification:"></a>Output Specification:</h3><p>For each given tree, print in a line <code>Max Heap</code> if it is a max heap, or <code>Min Heap</code> for a min heap, or <code>Not Heap</code> if it is not a heap at all. Then in the next line print the tree’s postorder traversal sequence. All the numbers are separated by a space, and there must no extra space at the beginning or the end of the line.</p>
+<h3 id="Sample-Input"><a href="#Sample-Input" class="headerlink" title="Sample Input:"></a>Sample Input:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">3 8</span><br><span class="line">98 72 86 60 65 12 23 50</span><br><span class="line">8 38 25 58 52 82 70 60</span><br><span class="line">10 28 15 12 34 9 8 56</span><br></pre></td></tr></table></figure>
+
+<h3 id="Sample-Output"><a href="#Sample-Output" class="headerlink" title="Sample Output:"></a>Sample Output:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Max Heap</span><br><span class="line">50 60 65 72 12 23 86 98</span><br><span class="line">Min Heap</span><br><span class="line">60 58 52 38 82 70 25 8</span><br><span class="line">Not Heap</span><br><span class="line">56 12 34 28 9 8 15 10</span><br></pre></td></tr></table></figure>
+
+<h2 id="题目分析-1"><a href="#题目分析-1" class="headerlink" title="题目分析"></a>题目分析</h2><p>其实和上一道题差别不大，这道题的每一次输出就是完成了一次上道题的内容。所以我把这两道题放到一期里，也是希望能够加深理解。依旧是通过深度优先搜索，按照路径遍历堆，然后做出判断</p>
+<p>不多BB，和上一道题这么像，直接上代码</p>
+<h2 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">HeapStruct</span> <span class="title">heap</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">HeapStruct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> Elements[<span class="number">1001</span>];</span><br><span class="line">    <span class="keyword">int</span> Size;</span><br><span class="line">&#125;H;</span><br><span class="line"><span class="keyword">int</span> F, PrintFlag;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BuildPath</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> a, <span class="keyword">int</span> dep)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">CheckHeap</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> dep)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PostOrder</span><span class="params">(<span class="keyword">int</span> idnex)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> m, n, i, j;</span><br><span class="line">    <span class="keyword">int</span> path[<span class="number">1000</span>];</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>, &amp;m, &amp;n);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; m; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        H.Size = <span class="number">0</span>;</span><br><span class="line">        F = <span class="number">-2</span>;</span><br><span class="line">        PrintFlag = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; n; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;H.Elements[++H.Size]);</span><br><span class="line">        &#125;</span><br><span class="line">        BuildPath(path, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (F == <span class="number">1</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Min Heap\n&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (F == <span class="number">-1</span>)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Max Heap\n&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Not Heap\n&quot;</span>);</span><br><span class="line">        PostOrder(<span class="number">1</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">BuildPath</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> a, <span class="keyword">int</span> dep)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (a &gt; H.Size)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//走完了一条路径</span></span><br><span class="line">        <span class="comment">//判断递增还是递减</span></span><br><span class="line">        <span class="keyword">int</span> flag = CheckHeap(p, dep);</span><br><span class="line">        <span class="comment">//F=1，minheap；</span></span><br><span class="line">        <span class="comment">//F=0,not heap;</span></span><br><span class="line">        <span class="comment">//F=-1,maxheap;</span></span><br><span class="line">        <span class="keyword">if</span> (F == <span class="number">-2</span>)</span><br><span class="line">            F = flag;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (F != flag)</span><br><span class="line">        &#123;</span><br><span class="line">            F = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        p[dep] = H.Elements[a];</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">2</span> * a + <span class="number">1</span> &lt;= H.Size)</span><br><span class="line">            BuildPath(p, <span class="number">2</span> * a + <span class="number">1</span>, dep + <span class="number">1</span>);</span><br><span class="line">        BuildPath(p, <span class="number">2</span> * a, dep + <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">CheckHeap</span><span class="params">(<span class="keyword">int</span> *p, <span class="keyword">int</span> dep)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> flag, i;</span><br><span class="line">    <span class="keyword">if</span> (p[<span class="number">1</span>] &gt; p[<span class="number">0</span>])<span class="comment">//minheap</span></span><br><span class="line">        flag = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        flag = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i + <span class="number">1</span> &lt; dep; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (flag == <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (p[i + <span class="number">1</span>] &lt; p[i])</span><br><span class="line">            &#123;</span><br><span class="line">                flag = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (p[i + <span class="number">1</span>] &gt; p[i])</span><br><span class="line">            &#123;</span><br><span class="line">                flag = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> flag;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PostOrder</span><span class="params">(<span class="keyword">int</span> index)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &lt;= H.Size)</span><br><span class="line">    &#123;</span><br><span class="line">        PostOrder(<span class="number">2</span> * index);</span><br><span class="line">        PostOrder(<span class="number">2</span> * index + <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (PrintFlag == <span class="number">0</span>)</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%d&quot;</span>, H.Elements[index]);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot; %d&quot;</span>, H.Elements[index]);</span><br><span class="line">        PrintFlag = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h2><p>由于和上一道题实在过于相似，我就没额外再添加注释，只是把自己当时ac时候的代码连着当时写的注释贴过来了。</p>
+<p>知识点上唯一的差别就是这道题还用到了后序遍历，这个我寻思着应该不难吧。。。不会的话建议先去csdn学习一下，也不难。。。</p>
+	
+	</div>
+	
+	<div id="current-post-cover" data-scr="/img/%E9%A3%8E%E6%99%AF%E5%9B%BE.jpg"></div>
+
+	<!-- relate post, comment...-->
+	<div class="investment-container">
+		<div class="investment-header">
+			<div class="investment-title-1">
+				<div class="on">相关文章</div>
+				<div>评论</div>
+				<div>分享</div>
+			</div>
+			<div class="investment-title-2">	            
+				
+	<span>
+		<a href="javascript: window.scrollTo(0, 0);">返回顶部</a>
+		
+			<a href="/2020/01/31/%E6%89%8B%E5%86%99%E7%AE%80%E5%8D%95%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2-html-css/" title="手写简单登录界面 html+css" rel="prev">
+				&laquo;上一篇
+			</a>
+		
+		
+			<a href="/2019/11/13/%E5%A0%86%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/" title="堆中的路径" rel="next">
+				下一篇&raquo;
+			</a>
+			
+	</span>
+
+
+      		
+			</div>	
+		</div>
+		
+		<div class="investment-content">
+			<div class="investment-content-list">
+				
+
+<div class="relate-post">
+	
+		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/03/06/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E6%8C%87%E9%92%88%E4%B8%8E%E6%95%B0%E7%BB%84%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BA%86%E8%A7%A3/" title="c语言中指针与数组的进一步了解">
+								c语言中指针与数组的进一步了解			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								三月 6日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+万万没想到大二下学期了，面向对象这门课上老师竟然一上来又给我们讲指针。更想不到的是大二下学期了，我对指针的认识还是不够深刻。这篇博客就是在我完成了这门课第二节课的两道作业后的思考。
+
+1.数组名与指针的关系我们都知道，数组名的值即是...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/03/06/c%E8%AF%AD%E8%A8%80%E4%B8%AD%E6%8C%87%E9%92%88%E4%B8%8E%E6%95%B0%E7%BB%84%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BA%86%E8%A7%A3/" title="c语言中指针与数组的进一步了解">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="c语言中指针与数组的进一步了解"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/02/15/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9Fhttp%E8%AF%B7%E6%B1%82/" title="使用telnet模拟http请求">
+								使用telnet模拟http请求			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								二月 15日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+去年双11的时候，趁着书打折，几乎是半价入了几本好书。现在想起来看。这几天在看《计算机网络-自顶向下方法》。这本书的讲解非常细致，并且鼓励动手实践。我在看到http报文的时候，按照书上说的试着用telnet模拟了一个请求报文，不过中...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/02/15/%E4%BD%BF%E7%94%A8telnet%E6%A8%A1%E6%8B%9Fhttp%E8%AF%B7%E6%B1%82/" title="使用telnet模拟http请求">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="使用telnet模拟http请求"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2020/01/31/%E6%89%8B%E5%86%99%E7%AE%80%E5%8D%95%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2-html-css/" title="手写简单登录界面 html+css">
+								手写简单登录界面 html+css			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								一月 31日, 2020				
+							</p>
+							<p class="relate-post-content">
+								
+好长时间没更博客了。。。差点忘了怎么更。。。
+觉得有必要更一下证明我还活着（虽然平时博客也没什么人看。。。）
+主要还是这学期是状态不太好吧，有点忙不过来的感觉。尤其是临近期末那一段时间真的感觉人要没了
+现在觉得写一写网页这样的也挺有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2020/01/31/%E6%89%8B%E5%86%99%E7%AE%80%E5%8D%95%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2-html-css/" title="手写简单登录界面 html+css">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/background.jpg" alt="手写简单登录界面 html+css"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/11/13/%E5%A0%86%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/" title="堆中的路径">
+								堆中的路径			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十一月 13日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+好久没更。。。主要之前不知道写啥，写课外的东西暂时是不太可能了，没什么精力。之前ds的作业也不敢发到博客上来，怕被查重。所以就在pta上面随便找了些题，有些题可能比较简单，就当练手了。
+有些难的作业题花了挺长时间的，可惜不能发上来。...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/11/13/%E5%A0%86%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84/" title="堆中的路径">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/备选封面.jpg" alt="堆中的路径"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/06/IP%E7%BD%91%E9%99%85%E5%8D%8F%E8%AE%AE/" title="IP网际协议">
+								IP网际协议			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 6日, 2019				
+							</p>
+							<p class="relate-post-content">
+								背景：TCP/IP协议定义了在因特网上传输的包，称为IP数据报
+IP协议TCP/IP模型中，位于网络层的协议，是整个协议族的核心。所有的TCP，UDP以及ICMP等数据都一IP数据报的格式传输。IP协议提供的数据报传输服务的特点是：不...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/06/IP%E7%BD%91%E9%99%85%E5%8D%8F%E8%AE%AE/" title="IP网际协议">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="IP网际协议"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/06/TCP-IP%E9%93%BE%E8%B7%AF%E5%B1%82/" title="TCP/IP链路层">
+								TCP/IP链路层			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 6日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+本来想今天去把数逻的软件下了的。。结果网速有点慢，所以就先不务正业一会
+上篇把TCP/IP四层模型整体上说完了，那这回来看看四层当中的最底层，链路层（也就是上一篇里面提到的网际接口层）
+另注明，本系列文章为本人在实验楼学习的笔记，课...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/06/TCP-IP%E9%93%BE%E8%B7%AF%E5%B1%82/" title="TCP/IP链路层">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="TCP/IP链路层"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/10/05/TCP-IP%E6%A8%A1%E5%9E%8B-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" title="TCP/IP模型 基本知识">
+								TCP/IP模型 基本知识			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								十月 5日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+咳咳，上次刚说过多更新数据结构与算法类的博客，但是在把作业题又复习了一遍之后还是闲不下来，于是上网找资源，打算了解一下TCP/IP方面的知识
+上个学期学了一门课，叫无线网络应用，通识课，上课讲的东西很硬核，可惜课程考核很水。。。不得...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/10/05/TCP-IP%E6%A8%A1%E5%9E%8B-%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" title="TCP/IP模型 基本知识">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="TCP/IP模型 基本知识"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" title="通过base64编码，向markdown中插入图片">
+								通过base64编码，向markdown中插入图片			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								九月 21日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+前言：开学了比较烦躁。。。更新频率大概率会显著降低，而且内容应该也会偏向算法为主，毕竟这学期要学。不过很烦的一点就是好像还不太能直接把作业的代码发上来，被别人抄袭的话我也会被判作弊。。。懒得吐槽这规则了
+然后这个插入图片的方法是我某...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/09/21/%E9%80%9A%E8%BF%87base64%E7%BC%96%E7%A0%81%EF%BC%8C%E5%90%91markdown%E4%B8%AD%E6%8F%92%E5%85%A5%E5%9B%BE%E7%89%87/" title="通过base64编码，向markdown中插入图片">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="通过base64编码，向markdown中插入图片"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/09/05/%E5%BB%BA%E7%AB%99%E5%8E%86%E7%A8%8B%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%9B%B4%E6%8D%A2%E4%B8%80%E4%B8%AA%E5%A5%BD%E7%9C%8B%E7%9A%84%E4%B8%BB%E9%A2%98/" title="建站历程(三)——更换一个好看的主题">
+								建站历程(三)——更换一个好看的主题			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								九月 5日, 2019				
+							</p>
+							<p class="relate-post-content">
+								
+唔建站历程系列欠了好久的第三期，也是暂时的最后一期（之后可能换电脑的话会加一期博客迁移）。这一期主要是如何更换主题的。偷个懒，简书上有位作者简要介绍了下如何更换主题，并且我跟他都用的是Annie主题，所以就直接转载了。
+
+本位转载自...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/09/05/%E5%BB%BA%E7%AB%99%E5%8E%86%E7%A8%8B%EF%BC%88%E4%B8%89%EF%BC%89%E2%80%94%E2%80%94%E6%9B%B4%E6%8D%A2%E4%B8%80%E4%B8%AA%E5%A5%BD%E7%9C%8B%E7%9A%84%E4%B8%BB%E9%A2%98/" title="建站历程(三)——更换一个好看的主题">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/cart_cover.jpg" alt="建站历程(三)——更换一个好看的主题"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2019/08/31/%E5%88%9D%E8%AF%86python%E7%9A%84GUI%E5%BA%93PyQt5/" title="初识python的GUI库PyQt5，记一些踩过的坑">
+								初识python的GUI库PyQt5，记一些踩过的坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 31日, 2019				
+							</p>
+							<p class="relate-post-content">
+								简短总结本文内容：我费了好大劲终于配好了PyQt5的环境，然后试着跑了几段代码，能用了！此处打算放个目录（因为前面废话有点多）
+学习了一段时间的python，也想试着去做一点东西了。一般来讲做一个小项目的话也总离不开图形界面的开发（也...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2019/08/31/%E5%88%9D%E8%AF%86python%E7%9A%84GUI%E5%BA%93PyQt5/" title="初识python的GUI库PyQt5，记一些踩过的坑">				
+								
+								<img class="lazy" src="/img/placeholder.jpg" data-src="/img/qt.png" alt="初识python的GUI库PyQt5，记一些踩过的坑"/>
+							</a>
+						</div>
+					</li>											
+			
+			
+		</ul>
+	
+</div>	
+			</div>
+			<div class="investment-content-list">
+				<div class="layout-comment">
+
+	
+
+		
+
+			<!-- gitalk comment -->
+			<!-- show gitalk comment -->
+<div id="gitalk-container"></div>
+
+<!-- gitalk`s css & js -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<link rel="stylesheet" href="/css/comment.css">
+<script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script type="text/javascript">
+	//Thanks O-R
+	//https://github.com/gitalk/gitalk/issues/102#issuecomment-382970552
+	//去除尾部匹配正则数组的字符串  
+	//Remove redundant characters
+	String.prototype.trimEnd = function(regStr) {
+		var result = this;
+		if(regStr == undefined || regStr == null || regStr == "") {
+			return result;
+		}
+		var array = regStr.split(',');
+
+		if(array.length > 0) {
+
+			var c = array.shift();
+			var str = this;
+			var i = str.length;
+			var rg = new RegExp(c);
+			var matchArr = str.match(rg);
+
+			if(matchArr != undefined && matchArr != null && matchArr.length > 0) {
+				var matchStr = matchArr[0].replace(/\\/g, "\\\\").replace(/\*/g, "\\*")
+					.replace(/\+/g, "\\+").replace(/\|/g, "\\|")
+					.replace(/\{/g, "\\{").replace(/\}/g, "\\}")
+					.replace(/\(/g, "\\(").replace(/\)/g, "\\)")
+					.replace(/\^/g, "\\^").replace(/\$/g, "\\$")
+					.replace(/\[/g, "\\[").replace(/\]/g, "\\]")
+					.replace(/\?/g, "\\?").replace(/\,/g, "\\,")
+					.replace(/\./g, "\\.").replace(/\&/g, "\\&");
+				matchStr = matchStr + '$';
+				result = str.replace(new RegExp(matchStr), "");
+			}
+
+			if(array.length > 0) {
+				return result.trimEnd(array.join())
+			} else {
+				return result;
+			}
+		}
+	};
+
+	//Create gitalk
+	var gitalk = new Gitalk({
+		clientID: '1cfceb2c83579f6c4709',
+		clientSecret: '4ac0cd088155f29d5d6f3ea2817cd1ac7b1d5995',
+		//id: window.location.pathname,
+		//id: decodeURI(window.location.pathname),
+		//id: (window.location.pathname).split("/").pop().substring(0, 49),
+		id: decodeURI( md5( location.href.trimEnd('#.*$,\\?.*$,index.html$') ) ),
+		repo: 'Blog-Comment-Repo',
+		owner: 'miku03090831',
+		admin: 'miku03090831',
+		distractionFreeMode: 'true',
+	})
+	gitalk.render('gitalk-container');
+</script>
+
+		
+		
+	
+
+</div>
+			</div>
+			<div class="investment-content-list">
+				<div class="layout-share">
+	
+	
+
+		
+			
+			<!-- socialShare share -->
+			<div class="social-share"></div>
+
+<!--  css & js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+			
+		
+		
+	
+</div>
+
+
+			</div>
+		</div>	
+	</div>
+	</div>
+</div>
+
+
+
+	<!-- leancloud -->
+	<!--
+	时间：2018-11-27
+	描述：
+		文章访问量：visitors
+		文章喜欢量：likes	
+		文章排行榜：topNPost
+		其他得说明：
+			01-Cookie相关的函数 
+				https://blog.csdn.net/somehow1002/article/details/78511541（Author：somehow1002）
+			02-visitors相关的函数 
+				https://blog.csdn.net/u013553529/article/details/63357382（Author：爱博客大伯）
+				https://notes.doublemine.me/2015-10-21-为NexT主题添加文章阅读量统计功能.html（Author：夏末）
+			03-topNPost相关的函数
+				https://hoxis.github.io/hexo-next-read-rank.html（Author：hoxis）
+			04-likes相关的函数，
+				参考了01 & 02进行简单的设计与实现
+-->
+
+
+
+	<script>
+		var appid = 'dX--',
+            appkey = 'dX--';	  
+        AnnieLeancloud(appid, appkey);         
+	</script>
+    
+
+	
+
+
+<!-- show math formula -->
+
+
+
+	 
+	
+<script src="/plugin/clipboard/clipboard.js"></script>
+
+	<script>
+		// Copy code !
+	    function codePreprocessing() {
+	        $("#article-content .highlight").each(function() {
+
+	            $(this).wrap('<div id="post-code"></div>');
+
+	        })
+
+	        $("#article-content #post-code").each(function() {
+
+	            $(this).prepend('<nav class="copy-nav"><span><i class="code-language"></i></span></nav>');
+
+	        })
+
+	        $("#article-content .copy-nav").each(function() {
+	            var temp = $(this).next().attr('class'),
+	                language = ((temp.length > 9) && (temp != null)) ? temp.substr(10) : "none"; //why 9? Need to check language?
+
+	            $(this).find('.code-language').text(language);
+
+	            $(this).append('<span class="copy-btn"><i class="fa fa-copy" aria-hidden="true"></i></span>');
+
+	        });
+	    }
+
+		function codeCopy() {
+		    $('#article-content #post-code').each(function(i) {
+		        var codeCopyId = 'codeCopy-' + i;
+
+		        var codeNode = $(this).find('.code'),
+		            copyButton = $(this).find('.copy-btn');
+
+		        codeNode.attr('id', codeCopyId);
+		        copyButton.attr('data-clipboard-target-id', codeCopyId);
+		    })
+
+		    
+			var clipboard = new ClipboardJS('.copy-btn', {
+					target: function(trigger) {
+						return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+					}
+		      	});
+
+			//pure js
+			function showTooltip(elem, msg) {		   
+				elem.setAttribute('aria-label', msg);
+				elem.setAttribute('class', 'copy-btn copy-status');
+				setTimeout(function() {
+					elem.setAttribute('class', 'copy-btn');
+				}, 2000);
+			}
+
+			clipboard.on('success', function(e) {
+			    e.clearSelection();
+			    console.info('Action:', e.action);		   
+			    console.info('Trigger:', e.trigger);
+			    showTooltip(e.trigger, 'Copied!');
+			    
+			});
+			clipboard.on('error', function(e) {
+			    console.error('Action:', e.action);
+			    console.error('Trigger:', e.trigger);
+			});
+		
+
+		}
+
+		if ($('.layout-post').length) {
+		    codePreprocessing();
+		    codeCopy();
+		} 
+	</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/plugin/fancybox/jquery.fancybox.css">
+
+
+<script src="/plugin/fancybox/jquery.fancybox.js"></script>
+
+
+<script type="text/javascript">
+	var titleID = $('.article-title a'),
+		imageID = $('.article-content img'),
+		videoID = $('.article-content video');
+
+	var postTitle = titleID.text() ? titleID.text() : "No post title!";
+
+	imageID.each(function() {
+		var imgPath = $(this).attr('src'),
+			imgTitle = $(this).attr('alt') ? $(this).attr('alt') : "No image description!";
+
+		//给每个匹配的<img>元素打包, 即添加父元素<a>
+		$(this).wrap('<a data-fancybox="gallery" data-caption=" 《 ' + postTitle + ' 》 ' + imgTitle + ' "  href=" ' + imgPath + ' "> </a>');
+	});
+
+	videoID.each(function() {
+		var videoPath = $(this).attr('src');
+
+		//给每个匹配的<img>元素打包, 即添加父元素<a>
+		$(this).wrap('<a data-fancybox href=" ' + videoPath + ' "> </a>');
+	});
+	//TODO：支持html5 video
+
+	if($('#layout-post').length) {
+		$('[data-fancybox="gallery"]').fancybox({
+			loop: true,
+			buttons: [
+				"zoom",
+				"share",
+				"slideShow",
+				"fullScreen",
+				//"download",
+				"thumbs",
+				"close"
+			],
+			protect: false
+		});
+	}
+</script>
+		</main>
+
+		<!--footer-->
+		<footer>
+	<div class="social">
+		<ul>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-github"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-weibo"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-pinterest"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-instagram"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<i class="fa fa-twitter"></i>
+			</a>
+		</li>
+	
+		<li>
+			<a href="/atom.xml" target="_blank">
+				<i class="fa fa-rss"></i>
+			</a>
+		</li>
+			
+</ul>
+
+	</div>
+		
+	<div class="copyright">
+		<p>
+			 
+				&copy;2019 - 2020, content by qh meng. All Rights Reserved.
+			
+			
+			
+
+	<!-- busuanzi -->
+	<!-- busuanzi -->
+
+		
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	
+
+		<span id="busuanzi_container_page_pv">
+	  		本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+		</span>
+
+	
+
+
+
+
+		</p>
+		<p>
+			<a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> Theme <a href="https://github.com/Sariay/hexo-theme-Annie" title="Annie" target="_blank" rel="noopener">Annie</a> by Sariay.
+			<a href="javascript:zh_tran('s');" class="zh_click" id="zh_click_s">简体</a> 
+			<a href="javascript:zh_tran('t');" class="zh_click" id="zh_click_t">繁體</a>				
+		</p>
+	</div>		
+</footer>
+		
+	<!-- set '1' to show motto in all pages! -->
+
+	
+<script src="/plugin/motto/motto.js"></script>
+
+	
+	<script type="text/javascript">
+		$(".motto").html( getMingYanContent() );
+	</script>	
+
+
+
+
+	<!--
+	时间：2018-10-3
+	描述：
+		插件名称：hexo-generator-search-zip
+		插件来源: https://github.com/SuperKieran/hexo-generator-search-zip
+		代码参考：https://github.com/SuperKieran/TKL/blob/master/layout/_partial/search.ejs(Include: js & css)	
+-->
+<div class="popup search-popup local-search-popup" >
+	<div class="local-search-container">
+		<span class="popup-btn-close">
+      		ESC
+   		</span>
+		<div class="local-search-header">
+			<div class="input-prompt">				
+			</div>
+			<input autocomplete="off" placeholder="Search..." type="text" id="local-search-input">
+		</div>
+		<div class="local-search-body">
+			<div id="local-search-output"></div>
+		</div>
+		<div class="local-search-footer">
+			<div class="topN-post">				
+				
+
+   
+	<div id="topN">
+		<div class="topN-title" data-title= "热门文章"></div> 
+	</div>
+	
+    <script>
+        var appid = 'dX--',
+            appkey = 'dX--',
+            limitCount = 10;
+        if( $('#topN').length ){
+            AV.initialize(appid, appkey);
+            var Counter = AV.Object.extend("Counter");  
+            topNPost(Counter, limitCount);
+        }
+    </script>
+   
+								
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="/plugin/search/ziploader.js"></script>
+<script src="/plugin/search/search.js"></script>
+
+
+<script type="text/javascript">
+	var search_path = 'search.json',
+		zip_Path = '/search.zip',
+		version_Path = '/searchVersion.txt',
+		input_Trigger = 'auto',
+		top_N = '2';
+
+	themeLocalSearch({
+		search_path, 
+		zip_Path, 
+		version_Path, 
+		input_Trigger, 
+		top_N
+	});
+</script>
+
+
+<!-- love effect -->
+
+	
+<script src="/plugin/love/love.js"></script>
+
+
+
+<!-- back to top -->
+
+	
+	<div id="totop">
+  		<a href="javascript:;"  name="TOTOP" class="fa fa-arrow-up" ></a>
+	</div>
+
+
+
+
+<!-- site analysis -->
+
+
+	<!-- site-analysis -->
+	
+	
+	
+	
+	
+ 
+
+
+<script src="/plugin/vibrant/vibrant.js"></script>
+<script src="/plugin/chinese/chinese.js"></script>
+<script src="/plugin/imgLazyLoader/yall.min.js"></script>
+<script src="/plugin/imgResize/jquery.resizeimagetoparent.min.js"></script>
+<script src="/plugin/nicescroll/jquery.nicescroll.js"></script>
+<script src="/js/resizediv.js"></script>
+<script src="/js/main.js"></script>
+
+	</body>	
+</html>
