@@ -223,6 +223,19 @@
 		插件作者：KELEN
 		插件来源: https://github.com/KELEN/katelog
 -->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
 	 
 
 <div class="layout-post">
@@ -248,7 +261,7 @@
 
 	<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" itemprop="url">
 		<time datetime="2022-08-07T16:25:33.000Z" itemprop="dateUpdated">
-	  		2022-08-08
+	  		2022-08-14
 	  </time>
 	</a> 
 
@@ -278,11 +291,16 @@
 </blockquote>
 <p>​		之前我没有完整使用react开发一个项目的经验，这次是我第一次使用，不过我对于react的写法也算比较熟悉了，之前完成公司的需求的时候也学到了不少。不过公司的组件基本都是类组件，而我开发的项目都是用的函数组件。函数组件比类组件简洁太多，而且react hooks使用起来也非常爽。具体的细节以后有机会再写吧，本来是打算做完项目之后好好总结一下的，结果之前做项目太累了，周末好好放松了一下，就没啥时间去记录了。简单做个笔记吧。</p>
 <ol>
-<li>react的数据绑定是单向的，只有model层影响view层（即页面会随着model层数据的变化，而重新渲染）。但是view层的数据变化，却不会自动改变model层的数据。这和vue是不同的。<br>举个例子就是，input框处理用户的输入，react需要监听onchange事件，然后获取用户的输入，将输入内容赋值给model层的变量，这个方向的数据流动是要自己去实现的。而vue只需要一个v-model的api，就可以将变量和用户的输入实现双向绑定，用户输入，变量自动改变，不需要自己去操作</li>
-<li>react的state：state就是状态，就是react会去监听的变量。当某个组件的state发生变化时，组件就会重新渲染（其他重新渲染的时机是，props变化，或者父组件重新渲染）。也就是说，一个变量是直接被定义，还是被当做state定义，区别就在于它是否需要被监听，用于重新渲染组件。如果它改变了，但是页面不需要重新渲染，那么他就不用被作为state定义。</li>
-<li>说到了state，原本是只有类组件有的。函数组件本来是无状态组件，但是为了让他能和类组件做到一样的事情，react后面加入了hooks，使得函数组件的功能和类组件一样完备。函数组件的state采用useState定义，返回一个数组，分别是变量和改变变量的方法。特别建议，当state的变量是数组或对象时，改变变量不要直接改变数组或对象元素，而是借助扩展操作符，重新创建一个数组或对象。</li>
-<li>useEffect：这其实是我一开始特别难以理解的一个点。包括我之前是用vue的，面试前背响应式原理，vue3的什么effect看得我云里雾里的，然后react这个hooks的useEffect我看文档也不是很明白。但是后来实际使用就明白了，所谓的effect就是你要去干一件事。就比如，useEffect就是用来，当某个条件到来的时候，你要去做一件事。比如，查询的参数变了，你要去重新向后端查询结果。useEffect的第一个参数是一个函数，就是你要做的那件事。第二个参数是一个数组，里面放着你要监听的变量，如果没有这个参数，则每次组件重新渲染，都会执行这个effect。如果这个参数为空数组，则只在组件第一次挂载的时候执行一次effect。通常情况下，是参数包含的变量发生改变时，effect被执行。</li>
-<li>关于组件间状态共享：最基本的父子组件可以使用props，复杂一点的可以使用redux（后面有空再说吧，公司项目里有用到）。而还有一种方法是context，它可以跨越层级，使得状态不用通过props一层一层的传下去，而是相对于传入context的组件，它的所有子组件都能直接共享状态。</li>
+<li><h2 id="react的数据绑定是单向的"><a href="#react的数据绑定是单向的" class="headerlink" title="react的数据绑定是单向的"></a>react的数据绑定是单向的</h2><p>只有model层影响view层（即页面会随着model层数据的变化，而重新渲染）。但是view层的数据变化，却不会自动改变model层的数据。这和vue是不同的。<br>举个例子就是，input框处理用户的输入，react需要监听onchange事件，然后获取用户的输入，将输入内容赋值给model层的变量，这个方向的数据流动是要自己去实现的。而vue只需要一个v-model的api，就可以将变量和用户的输入实现双向绑定，用户输入，变量自动改变，不需要自己去操作</p>
+</li>
+<li><h2 id="react的state："><a href="#react的state：" class="headerlink" title="react的state："></a>react的state：</h2><p>state就是状态，就是react会去监听的变量。当某个组件的state发生变化时，组件就会重新渲染（其他重新渲染的时机是，props变化，或者父组件重新渲染）。也就是说，一个变量是直接被定义，还是被当做state定义，区别就在于它是否需要被监听，用于重新渲染组件。如果它改变了，但是页面不需要重新渲染，那么他就不用被作为state定义。</p>
+</li>
+<li><h2 id="useState："><a href="#useState：" class="headerlink" title="useState："></a>useState：</h2><p>说到了state，原本是只有类组件有的。函数组件本来是无状态组件，但是为了让他能和类组件做到一样的事情，react后面加入了hooks，使得函数组件的功能和类组件一样完备。函数组件的state采用useState定义，返回一个数组，分别是变量和改变变量的方法。特别建议，当state的变量是数组或对象时，改变变量不要直接改变数组或对象元素，而是借助扩展操作符，重新创建一个数组或对象。</p>
+</li>
+<li><h2 id="useEffect："><a href="#useEffect：" class="headerlink" title="useEffect："></a>useEffect：</h2><p>这其实是我一开始特别难以理解的一个点。包括我之前是用vue的，面试前背响应式原理，vue3的什么effect看得我云里雾里的，然后react这个hooks的useEffect我看文档也不是很明白。但是后来实际使用就明白了，所谓的effect就是你要去干一件事。就比如，useEffect就是用来，当某个条件到来的时候，你要去做一件事。比如，查询的参数变了，你要去重新向后端查询结果。useEffect的第一个参数是一个函数，就是你要做的那件事。第二个参数是一个数组，里面放着你要监听的变量，如果没有这个参数，则每次组件重新渲染，都会执行这个effect。如果这个参数为空数组，则只在组件第一次挂载的时候执行一次effect。通常情况下，是参数包含的变量发生改变时，effect被执行。</p>
+</li>
+<li><h2 id="关于组件间状态共享："><a href="#关于组件间状态共享：" class="headerlink" title="关于组件间状态共享："></a>关于组件间状态共享：</h2><p>最基本的父子组件可以使用props，复杂一点的可以使用redux（后面有空再说吧，公司项目里有用到）。而还有一种方法是context，它可以跨越层级，使得状态不用通过props一层一层的传下去，而是相对于传入context的组件，它的所有子组件都能直接共享状态。</p>
+</li>
 </ol>
 	
 		</div>
@@ -301,6 +319,10 @@
 					
 	<span>
 		<a id="totop-post-page">返回顶部</a>
+		
+			<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑" rel="prev">
+				&laquo;上一篇
+			</a>
 		
 		
 			<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释" rel="next">
@@ -321,6 +343,31 @@
 <div class="relate-post">
 	
 		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">
+								react的一些坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 14日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+记录一些刚写react踩过的坑吧，想到多少就写多少
+
+从一个工作中的需求开始有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="react的一些坑"/>
+							</a>
+						</div>
+					</li>												
 			
 					<li>
 						<div class="relate-post-text">
