@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      react的一些坑 | moe&#39;s blog
+      css踩坑之子元素margin-top影响父元素 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「react的一些坑」
+			「css踩坑之子元素margin-top影响父元素」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" itemprop="url">
-		react的一些坑
+	<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" itemprop="url">
+		css踩坑之子元素margin-top影响父元素
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" itemprop="url">
-		<time datetime="2022-08-14T14:14:19.000Z" itemprop="dateUpdated">
-	  		2022-08-16
+	<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" itemprop="url">
+		<time datetime="2022-08-21T16:17:42.000Z" itemprop="dateUpdated">
+	  		2022-08-22
 	  </time>
 	</a> 
 
@@ -272,8 +272,12 @@
 				
 	<i class="icon-price-tags"></i>
 	
-		<a href="/tags/react/" class=" ">
-			react
+		<a href="/tags/css/" class=" ">
+			css
+		</a>
+	
+		<a href="/tags/%E5%A4%96%E8%BE%B9%E8%B7%9D%E5%90%88%E5%B9%B6/" class=" ">
+			外边距合并
 		</a>
 	
 		
@@ -287,15 +291,16 @@
 
 		<div class="article-content" id="article-content">
 			<blockquote>
-<p>记录一些刚写react踩过的坑吧，想到多少就写多少</p>
+<p>因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑</p>
 </blockquote>
-<h2 id="从一个工作中的需求开始"><a href="#从一个工作中的需求开始" class="headerlink" title="从一个工作中的需求开始"></a>从一个工作中的需求开始</h2><p>有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有些奇怪的操作使得弹窗没关掉。实现的方法就是监听点击事件呗，然后判断点击的是哪，如果弹窗是打开的，并且点击的地方不在弹窗里，就把弹窗关掉。</p>
-<p>具体代码我直接CSDN找了一个，好用的。通过createref来获取dom，对document使用addEventListener，监听点击的event.target，判断和弹窗dom的关系就可以了。本来是个挺简单的事，但是我用了之后发现，本来那个打开弹窗的按钮也不好用了。后来发现，因为那个按钮也是弹窗之外，所以弹窗打开就马上关闭了。一开始没想到事件捕获和冒泡，我想当然地以为，应该先触发document的点击事件，这个时候弹窗没出现，所以无事发生，然后再触发按钮的点击事件，打开弹窗。这和实际的结果并不相符。</p>
-<p>我调试的时候发现，点击按钮后总是先打开弹窗，再触发document的点击事件，把弹窗关上。我当时想的解决办法是，把点击按钮的onClick外面包一层setTimeout，延迟0。将打开按钮的操作改成了异步事件，根据事件循环机制，异步会在同步代码执行完毕一轮之后，再去执行，这样就保证了打开弹窗的操作，一定在判断点击位置然后关闭弹窗之后。这样就能正常打开弹窗了。</p>
-<h2 id="其他的解决方法"><a href="#其他的解决方法" class="headerlink" title="其他的解决方法"></a>其他的解决方法</h2><p>后来我下班之后，又继续研究这个问题，这时候才想明白，之前两个点击事件的执行顺序不对，是因为事件的捕获和冒泡机制。原来onClick和addEventListener默认都是冒泡，所以执行顺序就是先最低层级的dom元素，最后是document，就出问题了。然而addEventListener的第三个参数改成true，就变成捕获阶段了，这样就对了。然后我就想，写个简单的demo来验证一下。</p>
-<h2 id="问题并不简单"><a href="#问题并不简单" class="headerlink" title="问题并不简单"></a>问题并不简单</h2><p>然后就出问题了，我用vite脚手架建了个基本的react demo，然后用函数式组件，直接在函数体内部（没有使用useEffect）完成了对document添加点击响应事件的操作，然后我发现，怎么每回一点击屏幕，都会触发两次点击事件。我寻思为啥会触发两次呢？我顿时就想到，有可能是添加了两个点击响应事件。如果像我这样直接在函数体内部，不使用useEffect把addEventListener添加到一个元素上，然后组件重新渲染，函数重新执行，就会对一个事件添加多个响应函数。当然本身或者子组件除外，因为重新渲染的时候点击事件也没了。</p>
-<h2 id="函数式编程与副作用"><a href="#函数式编程与副作用" class="headerlink" title="函数式编程与副作用"></a>函数式编程与副作用</h2><p>但是我这显然是没有重新渲染的，一个连state都没有的根组件咋可能会去重新渲染。但是我通过chrome的api，getEventListeners查看，发现确实有2个eventListener。然后我试着加了个state，然后改变state，发现eventListener变成4个了，再改变state，变成6个了。这更加说明了每次组件重新渲染的时候，都渲染了两次。后来我去查了一些，发现是react18的严格模式下，开发环境的时候，组件的渲染会执行两遍，就是为了让开发者发现不应该出现的副作用。就比如我的这个添加eventListener应该写在useEffect内部，并且通过useEffect的return，清除副作用。这也给我提了个醒。</p>
-<p>函数式组件写起来很方便，很简便。但是和类组件不同，类组件重新渲染只会重新执行render函数，而函数式组件是通篇执行。所以函数式组件更要注意副作用，一定要写在useEffect里面，并且做好清除工作，比如remove响应事件。然后我感觉，我对函数式编程和副作用的理解还有待加强。只能说这一个小需求，让我收获了很多。虽然后来mentor跟我说这种不影响整体功能的需求没必要花时间，但是我认为这次我的尝试，还是让我对react有了更深一步的了解。</p>
+<h2 id="一个简单的答案和解决办法"><a href="#一个简单的答案和解决办法" class="headerlink" title="一个简单的答案和解决办法"></a>一个简单的答案和解决办法</h2><p>前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待的是父元素能够顶到最上面，然后子元素在父元素内部，和父元素的顶部保持一个100px的距离。但是结果是，子元素的顶和父元素的顶贴在了一起，然后父元素没有顶到最上面，反而被挤下来了100px的距离。</p>
+<p>上网了解了一下之后，知道了解决方案是给父元素设置padding-top或者border-top，这样就能达到预期了。</p>
+<p>然后我又深入了解了一下，原来是涉及到外边距合并的知识。当两个垂直方向的外边距相遇时会发生合并，二者不会相加，而是合并成二者的较大值（可以理解为两个外边距重叠了）。这个其实我之前就知道，不过之前我知道的情境是兄弟元素之间的外边距合并，上面的margin-bottom和下面的margin-top会合并。但是我才知道，原来父子元素的margin-top也会合并。</p>
+<p>而给父元素加伤padding-top和border-top就不会合并，是因为两个垂直外边距中间被border或者padding隔开，因此不会合并。</p>
+<h2 id="更进一步探究"><a href="#更进一步探究" class="headerlink" title="更进一步探究"></a>更进一步探究</h2><p>而好奇的我不会在此停下，既然说的是合并成二者中的较大值，那如果有一方是负外边距怎么办？负外边距是不是相当于永远不起作用了？</p>
+<p>然后我又找啊找，同时自己也试啊试，最终发现了一篇讲的很好的文章<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/30110209">图解 外边距合并、负外边距</a>，也能解释我实验的结果</p>
+<p>结论就是：当要合并的外边距都为正时，取二者最大值。当一正一负时，正的和负的相抵消，最后为正就是正多少，为负就是负多少。当两个负外边距时，会取绝对值较大的负外边距，作为二者重合多少的标准。</p>
+<p>当然，这种情况几乎没有什么用，我觉得也很少会有同时用到负外边距和外边距合并的情况，这么布局多少沾点魔鬼了，平时应该合理使用padding和margin，尽量让布局更加简明易懂</p>
 	
 		</div>
 		
@@ -314,12 +319,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想" rel="next">
+			<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -360,6 +361,31 @@ react不是魔法
 							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">
+								react的一些坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 14日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+记录一些刚写react踩过的坑吧，想到多少就写多少
+
+从一个工作中的需求开始有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="react的一些坑"/>
 							</a>
 						</div>
 					</li>												
@@ -409,31 +435,6 @@ serverless: 字面意思是“无服务器”，即开发者（开发公司）�
 							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">
-								css踩坑之子元素margin-top影响父元素			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 22日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑
-
-一个简单的答案和解决办法前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
 							</a>
 						</div>
 					</li>												
