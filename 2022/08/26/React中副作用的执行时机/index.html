@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      test-post | moe&#39;s blog
+      React中副作用的执行时机 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「test-post」
+			「React中副作用的执行时机」
 		
 	</p>
 
@@ -223,14 +223,27 @@
 		插件作者：KELEN
 		插件来源: https://github.com/KELEN/katelog
 -->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
 	 
 
 <div class="layout-post">
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		test-post
+	<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" itemprop="url">
+		React中副作用的执行时机
 	</a>
 
 		</div>
@@ -246,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		<time datetime="2022-07-24T09:29:59.000Z" itemprop="dateUpdated">
-	  		2022-07-24
+	<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" itemprop="url">
+		<time datetime="2022-08-25T16:07:10.000Z" itemprop="dateUpdated">
+	  		2022-08-26
 	  </time>
 	</a> 
 
@@ -256,7 +269,14 @@
 
 			</span>
 			<span>
-						
+				
+	<i class="icon-price-tags"></i>
+	
+		<a href="/tags/react/" class=" ">
+			react
+		</a>
+	
+		
 			</span>
 			
 			
@@ -266,7 +286,27 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-				
+			<h2 id="为什么一定要useEffect"><a href="#为什么一定要useEffect" class="headerlink" title="为什么一定要useEffect?"></a>为什么一定要useEffect?</h2><p>之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重新执行，为什么一定要放在useEffect里面？</p>
+<p>太长不看：为了不阻塞界面。（不过好像react18的新特性，useEffect也会阻塞了）</p>
+<h2 id="useEffect在界面绘制完毕后执行"><a href="#useEffect在界面绘制完毕后执行" class="headerlink" title="useEffect在界面绘制完毕后执行"></a>useEffect在界面绘制完毕后执行</h2><p>后来我偶然看到一句话，意思是说useEffect里面的副作用，是在渲染完毕之后才执行的。那问题又来了啊，我如果要在useEffect里面去改state咋办，那你渲染完了我再改state，那不是又要重新渲染？为啥不在渲染之前执行呢？</p>
+<p>这就涉及到react渲染机制的问题了。我们可以简单地把react的渲染分成两个阶段：render和commit。其中render就是创造vnode（也就是执行类组件的render方法，或者执行函数组件的函数体，去得到vnode），并且比较新旧vnode（其实是vnode转化的fiber tree）的过程。而commit就是将改动提交，将vnode转成真实dom，并且将真实dom绘制出来的过程，涉及到了浏览器的重排。</p>
+<p>而为了不阻塞界面的渲染（用户感觉界面卡顿），useEffect就被放到了界面渲染完毕后执行，至少在react16中是这样的。不过这样就会导致前面提到的问题，在useEffect中修改state，会导致连续两次的渲染（浏览器两次重新绘制），可能出现闪屏的情况，因为第一次渲染的结果可能刚出现，就要被第二次渲染的结果替代掉。</p>
+<p>如果有这种情况，或者需要在useEffect中获取最新dom信息，可以使用useLayoutEffect这个hook，这个hook和useEffect的唯一区别就是，useLayoutEffect是同步执行的。它的执行是在，得到真实dom之后	绘制到浏览器上之前。等到useLayoutEffect执行完毕之后，浏览器才开始绘制。并且如果执行useLayoutEffect的时候更改了state，浏览器会中止第一次绘制，直接去等第二次绘制的结果。我们用下面的代码，结合视频中界面的变化和控制台的输出，来更好地理解。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">App</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> [value, setValue] = <span class="title function_">useState</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> start = performance.<span class="title function_">now</span>();</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;坐牢开始&quot;</span>, start);</span><br><span class="line">  <span class="keyword">while</span> (performance.<span class="title function_">now</span>() - start &lt; <span class="number">2000</span>) &#123;&#125;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;坐牢结束&quot;</span>, performance.<span class="title function_">now</span>());</span><br><span class="line">  <span class="title function_">useLayoutEffect</span>(<span class="function">()=&gt;</span>&#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;执行useLayoutEffect&quot;</span>,performance.<span class="title function_">now</span>())</span><br><span class="line">    <span class="keyword">const</span> start = performance.<span class="title function_">now</span>();</span><br><span class="line">    <span class="keyword">while</span> (performance.<span class="title function_">now</span>() - start &lt; <span class="number">2000</span>) &#123;&#125;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;useLayoutEffect执行完毕&quot;</span>,performance.<span class="title function_">now</span>())</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="title function_">useEffect</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;执行useEffect&quot;</span>, performance.<span class="title function_">now</span>());</span><br><span class="line">    <span class="keyword">if</span> (value === <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> start = performance.<span class="title function_">now</span>();</span><br><span class="line">      <span class="keyword">while</span> (performance.<span class="title function_">now</span>() - start &lt; <span class="number">2000</span>) &#123;&#125;</span><br><span class="line">      <span class="title function_">setValue</span>(<span class="number">10</span> + <span class="title class_">Math</span>.<span class="title function_">random</span>() * <span class="number">200</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;useEffect执行完毕&quot;</span>)</span><br><span class="line">  &#125;, [value]);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;&gt;</span>&#123;console.log(&#x27;执行render&#x27;, performance.now())&#125;<span class="tag">&lt;/&gt;</span></span></span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">onClick</span>=<span class="string">&#123;()</span> =&gt;</span> setValue(0)&#125;&gt;value: &#123;value&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    &lt;/&gt;</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><video width="800" height="600"><source src="./React中副作用的执行时机/react16.mp4"><video></p>
+<p>代码的逻辑是，每次点击，都先将value设为0，再将value设为一个随机值。value的两次变化会导致界面被渲染两次。我们通过插入多个2秒的无条件循环，来拉长整个过程。我们可以发现，当useLayoutEffect执行完毕的时候，界面立刻发生了变化，之后才执行useEffect。也就是说，useEffect确实是发生在界面完全渲染之后的。</p>
+<h2 id="React18的新特性"><a href="#React18的新特性" class="headerlink" title="React18的新特性"></a>React18的新特性</h2><p>然而事情并没有这么简单。React18的新特性，疑似将useEffect的执行时机也提到了渲染之前。如下面视频所示，同样的一段代码在React18中有着完全不同的表现。</p>
+<p><video width="800" height="600"><source src="./React中副作用的执行时机/react18.mp4"><video></p>
+<p>我们发现，在useEffect执行完毕之前，界面都没有任何变化。说明useEffect也阻塞了界面的渲染。不过和useLayoutEffect不同的是，useEffect虽然阻塞了渲染，却并不会因为更改了state，让浏览器中止第一次绘制，我们还是能看到中间value为0的状态。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>React16中，渲染流程的执行顺序是，</p>
+<p>函数组件函数体-&gt;useLayoutEffect（可阻塞并打断绘制）&gt;浏览器绘制-&gt;useEffect</p>
+<p>React18中，渲染流程的执行顺序是，</p>
+<p>函数组件函数体-&gt;useLayoutEffect（可阻塞并打断绘制）-&gt;useEffect（可阻塞，但不能打断绘制）-&gt;浏览器绘制</p>
+<p>以上为React初学者对React的自行探究，如果错误还望指出</p>
+	
 		</div>
 		
 		<div id="current-post-cover" data-scr="/img/cart_cover.jpg"></div>
@@ -284,10 +324,10 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释" rel="prev">
-				&laquo;上一篇
-			</a>
 		
+			<a href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" title="useEffect和useLayoutEffect执行的时机" rel="next">
+				下一篇&raquo;
+			</a>
 			
 	</span>
 
@@ -303,28 +343,6 @@
 <div class="relate-post">
 	
 		<ul>
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
-								React中副作用的执行时机			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 26日, 2022				
-							</p>
-							<p class="relate-post-content">
-								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
-							</a>
-						</div>
-					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -344,31 +362,6 @@
 							<a href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" title="useEffect和useLayoutEffect执行的时机">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="useEffect和useLayoutEffect执行的时机"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">
-								css踩坑之子元素margin-top影响父元素			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 22日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑
-
-一个简单的答案和解决办法前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
 							</a>
 						</div>
 					</li>												
@@ -449,6 +442,31 @@ react不是魔法
 			
 					<li>
 						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">
+								css踩坑之子元素margin-top影响父元素			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 22日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑
+
+一个简单的答案和解决办法前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
 							<a class="relate-post-title" href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">
 								一些部署相关的名词解释			
 							</a>
@@ -469,6 +487,28 @@ serverless: 字面意思是“无服务器”，即开发者（开发公司）�
 							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/07/24/test-post/" title="test-post">
+								test-post			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 24日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/07/24/test-post/" title="test-post">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="test-post"/>
 							</a>
 						</div>
 					</li>												

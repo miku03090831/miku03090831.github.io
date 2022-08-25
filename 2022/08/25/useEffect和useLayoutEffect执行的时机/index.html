@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      test-post | moe&#39;s blog
+      useEffect和useLayoutEffect执行的时机 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「test-post」
+			「useEffect和useLayoutEffect执行的时机」
 		
 	</p>
 
@@ -229,8 +229,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		test-post
+	<a href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" itemprop="url">
+		useEffect和useLayoutEffect执行的时机
 	</a>
 
 		</div>
@@ -246,9 +246,9 @@
 
 	更新于
 
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		<time datetime="2022-07-24T09:29:59.000Z" itemprop="dateUpdated">
-	  		2022-07-24
+	<a href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" itemprop="url">
+		<time datetime="2022-08-24T17:15:40.000Z" itemprop="dateUpdated">
+	  		2022-08-25
 	  </time>
 	</a> 
 
@@ -256,7 +256,14 @@
 
 			</span>
 			<span>
-						
+				
+	<i class="icon-price-tags"></i>
+	
+		<a href="/tags/react/" class=" ">
+			react
+		</a>
+	
+		
 			</span>
 			
 			
@@ -266,7 +273,11 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-				
+			<p>之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我之前的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍，useEffect内的方法在依赖有变动时也会执行一遍。我不禁想，如果一个副作用，组件每次渲染都需要重新执行，并且还不需要清除，那放不放进useEffect里面有啥区别啊？</p>
+<p>后来我偶然看到一句话，意思是说useEffect里面的副作用，是在渲染完毕之后才执行的。那问题又来了啊，你渲染完毕之后才useEffect，可是我经常要在useEffect里面去改state啊，那你渲染完了我再改state，那不是又要重新渲染？为啥不在渲染（指函数组件return）之前执行呢？</p>
+<p>这就涉及到react渲染机制的问题了。我们可以简单地把react的渲染分成两个阶段：render和commit。其中render就是创造vnode，并且比较新旧vnode（其实是vnode转化的fiber tree）的过程，而commit就是将改动提交，去绘制dom的过程。</p>
+<p>而useEffect，相对于绘制dom是异步执行的，会在绘制结束之后，再去执行。而不写在useEffect内的副作用，则是在render之前就执行了。那么为啥useEffect</p>
+	
 		</div>
 		
 		<div id="current-post-cover" data-scr="/img/cart_cover.jpg"></div>
@@ -284,10 +295,14 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释" rel="prev">
+			<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机" rel="prev">
 				&laquo;上一篇
 			</a>
 		
+		
+			<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素" rel="next">
+				下一篇&raquo;
+			</a>
 			
 	</span>
 
@@ -322,53 +337,6 @@
 							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" title="useEffect和useLayoutEffect执行的时机">
-								useEffect和useLayoutEffect执行的时机			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 25日, 2022				
-							</p>
-							<p class="relate-post-content">
-								之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我之前的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍，useEffect内的方法在依赖有变动时也会执行一遍。我不禁想，如果一个...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/25/useEffect%E5%92%8CuseLayoutEffect%E6%89%A7%E8%A1%8C%E7%9A%84%E6%97%B6%E6%9C%BA/" title="useEffect和useLayoutEffect执行的时机">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="useEffect和useLayoutEffect执行的时机"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">
-								css踩坑之子元素margin-top影响父元素			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 22日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑
-
-一个简单的答案和解决办法前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
 							</a>
 						</div>
 					</li>												
@@ -449,6 +417,31 @@ react不是魔法
 			
 					<li>
 						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">
+								css踩坑之子元素margin-top影响父元素			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 22日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+因为css的知识比较琐碎，所以特地记录一下工作中踩过的坑
+
+一个简单的答案和解决办法前两天在工作中踩了个坑，给一个子元素设置了100px的margin-top，然后父元素没有设置border-top和padding-top，原本期待...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
 							<a class="relate-post-title" href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">
 								一些部署相关的名词解释			
 							</a>
@@ -469,6 +462,28 @@ serverless: 字面意思是“无服务器”，即开发者（开发公司）�
 							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/07/24/test-post/" title="test-post">
+								test-post			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 24日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/07/24/test-post/" title="test-post">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="test-post"/>
 							</a>
 						</div>
 					</li>												
