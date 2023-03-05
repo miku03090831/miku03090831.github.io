@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      一些部署相关的名词解释 | moe&#39;s blog
+      发布一个npm包的踩坑 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「一些部署相关的名词解释」
+			「发布一个npm包的踩坑」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" itemprop="url">
-		一些部署相关的名词解释
+	<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" itemprop="url">
+		发布一个npm包的踩坑
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" itemprop="url">
-		<time datetime="2022-07-24T10:25:59.000Z" itemprop="dateUpdated">
-	  		2022-07-24
+	<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" itemprop="url">
+		<time datetime="2023-03-05T17:13:49.000Z" itemprop="dateUpdated">
+	  		2023-03-06
 	  </time>
 	</a> 
 
@@ -272,16 +272,12 @@
 				
 	<i class="icon-price-tags"></i>
 	
-		<a href="/tags/%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" class=" ">
-			名词解释
+		<a href="/tags/%E5%89%8D%E7%AB%AF/" class=" ">
+			前端
 		</a>
 	
-		<a href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" class=" ">
-			项目部署
-		</a>
-	
-		<a href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" class=" ">
-			软件工程
+		<a href="/tags/npm%E5%8C%85/" class=" ">
+			npm包
 		</a>
 	
 		
@@ -294,16 +290,16 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-			<blockquote>
-<p>毕业刚入职，看到公司的各种发布，部署平台，眼花缭乱，看文档的过程中也看到了很多不懂的名词，了解了之后做一下记录</p>
-</blockquote>
-<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><ol>
-<li>serverless: 字面意思是“无服务器”，即开发者（开发公司）不用自己的机房服务器，采用云服务器厂商提供的云服务器</li>
-<li>PaaS：platform as a service，平台即服务，指提供一个软件部署平台，用户使用平台部署软件时，无需关心部署的硬件和底层细节，只需关注业务逻辑</li>
-<li>金丝雀发布：也叫灰度发布。意思是发布新版本时，通过对流量分流，先让一小部分用户能用到新版本（可理解为抢先体验），等到没有大问题之后再推广到全体用户。这和过去下矿时先用金丝雀来检验矿井下面是否有毒气体超标的行为相似，因此得名。</li>
-<li>微服务：一个整体架构的的应用程序，可能包含了很多功能。举个简单例子，一个图书馆的借书系统，要管理借书卡（比如新增或修改一个账号，查询一个账号借的书），要管理图书（比如借书，还书，增加库存）。这么一个简单的系统，功能不复杂，采用整体架构没问题。但是当一个系统功能多起来，开发和维护的人员肯定也要多。如果这时还采用整体架构，当各个功能都有改动，要发新版本的时候，会很痛苦。微服务就是把系统按照功能拆分开来，使得拆分出的部分互相解耦，每个部分就是一个微服务，例如单独拆出来个微服务管理借书卡，单独拆出来个部分管理图书。这两部分可以通过RESTful API等方式进行通信，但是一个部分做出改动时，不会影响另一个部分的正常使用。这就是微服务</li>
-<li>BFF层：Backend for Frontend，服务于前端的后端。由于微服务的拆分，或者多端（PC，移动等等）需要从后端返回的数据并不一致，使得前端在请求后端的接口时，通常要做聚合（把多个接口返回的数据组合起来）或裁减（对接口返回的数据做过滤，只用到一部分）。为了解决这个麻烦，BFF就相当于一个中间层，代替前端去请求后端的接口，并且对数据做聚合和裁剪等等，然后将直接可用的数据返回给前端，同时还能起到屏蔽后端修改的作用（当后端的接口做出什么改动时，BFF层做出修改，使得前端无需做出改动）</li>
-</ol>
+			<p>试着自己发布了一个npm包，记录一下自己踩的坑</p>
+<h2 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h2><p>首先npm init，然后添加type:module字段，将其定义为一个es6模块。然后在files字段设置要发布上去的内容，比如dist文件夹。</p>
+<p>接下来将开发用到的依赖添加到devDependencies里面去，比如react，和打包工具等等。这样当我们的包被引入时，就只会引进来我们的包，而不会把我们的依赖也一起安装下来。</p>
+<h2 id="rollup设置"><a href="#rollup设置" class="headerlink" title="rollup设置"></a>rollup设置</h2><p>我们使用rollup来打包。常用的打包工具中rollup比较简洁，适合库的打包。我们在项目根目录添加rollup.config.js来配置打包参数。output中我们根据format的不同，分别打包到dist下的cjs和esm目录，</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">output<span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span> </span><br><span class="line">      file<span class="punctuation">:</span> <span class="string">&quot;dist/cjs/index.js&quot;</span><span class="punctuation">,</span> </span><br><span class="line">      format<span class="punctuation">:</span> <span class="string">&quot;cjs&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">      file<span class="punctuation">:</span> <span class="string">&quot;dist/esm/index.js&quot;</span><span class="punctuation">,</span></span><br><span class="line">      format<span class="punctuation">:</span> <span class="string">&quot;esm&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">]</span><span class="punctuation">,</span></span><br></pre></td></tr></table></figure>
+
+<p>然后为了支持ts，我们添加插件rollup-plugin-typescript2。</p>
+<p>之后我们将rollup打包命令添加到package.json的build命令下。</p>
+<p>然后因为我们的组件里依赖了react，为了避免将react也打进来，我们需要再添加externals字段，将react添加到其中。</p>
+<p>之后我们执行npm publish就可以了。</p>
 	
 		</div>
 		
@@ -322,12 +318,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2022/07/24/test-post/" title="test-post" rel="next">
+			<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -345,104 +337,6 @@
 <div class="relate-post">
 	
 		<ul>
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">
-								聊聊react与函数式编程			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 20日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-react不是魔法
-
-今天我想来聊一聊函数式编程，和它在react中的体现。
-何为函数式编程我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">
-								react的一些坑			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 14日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-记录一些刚写react踩过的坑吧，想到多少就写多少
-
-从一个工作中的需求开始有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="react的一些坑"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">
-								使用react的一些心得与感想			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 8日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-刚忙完公司的新人训练营，9个人的团队2周完成一个小项目。我负责用remax开发一个微信小程序。remax就是蚂蚁的一个开源框架，让开发者能用react的语法去开发微信小程序。开发体验整体来讲非常不错，感觉也加深了我对react的理解...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="使用react的一些心得与感想"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">
-								发布一个npm包的踩坑			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								三月 6日, 2023				
-							</p>
-							<p class="relate-post-content">
-								试着自己发布了一个npm包，记录一下自己踩的坑
-package.json首先npm init，然后添加type:module字段，将其定义为一个es6模块。然后在files字段设置要发布上去的内容，比如dist文件夹。
-接下来将开发用...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="发布一个npm包的踩坑"/>
-							</a>
-						</div>
-					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -533,6 +427,106 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">
+								聊聊react与函数式编程			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 20日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+react不是魔法
+
+今天我想来聊一聊函数式编程，和它在react中的体现。
+何为函数式编程我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">
+								react的一些坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 14日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+记录一些刚写react踩过的坑吧，想到多少就写多少
+
+从一个工作中的需求开始有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="react的一些坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">
+								使用react的一些心得与感想			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 8日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+刚忙完公司的新人训练营，9个人的团队2周完成一个小项目。我负责用remax开发一个微信小程序。remax就是蚂蚁的一个开源框架，让开发者能用react的语法去开发微信小程序。开发体验整体来讲非常不错，感觉也加深了我对react的理解...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="使用react的一些心得与感想"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">
+								一些部署相关的名词解释			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 24日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+毕业刚入职，看到公司的各种发布，部署平台，眼花缭乱，看文档的过程中也看到了很多不懂的名词，了解了之后做一下记录
+
+名词解释
+serverless: 字面意思是“无服务器”，即开发者（开发公司）不用自己的机房服务器，采用云服务器厂商提...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
 							</a>
 						</div>
 					</li>												
