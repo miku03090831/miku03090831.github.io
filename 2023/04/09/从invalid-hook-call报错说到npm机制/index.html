@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      聊聊react与函数式编程 | moe&#39;s blog
+      从invalid hook call报错说到npm机制 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「聊聊react与函数式编程」
+			「从invalid hook call报错说到npm机制」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" itemprop="url">
-		聊聊react与函数式编程
+	<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm%E6%9C%BA%E5%88%B6/" itemprop="url">
+		从invalid hook call报错说到npm机制
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" itemprop="url">
-		<time datetime="2022-08-20T15:20:34.000Z" itemprop="dateUpdated">
-	  		2022-08-21
+	<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm%E6%9C%BA%E5%88%B6/" itemprop="url">
+		<time datetime="2023-04-09T12:33:33.000Z" itemprop="dateUpdated">
+	  		2023-04-09
 	  </time>
 	</a> 
 
@@ -276,6 +276,10 @@
 			react
 		</a>
 	
+		<a href="/tags/npm/" class=" ">
+			npm
+		</a>
+	
 		
 			</span>
 			
@@ -286,35 +290,24 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-			<blockquote>
-<p>react不是魔法</p>
-</blockquote>
-<p>今天我想来聊一聊函数式编程，和它在react中的体现。</p>
-<h2 id="何为函数式编程"><a href="#何为函数式编程" class="headerlink" title="何为函数式编程"></a>何为函数式编程</h2><p>我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，函数式编程使得我们对于程序的结果具有更高的掌控性。</p>
-<p>至于函数式编程中的什么，函数是第一等公民啊，函数柯里化，高阶函数，闭包，什么之类的，别的文章里面讲烂的东西我也不赘述了，我只想讲讲纯函数。</p>
-<h3 id="纯函数"><a href="#纯函数" class="headerlink" title="纯函数"></a>纯函数</h3><p>我今天不说编程意义上普遍的“函数”（也被叫做方法），我想谈谈数学上的函数和编程上的纯函数。</p>
-<p>数学意义上的函数，近代定义就是定义域到值域的对应关系。通俗地说，我们把函数理解成一个机器（对应关系），给它一个输入，它给你返回一个输出。如果你给它相同的输入，它能确保给你相同的输出，那么它就是一个函数。</p>
-<p>纯函数是指，你编写的函数，也能做到和数学意义的函数相同的事情，并且不能有副作用。即以下两点</p>
-<ul>
-<li>首先，在决定输出的时候，所依赖的东西必须是输入的子集。不能有会变的因素影响到函数的输出。比如我要输出一个数字，我不能根据当时的时间和天气来得到结果，也不能因为某个定义在函数外部的变量得到结果。这些都会导致输入不变时，输出发生变化。</li>
-<li>其次，函数不能有副作用。什么算副作用呢？所有影响了函数外部的东西的操作，都是副作用（side effect，不是负作用）。比如你修改了外部的一个变量，发送了一个请求，打印了一个数据，这些都是副作用。为啥叫做副作用呢，因为这些操作都是与函数不相关的，它们使得函数的影响不局限于函数本身之内了。这违背了函数式编程的初衷。副作用使得函数的影响范围不可控。<br>值得注意的是，改变了函数的实参，也是副作用。因为实参是定义在函数外部的变量。一个很好的例子是sort(Array.prototype.sort)，它就不是一个纯函数。当你调用a.sort()之后，a变成了排序后的数组。a当然也是sort的参数，因为对于sort来说，a就是this。而sort改变了this。所以说sort不是一个纯函数。<br>这其实是一个很不好的事，通常在这种情况下，我们应该新建一个对象，将新建的对象返回，而不是在原来的对象上面做更改。当然代价是更多的内存，不过这换来了更高的可调试性。我们试想一下，你写了一个会改变实参的方法，别人把自己定义的变量作为参数传给你，结果变量却被改变了，别人会被你气死，因为他万万想不到，变量的值不符合预期，竟然是因为变量作为参数传给了你。</li>
-</ul>
-<p>换句话说，纯函数的要求是相同输入对应相同的输出，并且不能对函数之外的部分造成影响。纯函数有以下优点：</p>
-<ol>
-<li>可缓存性：因为相同的输入有相同的输出，所以可以把某个输入对应的输出缓存起来，下次拿到相同的输入时，直接返回缓存的结果，不必重新计算。</li>
-<li>可测试性（重要）或者说，可预期的：纯函数测试起来很简单，你能完全掌握这个函数做的事，只需要通过观察它的输出是否正确。而如果有副作用的非纯函数话，函数对外界做出了影响，这些影响无法通过函数的输出检测到，容易被忽略，但是又可能会导致bug。这就是为什么纯函数比非纯函数好。</li>
-<li>可并行性：因为纯函数不会对函数外界造成影响，因此多个纯函数就互不影响，可以并行运行，各玩各的。不过js是单线程语言，这点并不能体会到。</li>
-<li>引用透明：即调用这个函数的语句，可以被函数计算的结果替代。</li>
-</ol>
-<p>由于这些优点，纯函数可以大大降低代码的耦合关系，使得结果完全可以预计，你写的变量也不会被别人的代码改变值。这样会使得开发与调试的难度大幅降低。因此，我们在开发的过程中，都应该注意尽量使用纯函数。</p>
-<h2 id="React中的函数式编程"><a href="#React中的函数式编程" class="headerlink" title="React中的函数式编程"></a>React中的函数式编程</h2><h3 id="react不是魔法"><a href="#react不是魔法" class="headerlink" title="react不是魔法"></a>react不是魔法</h3><p>首先解释下“react不是魔法”这句话。是的，react不是魔法，它只是JavaScript代码。</p>
-<p>你大可以把他当做一个黑盒子，你学着别人的样子，写着按照jsx语法写着代码，然后你的代码就出现在了屏幕上，就像我之前写vue时一样。我当初用着vue-cli的时候，根本不知道自己写的代码是如何变成dom的，只知道写template，script和style三部分。我不是在黑vue，只是说react的写法看起来更加原始，更能够让人们明白，自己写的每一行代码是如何变成dom的。当然vue也有很多不用脚手架的方法，写起来也不那么“黑盒”，只是当初我完全看不懂，也就无从深入了解罢了。</p>
-<p>而实际上，react就是需要你去写一个jsx，然后将这个jsx转成React.createElement。通过这个API去构造虚拟节点。而这个jsx，其实就是类组件中render()的返回值，或者函数组件的返回值。</p>
-<h3 id="react的组件其实就是函数调用"><a href="#react的组件其实就是函数调用" class="headerlink" title="react的组件其实就是函数调用"></a>react的组件其实就是函数调用</h3><p>我们这里取最简洁的函数组件为例，暂时不考虑使用hooks的情况，函数组件就是一个纯函数，接受一个props，返回一段jsx。react的渲染，其实就是首先用createRoot方法渲染根组件，然后按照组件的层级，一层一层地向下调用函数罢了。我始终忘不掉我之前用Remax写小程序的时候，看到最开始的app.js时的震撼。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&#x27;./app.css&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">App</span> = props=&gt;props.<span class="property">children</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title class_">App</span></span><br></pre></td></tr></table></figure>
-
-<p>一开始我不明白这是啥意思啊，后来我知道，原来这就是根组件啊。我没在它里面添加逻辑，它就只需要把它的子组件返回出去，然后让它的子组件去渲染就好了。因为箭头函数的语法，整个组件的代码简洁的令人震惊。看明白了之后我感觉我更加理解react组件是什么东西了。如果只是用函数组件（不带hooks）的话，react就是函数式编程，它的渲染就是一个一个纯函数的调用。</p>
-<p>当然了，一个react应用，没有副作用的话很难实现功能，因为发送请求等等都是副作用。所以副作用是几乎不可避免的，函数组件在hooks出现之前功能是不完备的。而函数式编程，也只是一个范式，一个规范，我们只能尽可能去遵守。后面有时间的话，再来说一说带hooks的函数组件，和函数式编程的关系吧。</p>
+			<h2 id="遇到了invalid-hook-call报错"><a href="#遇到了invalid-hook-call报错" class="headerlink" title="遇到了invalid hook call报错"></a>遇到了invalid hook call报错</h2><p>上周，业务下游的同事反馈了一个生产问题，说我们传的值有问题，领导让我帮忙排查一下。我最近一直没做那个项目相关的需求，打开那个项目切到release分支，拉代码，npm i然后启动，结果就白屏了。。。</p>
+<p>打开控制台，看到了invalid hook call的报错，发生在公共组提供的一个组件里面。这个报错其实还有点讲究，我们都知道react的hook因为实现方式的限制，必须保证每次render都按相同的顺序执行，所以hook的使用是有限制的。当违反这些限制的时候就会报invalid hook call的错。但是除了刚接触react的新手，几乎没人会犯这样的错误。</p>
+<p>这个报错的另外两个可能的原因，分别是react和react-dom的版本不匹配，和项目里存在多个版本的react。我在node_modules里面查看了报错的那个组件下面的node_modules，发现果然这个组件又单独装了个react的包进去。这样一来，我们项目里面就存在了两个react版本，导致了invalid hook call报错。</p>
+<p>项目的实际依赖结构如下：</p>
+<p>project<br>— node_modules<br>    — react 16.14.0<br>    — 某组件<br>        — node_modules<br>            — react 17.2.0</p>
+<h2 id="为什么会装两个react"><a href="#为什么会装两个react" class="headerlink" title="为什么会装两个react"></a>为什么会装两个react</h2><p>我最近一直没碰过那个项目，那其他人呢，其他人开发没遇见这个问题？我真忍不了了，开始翻那个组件的依赖，看到它peerDependencies里面有个react，但是这个应该不是问题，peerDependencies不会真的被安装。我又翻这个组件的深层的依赖，终于看到有个包直接把react写在了dependencies里面。然后我先暂时用force-resolution统一了项目里面的react版本，然后跟公共组的同事说了之后，他们就把dependencies里面的react和react-dom去掉了。</p>
+<p>其实我们直接用npm ls react命令也能看出来，项目里面就精装了多少个react和每个react的版本。</p>
+<h2 id="npm的各种依赖"><a href="#npm的各种依赖" class="headerlink" title="npm的各种依赖"></a>npm的各种依赖</h2><p>接下来就发散发散，说说npm的各种依赖吧。还记得半年前我刚工作的时候，还不懂devDependencies和dependencies的意义，改了组件的devDependencies，结果最后项目里没生效，还是向别人请教后才知道，组件的devDependencies最后不会被真的安装到项目里面去。</p>
+<p>字面意思，devDependencies是指开发环境用到的依赖，比如用于预览组件的storybook，实际项目是用不到的，它是用来开发组件的时候预览用的，所以storybook就是典型的要写在devDependencies里面的。总结就是你有一个组件A，它依赖了一个npm包B，如果B写在dependencies里面，那么当项目安装A的时候也会安装B。而如果B是写在A的devDependencies里面，那么项目安装A就不会自动安装B。有的时候如果你错把一些依赖写在devDependencies里面，可能会导致项目里面少安装了一些依赖。这种时候建议使用peerDependencies</p>
+<p>peerDependencies意思就是我必须需要这个依赖，但是我不会自带这个东西，需要安装我的项目去安装这个依赖。比如有的组件只能运行在react项目中，则可以把react写在peerDependencies里面。然后安装这个组件的项目需要自己指明react为dependencies。如果实际项目中缺少这个依赖，则会提示报错。</p>
+<p>我们应该明白各种依赖的意义，在实际开发过程中加以区分，将依赖的npm包写在最合适的位置。</p>
+<h2 id="npm机制"><a href="#npm机制" class="headerlink" title="npm机制"></a>npm机制</h2><h3 id="扁平化"><a href="#扁平化" class="headerlink" title="扁平化"></a>扁平化</h3><p>接下来再说说npm的机制。我们经常发现，有的时候项目里面明明package.json里面写的各种依赖很少，但是项目node_modules里面却有着巨多的文件夹。这其实是因为npm的扁平化机制。npm在安装包的过程中，会试图将依赖的依赖，以及更深层次的依赖，都提取到最外层来。提取到最外层，更有利于减少包的重复安装。</p>
+<p>例如一个项目，依赖了A和B，而A和B又都依赖了C。npm在早期没有做扁平化处理的时候，会普通的嵌套安装，A里面装一个C，B里面装一个C，造成了重复安装。而扁平化之后，C会被提取出来，安装在最外层，也就是和A，B同级（前提是A和B依赖的C的版本相同）。如果A依赖<a href="mailto:&#67;&#64;&#x31;&#46;&#x30;&#46;&#x30;">&#67;&#64;&#x31;&#46;&#x30;&#46;&#x30;</a>，B依赖<a href="mailto:&#x43;&#64;&#49;&#46;&#x30;&#46;&#49;">&#x43;&#64;&#49;&#46;&#x30;&#46;&#49;</a>，那么不一定哪个版本的C会被提取出来安装到最外层，然后另一个版本的C被安装到自己的父级下面，这取决于A和B的安装顺序了。这样的扁平化管理，一定程度上减少了包的重复安装，但是具有一定的不确定性，被提升上去的版本可能会在某次更改后发生变化。</p>
+<h3 id="幽灵依赖"><a href="#幽灵依赖" class="headerlink" title="幽灵依赖"></a>幽灵依赖</h3><p>这种扁平化导致了一个问题就是幽灵依赖。即，我明明没有安装过某个包，但是我却可以使用它。还拿上面的例子，项目依赖了A和B，并没有直接依赖C，也就是说项目指明的依赖里面是没有C的，但是因为扁平化机制，C被提升到node_modules的最外层，项目里直接从C里面import东西，也是能做到的，这个就很恐怖了。</p>
+<p>幽灵依赖会导致一些问题，首先最直接的一点就是，如果引入了幽灵依赖的原始依赖被移出，幽灵依赖也不存在了，但是去除原始依赖的人可能没察觉到这一点，直接导致项目挂掉。再次，更神不知鬼不觉的情况就是，你升级了原始依赖的版本，新版本的原始依赖不包含幽灵依赖了，项目还是直接挂掉。</p>
+<p>还有一些问题就是，幽灵依赖的具体版本不可控，项目会在没有察觉的情况下使用新版本的幽灵依赖，而新版本和老版本可能不兼容，比如去掉了某个API之类的，还是会导致项目报错。</p>
+<h3 id="pnpm"><a href="#pnpm" class="headerlink" title="pnpm"></a>pnpm</h3><p>针对npm的扁平化提升遗留的缺点，和幽灵依赖的问题，新的包管理器pnpm出现了。pnpm通过硬链接，将node_modules下面的包都指向了全局的一个pnpm store当中。多个项目用到相同的包，其实最后硬盘里只会安装一份，这样也节省了硬盘的空间。总的来说，pnpm其实是具有很多优点的。我们的项目也尝试过使用pnpm，但是因为自身项目不规范等等的原因（比如项目本身存在使用幽灵依赖的情况），失败了，最后又转回了npm。</p>
+<p>如果有机会从头开始规范做的话，还是挺建议使用pnpm的</p>
 	
 		</div>
 		
@@ -333,12 +326,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑" rel="next">
+			<a href="/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/" title="useState为什么获取不到更新后的值，如何解决" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -356,6 +345,54 @@
 <div class="relate-post">
 	
 		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
+								React中副作用的执行时机			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 26日, 2022				
+							</p>
+							<p class="relate-post-content">
+								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">
+								聊聊react与函数式编程			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 20日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+react不是魔法
+
+今天我想来聊一聊函数式编程，和它在react中的体现。
+何为函数式编程我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
+							</a>
+						</div>
+					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -401,76 +438,6 @@
 							<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="使用react的一些心得与感想"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">
-								一些部署相关的名词解释			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								七月 24日, 2022				
-							</p>
-							<p class="relate-post-content">
-								
-毕业刚入职，看到公司的各种发布，部署平台，眼花缭乱，看文档的过程中也看到了很多不懂的名词，了解了之后做一下记录
-
-名词解释
-serverless: 字面意思是“无服务器”，即开发者（开发公司）不用自己的机房服务器，采用云服务器厂商提...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm%E6%9C%BA%E5%88%B6/" title="从invalid hook call报错说到npm机制">
-								从invalid hook call报错说到npm机制			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								四月 9日, 2023				
-							</p>
-							<p class="relate-post-content">
-								遇到了invalid hook call报错上周，业务下游的同事反馈了一个生产问题，说我们传的值有问题，领导让我帮忙排查一下。我最近一直没做那个项目相关的需求，打开那个项目切到release分支，拉代码，npm i然后启动，结果就白屏...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm%E6%9C%BA%E5%88%B6/" title="从invalid hook call报错说到npm机制">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="从invalid hook call报错说到npm机制"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
-								React中副作用的执行时机			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 26日, 2022				
-							</p>
-							<p class="relate-post-content">
-								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
 							</a>
 						</div>
 					</li>												
@@ -588,6 +555,32 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">
+								一些部署相关的名词解释			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 24日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+毕业刚入职，看到公司的各种发布，部署平台，眼花缭乱，看文档的过程中也看到了很多不懂的名词，了解了之后做一下记录
+
+名词解释
+serverless: 字面意思是“无服务器”，即开发者（开发公司）不用自己的机房服务器，采用云服务器厂商提...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="一些部署相关的名词解释"/>
 							</a>
 						</div>
 					</li>												
