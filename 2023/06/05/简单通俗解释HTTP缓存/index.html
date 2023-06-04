@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      关于SPA与SSR的简单介绍 | moe&#39;s blog
+      简单通俗解释HTTP缓存 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「关于SPA与SSR的简单介绍」
+			「简单通俗解释HTTP缓存」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" itemprop="url">
-		关于SPA与SSR的简单介绍
+	<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" itemprop="url">
+		简单通俗解释HTTP缓存
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" itemprop="url">
-		<time datetime="2023-02-27T16:15:52.000Z" itemprop="dateUpdated">
-	  		2023-02-28
+	<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" itemprop="url">
+		<time datetime="2023-06-04T16:40:17.000Z" itemprop="dateUpdated">
+	  		2023-06-05
 	  </time>
 	</a> 
 
@@ -272,16 +272,20 @@
 				
 	<i class="icon-price-tags"></i>
 	
-		<a href="/tags/SPA/" class=" ">
-			SPA
-		</a>
-	
-		<a href="/tags/SSR/" class=" ">
-			SSR
-		</a>
-	
 		<a href="/tags/%E5%89%8D%E7%AB%AF/" class=" ">
 			前端
+		</a>
+	
+		<a href="/tags/http/" class=" ">
+			http
+		</a>
+	
+		<a href="/tags/http%E7%BC%93%E5%AD%98/" class=" ">
+			http缓存
+		</a>
+	
+		<a href="/tags/%E5%B0%8F%E7%99%BD%E9%83%BD%E8%83%BD%E6%87%82/" class=" ">
+			小白都能懂
 		</a>
 	
 		
@@ -294,21 +298,29 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-			<p>本文将简要介绍几个概念，如SPA, CSR, SSR, 前端路由。适合小白，我将用浅显又生动的话语来介绍这些概念。</p>
-<h2 id="什么是SPA"><a href="#什么是SPA" class="headerlink" title="什么是SPA"></a>什么是SPA</h2><p>SPA（single page application）单页应用，占了现如今web应用的绝大多数。其意思就如字面所言，但是或许小白们不能真正理解何为单页，且让我讲给你听。我们先说，CSR（客户端渲染）和SSR（服务端渲染）都是SPA，我们先讲CSR的情况</p>
-<p>从一个很经典的问题讲起，“当你在浏览器地址栏里输入了一个url，并且敲了回车之后发生了什么”。你只需要知道前端的代码需要部署在服务器上面（注意与作为ajax请求目标的后端接口服务器不同，本文的服务器均指代部署着前端代码的服务器），浏览器会向服务器发送一个请求，而服务器会返回给你html，css和js这些静态资源。多说一嘴为什么叫静态资源，就是因为它是不变的（每个人拿到的都是相同的），它就是你写的前端代码打包出来的产物。试想如果你完的代码会自己变化就太恐怖了。而所谓的动态通常指依赖接口返回的数据（通常不同的用户拿到的也不同）。</p>
-<p>而对于SPA来说，相信无论是用vue或者react的各位都还记得，项目的入口html文件里面有个div，id可能是root或者app，它就是页面的根节点。而vue或者react框架，就是写一堆js去生成dom元素，然后把生成的dom元素塞到根节点里面（挂载到根节点下）。如果你打开一个CSR（客户端渲染）的SPA应用，去查看控制台，network里面的Doc下面，有个很简洁的html文件，这个就是服务器传给浏览器的html文档。这个文档，也就是单页应用中的那个单页。</p>
-<p>而单页，单就单在，这个网站的各个界面，点击跳转之后的界面，都是渲染在最初的这一份html文档上面的。打个比方，把网站当成一幅画，最初的那份html就是画布。你先在上面画了一个myWebSite.com&#x2F;home，然后你要跳转到myWebSite.com&#x2F;about，不是再拿一幅画布，而是把原来的画布擦干净，画一幅新的上去。这也就是前端路由的概念。在SPA中，当你去做一些跳转的操作时，不会再向服务器发送请求新的html文档，而是通过js的操作，去更新html上的内容。</p>
-<p>关于前端路由的具体实现，本文不具体讲解，我们只需要知道前端路由是在不重新向服务器请求页面的前提下。改变了url。然后通过一些api，根据url的变化，去渲染不同的组件，从而使得我们能看到不同的页面。当然需要注意，虽然url被改变了，但是浏览器没有向服务器发送请求。如果你这时候刷新页面，则浏览器会试图向服务器发送请求，某些情况下会拿到404响应码，比如vue的history模式路由。</p>
-<p>我们回顾SPA的渲染过程，它只在你第一次输入URL并且敲回车的时候请求一次服务器，拿到所有的html，css，js之后，浏览器开始完全接管页面的渲染和交互。通过执行js，将你写的组件挂载到根节点当中。当你试图在应用内（也就是你写的项目里）跳转时，你写的js会在原有html上渲染出新的组件，而你的交互也都是通过浏览器去执行js来实现。这就是CSR（客户端渲染），页面的渲染都是在浏览器上完成的。</p>
-<h1 id="什么是SSR"><a href="#什么是SSR" class="headerlink" title="什么是SSR"></a>什么是SSR</h1><p>大部分小白们可能刚接触vue和react的时候写的都是CSR，也就是上面提到的内容。CSR有一些缺点，比如FCP（First Contentful Paint）首次内容绘制时间长，说白了就是首屏的白屏时间长（相对较长）。因为一开始浏览器拿到的只有一份空的html，所以用户看到的是白屏。你写的组件要等到浏览器去执行js去渲染到html上。假设浏览器执行js要10秒钟，那用户就会看到10秒的白屏，认为你这个网站好卡啊。</p>
-<p>当然这是CSR的缺点之一，其次还有不利于SEO，说白了就是不容易被搜索引擎给抓取到，因为搜索引擎也会认为你这个网站是个空的html（搜索引擎也有做优化，稍有改善）。</p>
-<p>为了解决这些问题，人们采用了SSR（服务端渲染）的解决方案。其实最早前后端没分离的时候，就是由后端服务器将动态的数据塞到html模板里面，返回给前端的。当你输入url按下回车之后，浏览器拿到的就是一份完整的有内容的html，而不是空的html。当然这是古早时期的行为了，不在本文讨论范围内。</p>
-<p>为了解决CSR由浏览器绘制页面导致的白屏时间长的问题，SSR直接由服务端将你的组件渲染好塞到html文档里面，一起返回给你。说白了，和客户端渲染的区别就是，第一次拿到的是带内容的html文档，css和js。浏览器拿到带内容的html文档，就可以直接展示给用户看了。然后浏览器再执行js，将点击事件之类的添加到页面上，不然你的页面就只能看，没有任何交互了。</p>
-<p>举个服务端渲染的例子，我想访问myWebSite.com&#x2F;home,，服务器会渲染好一个home的html（html当然只能看不能点），连带着css，js返回给浏览器，之后浏览器在执行js。我们以最流行的React框架Next为例讲解，对于静态的页面，那可能如果myWebSite.com&#x2F;home依赖动态数据，那么你可以在getServerSideProps方法里面去获取，然后将数据作为方法的返回值，这样一来你的页面就能从props拿到动态的数据。比如&#x2F;home页面可能需要从接口拿用户信息，你可以选择普通的将调用接口写在组件的生命周期里（由浏览器执行js的时候调用），也可以将调接口写在getServerSideProps里（由服务端调用），再讲接口的数据传给页面组件。</p>
-<p>那么服务端渲染的前端路由切换是怎么样的呢，还是以next为例，我们这里只讲解getServerSideProps的情况，这种最复杂有趣，其他情况请参见next文档。当你在next中使用前端路由跳转到一个通过getServerSideProps来进行服务端渲染的页面时，你要记得你依然是一个单页应用，next会支持你在原有的html文档上面切换要渲染的组件。但是你的页面是依赖getServerSideProps来给你提供数据的，而getServerSideProps不能在浏览器调用。这下困难了，不能像CSR那样不借助服务器就完成页面的切换了。这个时候next框架会替你向服务器发送一份请求，求助服务器帮忙执行一下新页面的getServerSideProps方法，并且将结果以json格式返回给浏览器。这个请求的url是形如<code>myWebSite.com/&#123;配置的basepath&#125;/_next/data/&#123;generateBuildId&#125;/&#123;query&#125;/&#123;页面的名字&#125;.json</code>。如果这个请求挂掉了（不常见的原因，比如我司配的软路由不恰当，将这个请求导向了错误的地址），那么next的补救措施是，让浏览器重新向服务器发送请求，有服务器渲染一个新的要跳转到的页面，再返回给浏览器，相当于重新执行了一遍最初的工作。</p>
-<p>SSR也有缺点，比如每当浏览器重新向服务器请求的时候，都会请求很多的数据，包括当前页面的带内容的html，所有页面的css，所有页面的js（不考虑代码分割，懒加载的情况）。每当SSR的前端路由请求挂掉时，SSR都要重新请求大量的数据。而相对的，CSR只有首次渲染依赖前端服务器，而且这一次请求的内容是不带内容的html，所有页面的css，所有页面的js。这样看来哪怕是单次比较，CSR请求的东西也是比SSR少的，也就是说CSR虽然首次绘制出内容要晚于CSR，但是因为网络传输的内容少，所以会更早拿到请求的内容，从而更早执行完js，使得用户可以交互。而SSR虽然一开始拿到了有内容的html，让用户更早看到页面，但是要传输的内容多，从而晚执行完js，使得用户更晚才能交互。这个指标叫TTI（Time To Interactive），首次可交互时间。</p>
-<p>所以SSR和CSR其实各有优缺点，使用的时候需要综合考量。</p>
+			<blockquote>
+<p>开始前的碎碎念</p>
+<p>最近加班真的很严重，组里同事们都已经苦不堪言。业务交付压力非常大，根本没时间去磨练本领，学习技术。真的很讨厌这种没有成长的日子，每天被业务需求赶着跑。每天下班之后，本来应该用于提升自我的时间也被压榨用来写业务代码。</p>
+<p>希望组里能早日摆脱现状，不然就只能润了</p>
+</blockquote>
+<p>很多人应该都听过http缓存，也是比较常问的面试题吧。还记得我当时什么也不会，刷面经的时候就看到什么http状态码里的304，然后就顺着去搜了一下，搜到了什么协商缓存，看了一下，看的云里雾里。主要还是当时真的欠缺太多基本知识了，搜到的博客里面又都没讲这些基础的点。所以我这次想来通俗的讲一讲，http缓存。注意，本文中所指的服务器，绝大部分都是前端的，返回给你html文件等等的那个服务器，而不是部署着接口的后端服务器。</p>
+<h2 id="为什么需要http缓存"><a href="#为什么需要http缓存" class="headerlink" title="为什么需要http缓存"></a>为什么需要http缓存</h2><h3 id="理解静态资源"><a href="#理解静态资源" class="headerlink" title="理解静态资源"></a>理解静态资源</h3><p>我们都知道，访问一个网站，浏览器会向网站服务器发送很多http请求，去请求html文件，css文件，js文件等等。这些文件都是静态资源。静态资源，其实就是服务器上的文件罢了，不经常变化。你写一个网站的前端代码，写好了部署上去，就不变了。除非你重新部署，上面的文件才变。不像你请求接口，去查数据库里面的数据，那是经常变化的。</p>
+<p>就因为静态资源不常变，所以我们可以把它们缓存起来。这样下次再请求的时候，缓存没过期的话，就可以直接从缓存里面读静态资源，会比从服务器再收一次静态资源快上很多。</p>
+<p>注意：http缓存通常只针对get请求。这也很合理，因为浏览器访问网站，获取静态资源时，发送的请求都是get。至于你访问接口，就由你自己控制了。我的评价是接口都可以用post访问。</p>
+<h2 id="如何判断缓存是否过期"><a href="#如何判断缓存是否过期" class="headerlink" title="如何判断缓存是否过期"></a>如何判断缓存是否过期</h2><p>http缓存有两种：强缓存和协商缓存。流程省流：先强缓存，再协商缓存，再重新向服务器请求。</p>
+<h3 id="省流"><a href="#省流" class="headerlink" title="省流"></a>省流</h3><p>通俗来说，浏览器向服务器请求静态资源的时候，服务器会说，你多久之内不要再来问我这个问题。于是这个时间内，每当浏览器需要用这个资源时，都会用第一次服务器给他的那份，这就是强缓存。</p>
+<p>过了这个时间以后，强缓存失效了。浏览器会再去问服务器要这个资源，但是它问的时候会带上两个问题:</p>
+<ol>
+<li>你上次给我的东西，哈希值是这个，你看看变了没</li>
+<li>你上次给我的东西，是某个时间更新的，你看看还是不是最新的</li>
+</ol>
+<p>服务器根据这两个问题来判断，浏览器的缓存还能不能用。如果能，服务器返回给浏览器的http状态码是304，意思就是和上次一样，我就不再给你一份了。如果不能，则服务器会重新发一份静态资源给浏览器。这就是协商缓存</p>
+<h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>强缓存就是指，你第一次请求静态资源的时候，服务器返回给你的response header里面如果带下面的两个字段之一：expires或者cache-control，则浏览器会用强缓存规则判断缓存是否过期。expires是直接写死的过期时间，下次再发请求的时候，取当前时间和过期时间比较，来判断是否过期。而cache-control下面的max-age字段则是指定了一个时长。下次请求的时候，会看距离上次过了多久，比较时长来判断是否过期。</p>
+<p>expires来自http1.0，cache-control的max-age来自http1.1 。expires的缺陷是没考虑时区问题。客户端和服务端的所处时区不一致时，expires是服务端所在时区的时间，而客户端会把它当成是自己所在时区的时间。</p>
+<p>看到这里我们可以知道，强缓存的过期时间是服务器那边人为控制的，人为指定了这个缓存能有效多久。如果缓存没过期，我直接问都不问服务器。所以这个时间设定不宜太长，不然即便这些静态资源被更新了，用户也拿不到，因为用户一直在读本地的缓存。</p>
+<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>当强缓存失效的时候，浏览器还会再挣扎一下，走协商缓存。前提是第一次返回的静态资源的响应头里面有下面两个字段之一：etag或者last-modified。etag可以理解为是这个静态资源的哈希值，内容变化会导致etag的变化。last-modified是这个静态资源上次被修改的时间。</p>
+<p>等到第二次请求这个静态资源时，浏览器会向服务器发一个请求，这次请求头里面的if-none-match的值为上一次的response的etag，if-modified-since值为上一次response的last-modified。服务器收到这个请求，会再去看一下服务器上的静态资源，它的etag和last-modified，然后自己根据浏览器传过来的etag和last-modified，判断一下浏览器那边的缓存是否还能用。如果还能用，也就是没过期，就返回一个http code304。如果不能用，就返回最新的静态资源过去（当然http code是200）。</p>
+<p>至于服务器如何根据etag和last-modified判断，这个是看服务器具体怎么实现的，各大框架应该都已经有现成的实现了。反正单独看两个字段的话，肯定是比较etag是否一致，和last-modified值是否相同了。但是二者的优先级，是依靠具体实现的。etag的准确度肯定更高。如果在last-modified的最小时间精度内，文件被修改了多次，last-modified是区分不出来的。而且无谓的修改也会导致last-modified的改变，即使修改并没有改动到文件的内容。所以通常建议以etag为准。</p>
 	
 		</div>
 		
@@ -327,12 +339,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录" rel="next">
+			<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -350,31 +358,6 @@
 <div class="relate-post">
 	
 		<ul>
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">
-								简单通俗解释HTTP缓存			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 5日, 2023				
-							</p>
-							<p class="relate-post-content">
-								
-开始前的碎碎念
-最近加班真的很严重，组里同事们都已经苦不堪言。业务交付压力非常大，根本没时间去磨练本领，学习技术。真的很讨厌这种没有成长的日子，每天被业务需求赶着跑。每天下班之后，本来应该用于提升自我的时间也被压榨用来写业务代码。
-...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="简单通俗解释HTTP缓存"/>
-							</a>
-						</div>
-					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -396,6 +379,29 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="发布一个npm包的踩坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">
+								关于SPA与SSR的简单介绍			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								二月 28日, 2023				
+							</p>
+							<p class="relate-post-content">
+								本文将简要介绍几个概念，如SPA, CSR, SSR, 前端路由。适合小白，我将用浅显又生动的话语来介绍这些概念。
+什么是SPASPA（single page application）单页应用，占了现如今web应用的绝大多数。其意思就...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="关于SPA与SSR的简单介绍"/>
 							</a>
 						</div>
 					</li>												
