@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      test-post | moe&#39;s blog
+      webpack动态加载原理简述 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「test-post」
+			「webpack动态加载原理简述」
 		
 	</p>
 
@@ -223,14 +223,27 @@
 		插件作者：KELEN
 		插件来源: https://github.com/KELEN/katelog
 -->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
 	 
 
 <div class="layout-post">
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		test-post
+	<a href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" itemprop="url">
+		webpack动态加载原理简述
 	</a>
 
 		</div>
@@ -246,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/07/24/test-post/" itemprop="url">
-		<time datetime="2022-07-24T09:29:59.000Z" itemprop="dateUpdated">
-	  		2022-07-24
+	<a href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" itemprop="url">
+		<time datetime="2023-06-17T14:07:45.000Z" itemprop="dateUpdated">
+	  		2023-06-17
 	  </time>
 	</a> 
 
@@ -256,7 +269,18 @@
 
 			</span>
 			<span>
-						
+				
+	<i class="icon-price-tags"></i>
+	
+		<a href="/tags/webpack/" class=" ">
+			webpack
+		</a>
+	
+		<a href="/tags/%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/" class=" ">
+			动态加载
+		</a>
+	
+		
 			</span>
 			
 			
@@ -266,7 +290,28 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-				
+			<h2 id="为什么需要动态加载"><a href="#为什么需要动态加载" class="headerlink" title="为什么需要动态加载"></a>为什么需要动态加载</h2><p>上一篇讲我写webpack针对markdown的loader的时候，提到了希望能动态加载以优化性能。篇幅原因没有展开说，打算单独写一篇文章讲一下。</p>
+<p>当我们访问网站的时候，浏览器会向服务器请求页面资源。首先请求的当然是html文件。html文件里会带很多script标签，浏览器解析到这些标签的话，就会去下载这些js资源。当然有些script标签带了async或者defer属性，不会阻塞后续dom的解析。但是很多单页应用，本身渲染就是强依赖js的，js下载的慢，就会推迟页面开始渲染的时机。因此，我们肯定都是希望下载js越快越好的，因此我们就希望缩减js的体积。</p>
+<p>缩减js体积的办法有很多，主要思路都是将非首屏必须的js资源拆出来，以减小首屏js的体积，首屏js加载完了就可以渲染出东西来了。所以所以我们可以对组件做动态加载。动态加载会让组件从项目js中拆出来，被打包成一个单独的js文件，被引入。webpack中我们可以通过import()语法，去动态加载组件</p>
+<h2 id="动态加载的实现"><a href="#动态加载的实现" class="headerlink" title="动态加载的实现"></a>动态加载的实现</h2><p>知其然，也想知其所以然。动态加载是怎么实现的呢？是webpack借助类似jsonp的方式来实现的。</p>
+<p>说白了就是，被动态加载的组件会被单独打包，当你写的import()被执行的时候，webpack会去拼一个script标签出来，script标签的src属性就是被单独打包的组件的url。</p>
+<h4 id="window对象上的webpackJsonp数组"><a href="#window对象上的webpackJsonp数组" class="headerlink" title="window对象上的webpackJsonp数组"></a>window对象上的webpackJsonp数组</h4><p>细致地说，在首屏的js中，webpack会在window上挂一个数组，用来记录已被动态加载完毕的组件。最初这个数组为空。然后被动态加载的组件，所在的js文件的开头，就是向window对象上的那个数组，push自己进去。因此当动态加载的js被下载完毕时，就会立刻执行push方法，后面有讲，这个push方法被动了手脚，在真的push之前，会执行一些必要的操作（详见webpackJsonpCallback）。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">## 首屏js</span><br><span class="line"><span class="keyword">var</span> jsonpArray = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] || [];</span><br><span class="line"> 	<span class="keyword">var</span> oldJsonpFunction = jsonpArray.<span class="property">push</span>.<span class="title function_">bind</span>(jsonpArray);</span><br><span class="line"> 	jsonpArray.<span class="property">push</span> = webpackJsonpCallback;</span><br><span class="line"> 	jsonpArray = jsonpArray.<span class="title function_">slice</span>();</span><br><span class="line"> 	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; jsonpArray.<span class="property">length</span>; i++) <span class="title function_">webpackJsonpCallback</span>(jsonpArray[i]);</span><br><span class="line"> 	<span class="keyword">var</span> parentJsonpFunction = oldJsonpFunction;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## 被单独打包的js</span><br><span class="line">(<span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] || []).<span class="title function_">push</span>([[<span class="number">0</span>],&#123;</span><br><span class="line">	<span class="comment">/** 被动态引入的组件，被打包后的内容 */</span></span><br><span class="line">&#125;]);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="动态加载的起点，requireEnsure方法"><a href="#动态加载的起点，requireEnsure方法" class="headerlink" title="动态加载的起点，requireEnsure方法"></a>动态加载的起点，requireEnsure方法</h4><p>当执行到动态加载的时候，会调用webpack的requireEnsure方法。requireEnsure方法首先检查，这个模块是否被加载过，如果没加载过，就new一个Promise，然后去添加一个script标签，并为这个script标签设置好onerror和onload事件。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">## 首屏js</span><br><span class="line">__webpack_require__.<span class="property">e</span> = <span class="keyword">function</span> <span class="title function_">requireEnsure</span>(<span class="params">chunkId</span>) &#123;</span><br><span class="line"> 		<span class="keyword">var</span> promises = [];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> 		<span class="comment">// JSONP chunk loading for javascript</span></span><br><span class="line"></span><br><span class="line"> 		<span class="keyword">var</span> installedChunkData = installedChunks[chunkId];</span><br><span class="line"> 		<span class="keyword">if</span>(installedChunkData !== <span class="number">0</span>) &#123; <span class="comment">// 0 means &quot;already installed&quot;.</span></span><br><span class="line"></span><br><span class="line"> 			<span class="comment">// a Promise means &quot;currently loading&quot;.</span></span><br><span class="line"> 			<span class="keyword">if</span>(installedChunkData) &#123;</span><br><span class="line"> 				promises.<span class="title function_">push</span>(installedChunkData[<span class="number">2</span>]);</span><br><span class="line"> 			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"> 				<span class="comment">// setup Promise in chunk cache</span></span><br><span class="line"> 				<span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="keyword">function</span>(<span class="params">resolve, reject</span>) &#123;</span><br><span class="line"> 					installedChunkData = installedChunks[chunkId] = [resolve, reject];</span><br><span class="line"> 				&#125;);</span><br><span class="line"> 				promises.<span class="title function_">push</span>(installedChunkData[<span class="number">2</span>] = promise);</span><br><span class="line"></span><br><span class="line"> 				<span class="comment">// start chunk loading</span></span><br><span class="line"> 				<span class="keyword">var</span> script = <span class="variable language_">document</span>.<span class="title function_">createElement</span>(<span class="string">&#x27;script&#x27;</span>);</span><br><span class="line"> 				<span class="keyword">var</span> onScriptComplete;</span><br><span class="line"></span><br><span class="line"> 				script.<span class="property">charset</span> = <span class="string">&#x27;utf-8&#x27;</span>;</span><br><span class="line"> 				script.<span class="property">timeout</span> = <span class="number">120</span>;</span><br><span class="line"> 				<span class="keyword">if</span> (__webpack_require__.<span class="property">nc</span>) &#123;</span><br><span class="line"> 					script.<span class="title function_">setAttribute</span>(<span class="string">&quot;nonce&quot;</span>, __webpack_require__.<span class="property">nc</span>);</span><br><span class="line"> 				&#125;</span><br><span class="line"> 				script.<span class="property">src</span> = <span class="title function_">jsonpScriptSrc</span>(chunkId);</span><br><span class="line"></span><br><span class="line"> 				<span class="comment">// create error before stack unwound to get useful stacktrace later</span></span><br><span class="line"> 				<span class="keyword">var</span> error = <span class="keyword">new</span> <span class="title class_">Error</span>();</span><br><span class="line"> 				onScriptComplete = <span class="keyword">function</span> (<span class="params">event</span>) &#123;</span><br><span class="line"> 					<span class="comment">// avoid mem leaks in IE.</span></span><br><span class="line"> 					script.<span class="property">onerror</span> = script.<span class="property">onload</span> = <span class="literal">null</span>;</span><br><span class="line"> 					<span class="built_in">clearTimeout</span>(timeout);</span><br><span class="line"> 					<span class="keyword">var</span> chunk = installedChunks[chunkId];</span><br><span class="line"> 					<span class="keyword">if</span>(chunk !== <span class="number">0</span>) &#123;</span><br><span class="line"> 						<span class="keyword">if</span>(chunk) &#123;</span><br><span class="line"> 							<span class="keyword">var</span> errorType = event &amp;&amp; (event.<span class="property">type</span> === <span class="string">&#x27;load&#x27;</span> ? <span class="string">&#x27;missing&#x27;</span> : event.<span class="property">type</span>);</span><br><span class="line"> 							<span class="keyword">var</span> realSrc = event &amp;&amp; event.<span class="property">target</span> &amp;&amp; event.<span class="property">target</span>.<span class="property">src</span>;</span><br><span class="line"> 							error.<span class="property">message</span> = <span class="string">&#x27;Loading chunk &#x27;</span> + chunkId + <span class="string">&#x27; failed.\n(&#x27;</span> + errorType + <span class="string">&#x27;: &#x27;</span> + realSrc + <span class="string">&#x27;)&#x27;</span>;</span><br><span class="line"> 							error.<span class="property">name</span> = <span class="string">&#x27;ChunkLoadError&#x27;</span>;</span><br><span class="line"> 							error.<span class="property">type</span> = errorType;</span><br><span class="line"> 							error.<span class="property">request</span> = realSrc;</span><br><span class="line"> 							chunk[<span class="number">1</span>](error);</span><br><span class="line"> 						&#125;</span><br><span class="line"> 						installedChunks[chunkId] = <span class="literal">undefined</span>;</span><br><span class="line"> 					&#125;</span><br><span class="line"> 				&#125;;</span><br><span class="line"> 				<span class="keyword">var</span> timeout = <span class="built_in">setTimeout</span>(<span class="keyword">function</span>(<span class="params"></span>)&#123;</span><br><span class="line"> 					<span class="title function_">onScriptComplete</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;timeout&#x27;</span>, <span class="attr">target</span>: script &#125;);</span><br><span class="line"> 				&#125;, <span class="number">120000</span>);</span><br><span class="line"> 				script.<span class="property">onerror</span> = script.<span class="property">onload</span> = onScriptComplete;</span><br><span class="line"> 				<span class="variable language_">document</span>.<span class="property">head</span>.<span class="title function_">appendChild</span>(script);</span><br><span class="line"> 			&#125;</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		<span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">all</span>(promises);</span><br><span class="line"> 	&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="加载完毕的回调，webpackJsonpCallback"><a href="#加载完毕的回调，webpackJsonpCallback" class="headerlink" title="加载完毕的回调，webpackJsonpCallback"></a>加载完毕的回调，webpackJsonpCallback</h4><p>然后还有一个很重要的方法，叫webpackJsonpCallback。window对象上的数组，push方法被劫持了，就是被改为webpackJsonpCallback方法。在webpackJsonpCallback里，会执行之前promise的resolve，然后把自己记录为已加载状态，最后再把自己push到数组里（劫持了原来的push方法，相当于在真的push之前作了上述操作）。这里也就能看出来，import()的本质是一个promise（严谨地说是promise.all）</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">## 首屏js	</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">webpackJsonpCallback</span>(<span class="params">data</span>) &#123;</span><br><span class="line"> 		<span class="keyword">var</span> chunkIds = data[<span class="number">0</span>];</span><br><span class="line"> 		<span class="keyword">var</span> moreModules = data[<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> 		<span class="comment">// add &quot;moreModules&quot; to the modules object,</span></span><br><span class="line"> 		<span class="comment">// then flag all &quot;chunkIds&quot; as loaded and fire callback</span></span><br><span class="line"> 		<span class="keyword">var</span> moduleId, chunkId, i = <span class="number">0</span>, resolves = [];</span><br><span class="line"> 		<span class="keyword">for</span>(;i &lt; chunkIds.<span class="property">length</span>; i++) &#123;</span><br><span class="line"> 			chunkId = chunkIds[i];</span><br><span class="line"> 			<span class="keyword">if</span>(<span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">hasOwnProperty</span>.<span class="title function_">call</span>(installedChunks, chunkId) &amp;&amp; installedChunks[chunkId]) &#123;</span><br><span class="line"> 				resolves.<span class="title function_">push</span>(installedChunks[chunkId][<span class="number">0</span>]);</span><br><span class="line"> 			&#125;</span><br><span class="line"> 			installedChunks[chunkId] = <span class="number">0</span>;</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		<span class="keyword">for</span>(moduleId <span class="keyword">in</span> moreModules) &#123;</span><br><span class="line"> 			<span class="keyword">if</span>(<span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">hasOwnProperty</span>.<span class="title function_">call</span>(moreModules, moduleId)) &#123;</span><br><span class="line"> 				modules[moduleId] = moreModules[moduleId];</span><br><span class="line"> 			&#125;</span><br><span class="line"> 		&#125;</span><br><span class="line"> 		<span class="keyword">if</span>(parentJsonpFunction) <span class="title function_">parentJsonpFunction</span>(data);</span><br><span class="line"></span><br><span class="line"> 		<span class="keyword">while</span>(resolves.<span class="property">length</span>) &#123;</span><br><span class="line"> 			resolves.<span class="title function_">shift</span>()();</span><br><span class="line"> 		&#125;</span><br><span class="line"></span><br><span class="line"> 	&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>以上就是webpack动态加载的原理</p>
+	
 		</div>
 		
 		<div id="current-post-cover" data-scr="/img/cart_cover.jpg"></div>
@@ -284,10 +329,10 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" title="一些部署相关的名词解释" rel="prev">
-				&laquo;上一篇
-			</a>
 		
+			<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑" rel="next">
+				下一篇&raquo;
+			</a>
 			
 	</span>
 
@@ -303,29 +348,6 @@
 <div class="relate-post">
 	
 		<ul>
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" title="webpack动态加载原理简述">
-								webpack动态加载原理简述			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 17日, 2023				
-							</p>
-							<p class="relate-post-content">
-								为什么需要动态加载上一篇讲我写webpack针对markdown的loader的时候，提到了希望能动态加载以优化性能。篇幅原因没有展开说，打算单独写一篇文章讲一下。
-当我们访问网站的时候，浏览器会向服务器请求页面资源。首先请求的当然是...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" title="webpack动态加载原理简述">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="webpack动态加载原理简述"/>
-							</a>
-						</div>
-					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -532,6 +554,32 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2022/08/22/css%E8%B8%A9%E5%9D%91%E4%B9%8B%E5%AD%90%E5%85%83%E7%B4%A0margin-top%E5%BD%B1%E5%93%8D%E7%88%B6%E5%85%83%E7%B4%A0/" title="css踩坑之子元素margin-top影响父元素">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="css踩坑之子元素margin-top影响父元素"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">
+								聊聊react与函数式编程			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 20日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+react不是魔法
+
+今天我想来聊一聊函数式编程，和它在react中的体现。
+何为函数式编程我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
 							</a>
 						</div>
 					</li>												
