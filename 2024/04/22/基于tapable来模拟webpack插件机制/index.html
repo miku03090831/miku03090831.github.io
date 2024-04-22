@@ -1,0 +1,922 @@
+<!--
+	作者：Sariay
+	时间：2018-08-26
+	描述：There may be a bug, but don't worry, Qiling(器灵) says that it can work normally! aha!
+-->
+<!DOCTYPE html>
+<html class="html-loading">
+		
+
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <title>
+    
+      基于tapable来模拟webpack插件机制 | moe&#39;s blog
+    
+  </title>
+  <meta name="author" content="qh_meng">
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+	<!-- favicon -->
+  <link rel="shortcut icon" href="/img/favicon.ico">
+
+  <!-- css -->
+  
+<link rel="stylesheet" href="/css/Annie.css">
+
+  
+  <!-- jquery -->
+	
+<script src="/plugin/jquery/jquery.min.js"></script>
+
+
+<script>
+    const CONFIG_BGIMAGE = {
+      mode: 'normal',
+      normalSrc: '/img/header-bg.jpg',
+      randomYouMax: 110,
+      randomYouSrc: 'https://sariay.github.io/Random-img/',
+	  randomOtherSrc: 'https://api.berryapi.net/?service=App.Bing.Images&day=-0',
+	  preloaderEnable: true
+    }
+	
+    const CONFIG_LEACLOUD_COUNT = {
+      enable: false,
+	  appId: 'AU8...',
+	  appKey: '4cU...',
+	  serverURLs: 'http' || ' '
+    }
+  </script>
+<meta name="generator" content="Hexo 6.2.0"></head>
+	<body>
+		<!-- Preloader -->
+
+	<div id="preloader">
+		<div class="pre-container">
+			
+				<div class="spinner">
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
+				</div>
+						
+		</div>
+	</div>
+
+
+<!-- header -->
+<header class="fixbackground bg-pan-br">
+	<div class="mask">
+		<!-- motto -->
+		<div class="h-body">	
+			
+				<div class="motto text-shadow-pop-left">
+					<p class="content" id="motto-content">获取中...</p>
+					<p>-<p>
+					<p class="author" id="motto-author">Just a minute...</p>
+				</div>
+			
+		</div>
+		
+		<!-- others: such as time... -->			
+		<div class="h-footer">
+			<a href="javascript:;" id="read-more" class="scroll-down">
+				<span class="icon-anchor1 animation-scroll-down"></span>
+			</a>
+		</div>
+	</div>
+</header>
+
+<div id="navigation-hide">
+	<!-- Progress bar -->
+	<div id="progress-bar"></div>
+
+	<!-- Progress percent -->
+	<div id="progress-percentage"><span>0.0%</span></div>
+
+	<div class="toc-switch"><span class="switch-button">目录</span></div>
+
+	<!-- Page title -->
+	<p>
+		
+			「基于tapable来模拟webpack插件机制」
+		
+	</p>
+
+	
+	
+
+	<!-- Nav trigger for navigation-H-->
+	<a class="nav-trigger"><span></span></a>
+</div>
+
+<!-- Navigation in div(id="navigation-H") -->
+<nav class="nav-container" id="cd-nav">
+	<div class="nav-header">
+		<span class="logo"> 
+			<img src="/img/logo.png">
+		</span>
+		<a href="javascript:;" class="nav-close"></a>
+	</div>
+	
+	<div class="nav-body">
+		<ul id="global-nav">
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home" target="_blank">主页</a>
+		</li>
+		
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive" target="_blank">归档</a>
+		</li>
+		
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories" target="_blank">分类</a>
+		</li>
+		
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags" target="_blank">标签</a>
+		</li>
+		
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about" target="_blank">关于</a>
+		</li>
+		
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery" target="_blank">相册</a>
+		</li>
+		
+	
+
+	
+</ul>
+	</div>
+	
+	<div class="nav-footer">
+		<ul id="global-social">
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-one"><span class="path1"></span><span class="path2"></span></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-zhihu"></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-github"></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-sina-weibo "></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-pinterest2"></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-instagram"></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="http://github.com/" target="_blank">
+				<span class="icon-twitter"></span>
+			</a>
+		</li>
+	
+		<li>
+			<a href="/atom.xml" target="_blank">
+				<span class="icon-rss"></span>
+			</a>
+		</li>
+			
+</ul>
+
+	</div>
+</nav>
+			
+		<!--main-->
+		<main>
+			<!--
+	时间：2018-11-17
+	描述：
+		插件名称：katelog.min.js
+		插件作者：KELEN
+		插件来源: https://github.com/KELEN/katelog
+-->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
+	 
+
+<div class="layout-post">
+	<div id="layout-post">
+		<div class="article-title">
+			
+	<a href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" itemprop="url">
+		基于tapable来模拟webpack插件机制
+	</a>
+
+		</div>
+
+		<div class="article-meta">
+			<span>
+				<i class="icon-calendar1"></i>
+				
+				
+
+
+
+
+	更新于
+
+	<a href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" itemprop="url">
+		<time datetime="2024-04-22T15:29:24.000Z" itemprop="dateUpdated">
+	  		2024-04-23
+	  </time>
+	</a> 
+
+
+
+			</span>
+			<span>
+				
+	<i class="icon-price-tags"></i>
+	
+		<a href="/tags/webpack/" class=" ">
+			webpack
+		</a>
+	
+		<a href="/tags/webpack-plugin/" class=" ">
+			webpack plugin
+		</a>
+	
+		<a href="/tags/tapable/" class=" ">
+			tapable
+		</a>
+	
+		
+			</span>
+			
+			
+
+
+
+		</div>
+
+		<div class="article-content" id="article-content">
+			<blockquote>
+<p> 前两天看到ByteFE公众号发了篇文章，从源码去讲webpack。我之前也从很多方面去学习webpack，只是源码一直没太看得进去，这一次我想仔细地读一读。</p>
+</blockquote>
+<h2 id="简要介绍tapable"><a href="#简要介绍tapable" class="headerlink" title="简要介绍tapable"></a>简要介绍tapable</h2><p>说实话，之前看webpack源码一直没看的太懂，看不进去，有一部分原因就是它的hooks我根本看不懂是在干什么。比如这样，一堆hooks，还有全是回调函数，看不进去</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">run</span> = (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">	<span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">callAsync</span>(<span class="variable language_">this</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (err) <span class="keyword">return</span> <span class="title function_">finalCallback</span>(err);</span><br><span class="line"></span><br><span class="line">		<span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">run</span>.<span class="title function_">callAsync</span>(<span class="variable language_">this</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> (err) <span class="keyword">return</span> <span class="title function_">finalCallback</span>(err);</span><br><span class="line"></span><br><span class="line">			<span class="variable language_">this</span>.<span class="title function_">readRecords</span>(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">				<span class="keyword">if</span> (err) <span class="keyword">return</span> <span class="title function_">finalCallback</span>(err);</span><br><span class="line"></span><br><span class="line">				<span class="variable language_">this</span>.<span class="title function_">compile</span>(onCompiled);</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;);</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>我去看了一下，<code>this.hooks</code>里面的各个属性，都是从tapable导出的类的实例。我就去了解了一下tapable这个包，它是一个基于发布订阅模式的处理消息的npm包，webpack的插件机制就是基于它实现的。</p>
+<p>它的基础用法就是，先从tapable导出的某种hooks实例化一个对象A。然后通过一个方法比如A.tap，去给A绑定一个回调。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// compiler.hooks.beforeRun就是对象A。tap方法的第一个参数，我将它理解为是一个标记之类的东西</span></span><br><span class="line"><span class="comment">// 因为一个事件可以被好多地方监听，第一个参数就相当于是区分是哪一处代码在监听。实际用处不大</span></span><br><span class="line"><span class="comment">// 第二个参数就是回调方法</span></span><br><span class="line">compiler.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">tap</span>(<span class="string">&quot;plugin1-beforerun&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">     <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;beforeRun in Plugin1&quot;</span>);</span><br><span class="line">   &#125;);</span><br></pre></td></tr></table></figure>
+
+
+
+<p>然后我就可以在另一个地方，通过A.call来主动触发事件。此时，所有A.tap绑定的回调都会被触发。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 触发beforeRun事件（此处的this和上面代码的compiler是一个实例）</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">call</span>();</span><br><span class="line"><span class="comment">// 然后会执行上面绑定的回调</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>tapable导出的hooks有很多种，有同步触发的，有异步触发的。有多个监听者并行触发的，有串行触发的。我们今天就只看最简单的一种，同步触发，来简易地模拟一下webpack的插件机制。</p>
+<h2 id="动手实践"><a href="#动手实践" class="headerlink" title="动手实践"></a>动手实践</h2><p>首先我们<code>pnpm init</code>，然后<code>pnpm i tapable</code>（我确实喜欢pnpm，没有幽灵依赖，依赖版本明确，节省磁盘空间）</p>
+<p>然后我们新建一个src目录，接下来我们就模仿webpack的代码，开始动手。</p>
+<p>首先我们来写两个简单的webpack插件</p>
+<h4 id="src-x2F-Plugin-x2F-plugin1-js"><a href="#src-x2F-Plugin-x2F-plugin1-js" class="headerlink" title="src&#x2F;Plugin&#x2F;plugin1.js"></a>src&#x2F;Plugin&#x2F;plugin1.js</h4><p>我们先来用class来实现一个webpack插件。我们需要实现一个class，它有一个apply方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Plugin1</span> &#123;</span><br><span class="line">  <span class="title function_">apply</span>(<span class="params">compiler</span>) &#123;</span><br><span class="line">    <span class="comment">// 监听beforeRun事件</span></span><br><span class="line">    compiler.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">tap</span>(<span class="string">&quot;plugin1-beforerun&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;beforeRun in Plugin1&quot;</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 监听run事件，并接收一个参数</span></span><br><span class="line">    compiler.<span class="property">hooks</span>.<span class="property">run</span>.<span class="title function_">tap</span>(<span class="string">&quot;plugin1-run&quot;</span>, <span class="function">(<span class="params">stage</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;stage&#125;</span> in plugin1`</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="comment">// 监听afterRun事件，并接收三个参数  </span></span><br><span class="line">    compiler.<span class="property">hooks</span>.<span class="property">afterRun</span>.<span class="title function_">tap</span>(</span><br><span class="line">      <span class="string">&quot;plugin1-afterrun&quot;</span>,</span><br><span class="line">      <span class="function">(<span class="params">stage, timestamp, result</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(</span><br><span class="line">          <span class="string">`<span class="subst">$&#123;stage&#125;</span> in plugin1, timestamp is <span class="subst">$&#123;timestamp&#125;</span>, and the result is <span class="subst">$&#123;result&#125;</span>`</span></span><br><span class="line">        );</span><br><span class="line">      &#125;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">Plugin1</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="src-x2F-Plugin-x2F-plugin2-js"><a href="#src-x2F-Plugin-x2F-plugin2-js" class="headerlink" title="src&#x2F;Plugin&#x2F;plugin2.js"></a>src&#x2F;Plugin&#x2F;plugin2.js</h4><p>接下来我们用function来实现一个webpack插件，我们直接在函数体里面给事件绑定回调就可以了，代码完全和上一个插件一样，只是打印出来的plugin1改成plugin2</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Plugin2</span>(<span class="params">compiler</span>) &#123;</span><br><span class="line">  compiler.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">tap</span>(<span class="string">&quot;plugin2-beforerun&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;beforeRun in Plugin2&quot;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">  compiler.<span class="property">hooks</span>.<span class="property">run</span>.<span class="title function_">tap</span>(<span class="string">&quot;plugin2-run&quot;</span>, <span class="function">(<span class="params">stage</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;stage&#125;</span> in plugin1`</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">  compiler.<span class="property">hooks</span>.<span class="property">afterRun</span>.<span class="title function_">tap</span>(</span><br><span class="line">    <span class="string">&quot;plugin2-afterrun&quot;</span>,</span><br><span class="line">    <span class="function">(<span class="params">stage, timestamp, result</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(</span><br><span class="line">        <span class="string">`<span class="subst">$&#123;stage&#125;</span> in plugin2, timestamp is <span class="subst">$&#123;timestamp&#125;</span>, and the result is <span class="subst">$&#123;result&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">Plugin2</span></span><br></pre></td></tr></table></figure>
+
+<p>接下来就是我们用来类比webpack的两个文件</p>
+<h4 id="src-x2F-Compiler-js"><a href="#src-x2F-Compiler-js" class="headerlink" title="src&#x2F;Compiler.js"></a>src&#x2F;Compiler.js</h4><p>类比webpack中&#x2F;lib&#x2F;Compiler.js，我们只实现其中核心的run方法  </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; <span class="title class_">SyncHook</span> &#125; = <span class="built_in">require</span>(<span class="string">&quot;tapable&quot;</span>);</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyCompiler</span> &#123;</span><br><span class="line">  <span class="title function_">constructor</span>(<span class="params">options</span>) &#123;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">result</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">hooks</span> = &#123;</span><br><span class="line">      <span class="attr">beforeRun</span>: <span class="keyword">new</span> <span class="title class_">SyncHook</span>(),</span><br><span class="line">      <span class="attr">run</span>: <span class="keyword">new</span> <span class="title class_">SyncHook</span>([<span class="string">&quot;stage&quot;</span>]),</span><br><span class="line">      <span class="attr">afterRun</span>: <span class="keyword">new</span> <span class="title class_">SyncHook</span>([<span class="string">&quot;stage&quot;</span>, <span class="string">&quot;timestamp&quot;</span>, <span class="string">&quot;calResult&quot;</span>]),</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="title function_">run</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 在不同的阶段，去触发不同的事件</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">beforeRun</span>.<span class="title function_">call</span>();</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">run</span>.<span class="title function_">call</span>(<span class="string">&quot;run&quot;</span>);</span><br><span class="line">    <span class="comment">// 做个运算，来当做run了（类比compile代码）</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">result</span>++;</span><br><span class="line">    <span class="keyword">const</span> timestamp = <span class="keyword">new</span> <span class="title class_">Date</span>().<span class="title function_">getTime</span>();</span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">hooks</span>.<span class="property">afterRun</span>.<span class="title function_">call</span>(<span class="string">&quot;afterRun&quot;</span>, timestamp, <span class="variable language_">this</span>.<span class="property">result</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="title class_">MyCompiler</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="src-x2F-webpack-js"><a href="#src-x2F-webpack-js" class="headerlink" title="src&#x2F;webpack.js"></a>src&#x2F;webpack.js</h4><p>类比webpack中&#x2F;lib&#x2F;webpack.js，只不过把调用webpack的代码也写进来了。</p>
+<p>这个文件的核心部分写的相当简陋，webpack里面只做了创建compiler和compiler.run两件事</p>
+<p>而createCompiler里面则负责将compiler实例化，并且注册插件。如果只是我这样简易的实现的话，没必要把注册插件的代码特地拿出来写一个方法，完全可以写到compiler的构造函数里。但是实际的webpack在createCompiler里面还做了很多事，不方便写到构造函数里。而我为了能够使读者更容易将我的代码和webpack类比起来，所以采用了和webpack相似的写法。</p>
+<p>注册插件的时候，如果插件本身是一个函数，那么直接执行它就可以了。如果插件本身是一个类，那么则需要实例化，并且调用它的apply方法。以上两种方式，都会让插件去成功监听webpack触发的各种事件。插件可以根据自己的需要，给不同的阶段加上不同的回调</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title class_">MyCompiler</span> = <span class="built_in">require</span>(<span class="string">&quot;./Compiler&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> <span class="title class_">Plugin1</span> = <span class="built_in">require</span>(<span class="string">&quot;./Plugin/plugin1&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> plugin2 = <span class="built_in">require</span>(<span class="string">&quot;./Plugin/plugin2&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> plugin1 = <span class="keyword">new</span> <span class="title class_">Plugin1</span>();</span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">plugins</span>: [plugin1, plugin2],</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">createCompiler</span> = (<span class="params">options</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> compiler = <span class="keyword">new</span> <span class="title class_">MyCompiler</span>(options);</span><br><span class="line">  <span class="keyword">if</span> (<span class="title class_">Array</span>.<span class="title function_">isArray</span>(options.<span class="property">plugins</span>)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> plugin <span class="keyword">of</span> options.<span class="property">plugins</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> plugin === <span class="string">&quot;function&quot;</span>) &#123;</span><br><span class="line">        plugin.<span class="title function_">call</span>(compiler, compiler);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        plugin.<span class="title function_">apply</span>(compiler);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> compiler;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">webpack</span> = (<span class="params">options</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> compiler = <span class="title function_">createCompiler</span>(options);</span><br><span class="line">  compiler.<span class="title function_">run</span>();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="title function_">webpack</span>(options);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>其实tapable远不止上面这么简单，比如各处监听者的回调触发的时机，各处回调之间的互相通信，等等。但是这个简单的例子，已经足够让大家了解webpack的插件机制了。后面的文章随缘更新，也许是继续深入了解webpack，也许是更进一步研究tapable</p>
+	
+		</div>
+		
+		<div id="current-post-cover" data-scr="/img/cart_cover.jpg"></div>
+
+		<!-- relate post, comment...-->
+		<div class="investment-container">
+			<div class="investment-header">
+				<div class="investment-title-1">
+					<div class="on">相关文章</div>
+					<div>评论</div>
+					<div>分享</div>
+				</div>
+				<div class="investment-title-2">	            
+					
+	<span>
+		<a id="totop-post-page">返回顶部</a>
+		
+		
+			<a href="/2023/07/23/%E6%B7%B1%E5%85%A5js%E2%80%94%E2%80%94%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%8C%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%A0%88/" title="深入js——作用域，作用域链，执行栈（一）" rel="next">
+				下一篇&raquo;
+			</a>
+			
+	</span>
+
+
+      		
+				</div>	
+			</div>
+			
+			<div class="investment-content">
+				<div class="investment-content-list">
+					
+
+<div class="relate-post">
+	
+		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/06/27/webpack%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BB%A3%E7%A0%81%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90/" title="webpack运行时代码简要分析">
+								webpack运行时代码简要分析			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								六月 27日, 2023				
+							</p>
+							<p class="relate-post-content">
+								开个坑，主要也是怕自己后面忘了
+简单写写，有空了补上
+__webpack_modules是一个数组，每个元素都是一个函数，函数接受三个参数：第一个参数module好像没用到，第二个是一个对象（会把本模块要导出的属性，赋值给这个对象），...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/06/27/webpack%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BB%A3%E7%A0%81%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90/" title="webpack运行时代码简要分析">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="webpack运行时代码简要分析"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" title="webpack动态加载原理简述">
+								webpack动态加载原理简述			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								六月 17日, 2023				
+							</p>
+							<p class="relate-post-content">
+								为什么需要动态加载上一篇讲我写webpack针对markdown的loader的时候，提到了希望能动态加载以优化性能。篇幅原因没有展开说，打算单独写一篇文章讲一下。
+当我们访问网站的时候，浏览器会向服务器请求页面资源。首先请求的当然是...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" title="webpack动态加载原理简述">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="webpack动态加载原理简述"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">
+								编写一个简单的webpack loader的踩坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								六月 16日, 2023				
+							</p>
+							<p class="relate-post-content">
+								
+因为觉得hexo框架搭的博客功能一般，就有了想要自己写一个博客的想法。然后就想着如果把markdown文件也放到项目里的话，会比较方便，发现需要编写一个加载markdown的loader，于是就有了这篇博客，来记录一下踩过的坑和收获...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="编写一个简单的webpack loader的踩坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/07/23/%E6%B7%B1%E5%85%A5js%E2%80%94%E2%80%94%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%8C%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%A0%88/" title="深入js——作用域，作用域链，执行栈（一）">
+								深入js——作用域，作用域链，执行栈（一）			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 23日, 2023				
+							</p>
+							<p class="relate-post-content">
+								
+最近在补js基础。当初自学js的时候，总是感觉学的不扎实。只能说不去上手，再怎么死读书，也理解不了。积累了经验，然后自己去思考，这个时候再去看理论，就容易理解了。
+感觉工作一年以来，确实学到了很多，但是过于专注于应用方面的知识，反倒...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/07/23/%E6%B7%B1%E5%85%A5js%E2%80%94%E2%80%94%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%8C%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%A0%88/" title="深入js——作用域，作用域链，执行栈（一）">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="深入js——作用域，作用域链，执行栈（一）"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">
+								简单通俗解释HTTP缓存			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								六月 5日, 2023				
+							</p>
+							<p class="relate-post-content">
+								
+开始前的碎碎念
+最近加班真的很严重，组里同事们都已经苦不堪言。业务交付压力非常大，根本没时间去磨练本领，学习技术。真的很讨厌这种没有成长的日子，每天被业务需求赶着跑。每天下班之后，本来应该用于提升自我的时间也被压榨用来写业务代码。
+...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="简单通俗解释HTTP缓存"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">
+								从invalid hook call报错说到npm install相关			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								四月 9日, 2023				
+							</p>
+							<p class="relate-post-content">
+								遇到了invalid hook call报错上周，业务下游的同事反馈了一个生产问题，说我们传的值有问题，领导让我帮忙排查一下。我最近一直没做那个项目相关的需求，打开那个项目切到release分支，拉代码，npm i然后启动，结果就白屏...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="从invalid hook call报错说到npm install相关"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/" title="useState为什么获取不到更新后的值，如何解决">
+								useState为什么获取不到更新后的值，如何解决			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								三月 9日, 2023				
+							</p>
+							<p class="relate-post-content">
+								令人困扰的问题是因为异步吗大家都知道，react的useState和useReducer，在set和dispatch之后，马上去获取值，是拿不到最新的值的。这个原因之一是useState和useReducer是异步更新的，也就是说我们...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/" title="useState为什么获取不到更新后的值，如何解决">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="useState为什么获取不到更新后的值，如何解决"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">
+								发布一个npm包的踩坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								三月 6日, 2023				
+							</p>
+							<p class="relate-post-content">
+								试着自己发布了一个npm包，记录一下自己踩的坑
+package.json首先npm init，然后添加type:module字段，将其定义为一个es6模块。然后在files字段设置要发布上去的内容，比如dist文件夹。
+接下来将开发用...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="发布一个npm包的踩坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">
+								关于SPA与SSR的简单介绍			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								二月 28日, 2023				
+							</p>
+							<p class="relate-post-content">
+								本文将简要介绍几个概念，如SPA, CSR, SSR, 前端路由。适合小白，我将用浅显又生动的话语来介绍这些概念。
+什么是SPASPA（single page application）单页应用，占了现如今web应用的绝大多数。其意思就...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="关于SPA与SSR的简单介绍"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录">
+								前端知识随手记录			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								二月 17日, 2023				
+							</p>
+							<p class="relate-post-content">
+								
+最近几个月被业务需求搞的要死，已经到了周末两天都要去加班的地步了。也没机会像之前那样，晚上下班之后到家学习一两个小时了。最近被逼急了，想着这样加班岂不是永远没有学习的时间，没有学习怎么能提升自己，于是晚上决定十一点到家也要翻翻书，哪...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="前端知识随手记录"/>
+							</a>
+						</div>
+					</li>												
+			
+		</ul>
+	
+</div>	
+				</div>
+				<div class="investment-content-list">
+					<div class="layout-comment">
+
+	
+		<div class="config-info">
+			Please check the parameter of <b>comment</b> in config.yml of hexo-theme-Annie!
+		</div>	
+	
+
+</div>
+				</div>
+				<div class="investment-content-list">
+					<div class="layout-share">
+	
+	
+
+		
+			
+			<!-- socialShare share -->
+			<div class="social-share"></div>
+
+<!--  css & js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+			
+		
+		
+	
+</div>
+
+
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>
+
+<!-- show math formula -->
+
+
+
+	 
+	
+<script src="/plugin/clipboard/clipboard.js"></script>
+
+	<script>
+		// Copy code !
+	    function preprocessing() {
+	        $("#article-content .highlight").each(function() {
+	            $(this).wrap('<div id="post-code"></div>');
+	        })
+
+	        $("#article-content #post-code").each(function() {
+	            $(this).prepend('<nav class="copy-nav"><span><i class="code-language"></i></span></nav>');
+	        })
+
+	        $("#article-content .copy-nav").each(function() {
+	            let languageClass = $(this).next().attr('class'),
+	                language = ((languageClass.length > 9) && (languageClass != null)) ? languageClass.substr(10) : "none"; //why 9? Need to check language?
+
+	            $(this).find('.code-language').text(language);
+	            $(this).append('<span class="copy-btn icon-paste"></span>');
+	        });
+	    }
+
+		function copy() {
+		    $('#article-content #post-code').each(function(i) {
+		        let codeCopyId = 'codeCopy-' + i;
+
+		        let codeNode = $(this).find('.code'),
+		            copyButton = $(this).find('.copy-btn');
+
+		        codeNode.attr('id', codeCopyId);
+		        copyButton.attr('data-clipboard-target-id', codeCopyId);
+		    })
+   
+			let clipboard = new ClipboardJS('.copy-btn', {
+					target: function(trigger) {
+						return document.getElementById(trigger.getAttribute('data-clipboard-target-id'));
+					}
+		      	});
+
+			//pure js
+			function showTooltip(elem, msg) {		   
+				elem.setAttribute('aria-label', msg);
+				elem.setAttribute('class', 'copy-btn icon-clipboard1');
+				setTimeout(function() {
+					elem.setAttribute('class', 'copy-btn icon-paste');
+				}, 2000);
+			}
+
+			clipboard.on('success', function(e) {
+			    e.clearSelection();
+			    console.info('Action:', e.action);		   
+			    console.info('Trigger:', e.trigger);
+			    showTooltip(e.trigger, 'Copied!');   
+			});
+			
+			clipboard.on('error', function(e) {
+			    console.error('Action:', e.action);
+			    console.error('Trigger:', e.trigger);
+			});
+		}
+		
+		(function copyCode(){
+			if ($('.layout-post').length) {
+			    preprocessing();
+			    copy();
+			} 
+		})();
+	</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="/plugin/fancybox/jquery.fancybox.css">
+
+
+<script src="/plugin/fancybox/jquery.fancybox.js"></script>
+
+
+<script type="text/javascript">
+	(function gallerySet(){
+		let titleID = $('.article-title a'),
+			imageID = $('.article-content img'),
+			videoID = $('.article-content video');
+		
+		let postTitle = titleID.text() ? titleID.text() : "No post title!";
+		
+		imageID.each(function() {
+			let imgPath = $(this).attr('src'),
+				imgTitle = $(this).attr('alt') ? $(this).attr('alt') : "No image description!";
+		
+			//给每个匹配的<img>元素打包, 即添加父元素<a>
+			$(this).wrap('<a data-fancybox="gallery" data-caption="《 ' + postTitle + ' 》' + imgTitle + '"href="' + imgPath + '"> </a>');
+		});
+		
+		videoID.each(function() {
+			let videoPath = $(this).attr('src');
+		
+			//给每个匹配的<img>元素打包, 即添加父元素<a>
+			$(this).wrap('<a data-fancybox href=" ' + videoPath + ' "> </a>');
+		});
+		
+		//TODO：支持html5 video
+
+		if($('#layout-post').length) {
+			$('[data-fancybox="gallery"]').fancybox({
+				loop: true,
+				buttons: [
+					"zoom",
+					"share",
+					"slideShow",
+					"fullScreen",
+					//"download",
+					"thumbs",
+					"close"
+				],
+				protect: true
+			});
+		}
+	})();
+</script>
+		</main>
+
+		<!--footer-->
+		<footer>
+	<div id="navigation-show">
+		<ul id="global-nav">
+	
+		<li class="menu-home">
+			<a href="/" class="menu-item-home" target="_blank">主页</a>
+		</li>
+		
+	
+		<li class="menu-archive">
+			<a href="/archives" class="menu-item-archive" target="_blank">归档</a>
+		</li>
+		
+	
+		<li class="menu-categories">
+			<a href="/categories" class="menu-item-categories" target="_blank">分类</a>
+		</li>
+		
+	
+		<li class="menu-tags">
+			<a href="/tags" class="menu-item-tags" target="_blank">标签</a>
+		</li>
+		
+	
+		<li class="menu-about">
+			<a href="/about" class="menu-item-about" target="_blank">关于</a>
+		</li>
+		
+	
+		<li class="menu-gallery">
+			<a href="/gallery" class="menu-item-gallery" target="_blank">相册</a>
+		</li>
+		
+	
+
+	
+</ul>
+	</div>
+
+	<div class="copyright">
+		<p>
+			 
+				&copy;2017 - 2024, content by Sariay. All Rights Reserved.
+			
+			
+				<a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> Theme <a href="https://github.com/Sariay/hexo-theme-Annie" title="Annie" target="_blank" rel="noopener">Annie</a> by Sariay.
+			
+		</p>
+		<p>
+			
+
+	<!-- busuanzi -->
+	<!-- busuanzi -->
+
+
+
+			<a href="javascript:zh_tran('s');" class="zh_click" id="zh_click_s">简体</a> 
+			<a href="javascript:zh_tran('t');" class="zh_click" id="zh_click_t">繁體</a>				
+		</p>
+	</div>		
+</footer>
+		
+	<!-- Local or hitokoto! -->
+
+	
+<script src="/plugin/motto/motto.js"></script>
+
+	
+	<script type="text/javascript">
+		(function motto(){
+			let mottoText = getMingYanContent().split('</br> - </br>'),
+			
+			mottoTextContent = mottoText[0]?mottoText[0]:'请刷新...',
+			
+			mottoTextFrom = mottoText[1]?mottoText[1]:'one/一个';
+			
+			mottoTextContent = mottoTextContent.trim().substring(0, 100);
+		
+			$("#motto-content").html( mottoTextContent);
+			$("#motto-author").html( mottoTextFrom  );
+		})();	
+	</script>	
+
+
+
+<!-- love effect -->
+
+
+<!-- back to top -->
+
+	<div id="totop">
+	<span class="icon-circle-up"></span>
+</div>
+
+
+
+<!-- site analysis -->
+
+
+	<!-- site-analysis -->
+	
+	
+	
+	
+	
+ 
+
+<!-- leancloud -->
+
+
+	<!-- leancloud -->
+	<!--
+	时间：2018-11-27
+	描述：
+		文章访问量：visitors
+		文章喜欢量：likes	
+		文章排行榜：topNPost
+		其他得说明：
+			01-Cookie相关的函数 
+				https://blog.csdn.net/somehow1002/article/details/78511541（Author：somehow1002）
+			02-visitors相关的函数 
+				https://blog.csdn.net/u013553529/article/details/63357382（Author：爱博客大伯）
+				https://notes.doublemine.me/2015-10-21-为NexT主题添加文章阅读量统计功能.html（Author：夏末）
+			03-topNPost相关的函数
+				https://hoxis.github.io/hexo-next-read-rank.html（Author：hoxis）
+			04-likes相关的函数，
+				参考了01 & 02进行简单的设计与实现
+-->
+
+
+	
+
+  
+
+
+
+<script src="/plugin/chinese/chinese.js"></script>
+<script src="/plugin/imagelazyloader/yall.min.js"></script>
+<script src="/plugin/imageloaded/imagesloaded.pkgd.min.js"></script>
+<script src="/plugin/nicescroll/jquery.nicescroll.js"></script>
+<script src="/plugin/resizediv/resizediv.js"></script>
+<script src="/js/main.js"></script>
+
+	</body>	
+</html>

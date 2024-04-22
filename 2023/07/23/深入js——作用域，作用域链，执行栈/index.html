@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      深入js——作用域，作用域链，执行栈 | moe&#39;s blog
+      深入js——作用域，作用域链，执行栈（一） | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「深入js——作用域，作用域链，执行栈」
+			「深入js——作用域，作用域链，执行栈（一）」
 		
 	</p>
 
@@ -223,6 +223,19 @@
 		插件作者：KELEN
 		插件来源: https://github.com/KELEN/katelog
 -->
+
+	
+		<div class="layout-toc">
+			<div id="layout-toc">
+				<div class="k-catelog-list" id="catelog-list" data-title="文章目录"></div>
+			</div>
+		</div>
+
+		
+<script src="/plugin/toc/katelog.min.js"></script>
+
+
+		
 	 
 
 <div class="layout-post">
@@ -230,7 +243,7 @@
 		<div class="article-title">
 			
 	<a href="/2023/07/23/%E6%B7%B1%E5%85%A5js%E2%80%94%E2%80%94%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%8C%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%A0%88/" itemprop="url">
-		深入js——作用域，作用域链，执行栈
+		深入js——作用域，作用域链，执行栈（一）
 	</a>
 
 		</div>
@@ -248,7 +261,7 @@
 
 	<a href="/2023/07/23/%E6%B7%B1%E5%85%A5js%E2%80%94%E2%80%94%E4%BD%9C%E7%94%A8%E5%9F%9F%EF%BC%8C%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE%EF%BC%8C%E6%89%A7%E8%A1%8C%E6%A0%88/" itemprop="url">
 		<time datetime="2023-07-22T17:15:42.000Z" itemprop="dateUpdated">
-	  		2023-07-23
+	  		2023-07-24
 	  </time>
 	</a> 
 
@@ -283,13 +296,23 @@
 		<div class="article-content" id="article-content">
 			<blockquote>
 <p>最近在补js基础。当初自学js的时候，总是感觉学的不扎实。只能说不去上手，再怎么死读书，也理解不了。积累了经验，然后自己去思考，这个时候再去看理论，就容易理解了。</p>
-<p>感觉工作一年依赖，确实学到了很多，但是过于专注于应用方面的知识，反倒基础上有些东西落下了。虽说平时写代码多半没什么影响，但是基础扎实，才能让你知其所以然。搞技术的永远不能放弃对“知其所以然”的追求。</p>
+<p>感觉工作一年以来，确实学到了很多，但是过于专注于应用方面的知识，反倒基础上有些东西忘记了。虽说平时写代码多半没什么影响，但是基础扎实，才能让你知其所以然。搞技术的永远不能放弃对“知其所以然”的追求。</p>
 <p>本篇文章小目标是当一个自己的笔记，免得过段时间又忘了。大目标就是写的详细一点，能让更多的人知其所以然</p>
 </blockquote>
 <p>最精简的结论：</p>
 <p>js作用域是静态作用域（词法作用域），在定义的时候就已经确定了。</p>
 <p>而执行上下文，顾名思义是运行时的东西，要看是谁调用了谁。</p>
 <p>todo 作用域和执行栈的画图解释，闭包，作用域的分类（全局script作用域，模块作用域）。js执行两阶段，活动对象等等</p>
+<h2 id="浅谈作用域和作用域链"><a href="#浅谈作用域和作用域链" class="headerlink" title="浅谈作用域和作用域链"></a>浅谈作用域和作用域链</h2><p>当访问变量时，js引擎会首先在当前作用域找这个变量，找不到就沿着作用域链向上找，直到全局作用域。沿着作用域链能找到的变量，就可以访问。沿着作用域链找不到的，就不能访问。</p>
+<p>js的作用域是静态作用域（也叫词法作用域），在定义的时候就已经被确定了，也就是说，要以代码被定义时的层级，作为作用域链。与之相对的是动态作用域，要以代码被调用的层级来作为作用域链（现代编程语言多数为静态作用域）</p>
+<p>举个例子，</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> a = <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">fun1</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">let</span> a = <span class="number">2</span></span><br><span class="line">    <span class="keyword">const</span> f= <span class="keyword">function</span> <span class="title function_">fun2</span>(<span class="params"></span>)&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(a)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> f</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> result = <span class="title function_">fun1</span>()</span><br><span class="line"><span class="title function_">result</span>()</span><br></pre></td></tr></table></figure>
+
+<p>这段js代码，打印出来的是2，因为fun2内部访问a的时候，沿着作用域链寻找，作用域链是按定义的层级来的，所以会找到fun1里面的a，而不是全剧最外面的a。</p>
+<p>如果是动态作用域，那么会打印出来1，因为调用f的环境是在全局。</p>
+<h2 id="执行栈"><a href="#执行栈" class="headerlink" title="执行栈"></a>执行栈</h2><p>js调用函数，是以栈的形式去实现的。有一个执行环境的栈，栈里面每一个元素都是一个执行上下文。至于什么是执行上下文，后面会详细讲解，可以简单理解为包含了函数执行相关信息，比如入参，和里面定义的变量等等。</p>
+<p>最初的执行栈就只有一个元素，就是全局上下文。然后如果调用了别的函数，就会创建一个新的上下文，并且推入栈中，如果在函数内又调用了函数，就继续创建新的上下文并入栈。当函数执行完毕，这个函数的上下文就出栈。</p>
+<p>这就是很基本的执行栈规则</p>
 <p>很忙，有空再更新</p>
 	
 		</div>
@@ -308,6 +331,10 @@
 					
 	<span>
 		<a id="totop-post-page">返回顶部</a>
+		
+			<a href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" title="基于tapable来模拟webpack插件机制" rel="prev">
+				&laquo;上一篇
+			</a>
 		
 		
 			<a href="/2023/06/27/webpack%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BB%A3%E7%A0%81%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90/" title="webpack运行时代码简要分析" rel="next">
@@ -328,6 +355,31 @@
 <div class="relate-post">
 	
 		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" title="基于tapable来模拟webpack插件机制">
+								基于tapable来模拟webpack插件机制			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								四月 22日, 2024				
+							</p>
+							<p class="relate-post-content">
+								
+ 前两天看到ByteFE公众号发了篇文章，从源码去讲webpack。我之前也从很多方面去学习webpack，只是源码一直没太看得进去，这一次我想仔细地读一读。
+
+简要介绍tapable说实话，之前看webpack源码一直没看的太懂，...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" title="基于tapable来模拟webpack插件机制">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="基于tapable来模拟webpack插件机制"/>
+							</a>
+						</div>
+					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -534,28 +586,6 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="前端知识随手记录"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
-								React中副作用的执行时机			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								八月 26日, 2022				
-							</p>
-							<p class="relate-post-content">
-								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
 							</a>
 						</div>
 					</li>												
@@ -774,7 +804,7 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 	<div class="copyright">
 		<p>
 			 
-				&copy;2017 - 2023, content by Sariay. All Rights Reserved.
+				&copy;2017 - 2024, content by Sariay. All Rights Reserved.
 			
 			
 				<a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> Theme <a href="https://github.com/Sariay/hexo-theme-Annie" title="Annie" target="_blank" rel="noopener">Annie</a> by Sariay.
