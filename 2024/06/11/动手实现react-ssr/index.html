@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      一些部署相关的名词解释 | moe&#39;s blog
+      动手实现react ssr | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「一些部署相关的名词解释」
+			「动手实现react ssr」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" itemprop="url">
-		一些部署相关的名词解释
+	<a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" itemprop="url">
+		动手实现react ssr
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2022/07/24/%E4%B8%80%E4%BA%9B%E9%83%A8%E7%BD%B2%E7%9B%B8%E5%85%B3%E7%9A%84%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" itemprop="url">
-		<time datetime="2022-07-24T10:25:59.000Z" itemprop="dateUpdated">
-	  		2022-07-24
+	<a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" itemprop="url">
+		<time datetime="2024-06-10T17:42:12.000Z" itemprop="dateUpdated">
+	  		2024-06-12
 	  </time>
 	</a> 
 
@@ -272,16 +272,20 @@
 				
 	<i class="icon-price-tags"></i>
 	
-		<a href="/tags/%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A/" class=" ">
-			名词解释
+		<a href="/tags/react/" class=" ">
+			react
 		</a>
 	
-		<a href="/tags/%E9%A1%B9%E7%9B%AE%E9%83%A8%E7%BD%B2/" class=" ">
-			项目部署
+		<a href="/tags/ssr/" class=" ">
+			ssr
 		</a>
 	
-		<a href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/" class=" ">
-			软件工程
+		<a href="/tags/%E5%8A%A8%E6%89%8B%E5%AE%9E%E8%B7%B5/" class=" ">
+			动手实践
+		</a>
+	
+		<a href="/tags/%E5%90%8C%E6%9E%84%E6%B8%B2%E6%9F%93/" class=" ">
+			同构渲染
 		</a>
 	
 		
@@ -294,16 +298,27 @@
 		</div>
 
 		<div class="article-content" id="article-content">
-			<blockquote>
-<p>毕业刚入职，看到公司的各种发布，部署平台，眼花缭乱，看文档的过程中也看到了很多不懂的名词，了解了之后做一下记录</p>
-</blockquote>
-<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><ol>
-<li>serverless: 字面意思是“无服务器”，即开发者（开发公司）不用自己的机房服务器，采用云服务器厂商提供的云服务器</li>
-<li>PaaS：platform as a service，平台即服务，指提供一个软件部署平台，用户使用平台部署软件时，无需关心部署的硬件和底层细节，只需关注业务逻辑</li>
-<li>金丝雀发布：也叫灰度发布。意思是发布新版本时，通过对流量分流，先让一小部分用户能用到新版本（可理解为抢先体验），等到没有大问题之后再推广到全体用户。这和过去下矿时先用金丝雀来检验矿井下面是否有毒气体超标的行为相似，因此得名。</li>
-<li>微服务：一个整体架构的的应用程序，可能包含了很多功能。举个简单例子，一个图书馆的借书系统，要管理借书卡（比如新增或修改一个账号，查询一个账号借的书），要管理图书（比如借书，还书，增加库存）。这么一个简单的系统，功能不复杂，采用整体架构没问题。但是当一个系统功能多起来，开发和维护的人员肯定也要多。如果这时还采用整体架构，当各个功能都有改动，要发新版本的时候，会很痛苦。微服务就是把系统按照功能拆分开来，使得拆分出的部分互相解耦，每个部分就是一个微服务，例如单独拆出来个微服务管理借书卡，单独拆出来个部分管理图书。这两部分可以通过RESTful API等方式进行通信，但是一个部分做出改动时，不会影响另一个部分的正常使用。这就是微服务</li>
-<li>BFF层：Backend for Frontend，服务于前端的后端。由于微服务的拆分，或者多端（PC，移动等等）需要从后端返回的数据并不一致，使得前端在请求后端的接口时，通常要做聚合（把多个接口返回的数据组合起来）或裁减（对接口返回的数据做过滤，只用到一部分）。为了解决这个麻烦，BFF就相当于一个中间层，代替前端去请求后端的接口，并且对数据做聚合和裁剪等等，然后将直接可用的数据返回给前端，同时还能起到屏蔽后端修改的作用（当后端的接口做出什么改动时，BFF层做出修改，使得前端无需做出改动）</li>
-</ol>
+			<p>关于ssr相关的介绍，可以移步之前的一篇博文，本文不再赘述</p>
+<p>日常工作中，我们可能都接触过ssr，不过我们可能通常是借助于框架（例如Next.js）的支持来完成ssr。今天我想尝试，摆脱高度封装的前端框架，只依赖react相关的库，来实现ssr。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/miku03090831/Attempting-SSR-based-on-React">本篇代码</a> <code>pnpm i</code>安装依赖，<code>npm run server</code>启动服务</p>
+<p>环境：node 20.12.0 react和react-dom版本均为18.3.1</p>
+<p>参考文献：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/697570886">知乎专栏：SSR原理与实践</a></p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>我们的目的，是本地的8080端口起一个node服务，然后当我们访问localhost:8080的时候，服务端能返回给我们一个页面，。在拿到页面之后，浏览器会对页面进行水合，从而使得页面可交互。</p>
+<p>首先，我们先安装一下依赖。我比较喜欢pnpm（节省磁盘空间，避免幽灵依赖），所以我直接在命令行敲<code>pnpm i react react-dom express</code> 。安装react（将jsx转为虚拟dom），react-dom（将虚拟dom转成dom），express（用于起一个web服务器）</p>
+<p>然后我们新建三个文件，分别是server.js，index.js，App.jsx</p>
+<p><strong>App.jsx</strong>里面，我们就简单实现一个组件吧，然后要用commonjs的方式去引入和导出（因为我们是极简版本，甚至都没有经过打包构建流程，为了能让node端识别，就直接按cjs规范写了）</p>
+<p><strong>index.js</strong>里面，我们要去写用于客户端执行的代码，我们暂且随便在里面console.log一句话吧，用于证明index.js被成功加载。</p>
+<p>本期的重头戏来了，<strong>server.js</strong>，不多bb先上代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">const express = require(&quot;express&quot;);</span><br><span class="line">const App = require(&quot;./app.jsx&quot;);</span><br><span class="line">const ReactDom = require(&quot;react-dom/server&quot;);</span><br><span class="line">const React = require(&#x27;react&#x27;)</span><br><span class="line"></span><br><span class="line">const server = express();</span><br><span class="line">server.use(express.static(&#x27;.&#x27;))</span><br><span class="line">server.get(&quot;/&quot;, function (req, res, next) &#123;</span><br><span class="line">  const elementString = ReactDom.renderToString(&lt;App /&gt;);</span><br><span class="line">  const html = `&lt;!DOCTYPE html&gt;</span><br><span class="line">  &lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">      &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">      &lt;title&gt;my react ssr&lt;/title&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">      &lt;div id=&quot;root&quot;&gt;</span><br><span class="line">         $&#123;elementString&#125;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">  &lt;/html&gt;</span><br><span class="line">  &lt;script type=&quot;text/javascript&quot;  src=&quot;index.js&quot;&gt;&lt;/script&gt;`;</span><br><span class="line">  res.send(html);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.listen(8080);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>对于访问根目录的请求，我们依旧是通过cjs的require，拿到app.jsx的内容。然后借助react-dom&#x2F;server的api <code>renderToString</code>，将jsx组件转成html字符串 。</p>
+<p>接下来就是拼模板啦，直接copy模板，然后把得到的html字符串放到模板字符串中间，并且在最后写一个script标签，加载未来可期的index.js。然后返回response就可以了</p>
+<p>然后为了解决node不认识jsx的问题，我们又装了bable的一系列包。依旧是用pnpm安装@babel&#x2F;cli，@babel&#x2F;core，@babel&#x2F;node，babel&#x2F;preset-env，@babel&#x2F;preset-react。然后在package.json添加一个script，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;scripts&quot;: &#123;</span><br><span class="line">	&quot;server&quot;: &quot;babel-node server.js&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们就可以通过npm run server，来启动服务了。打开浏览器，访问localhost:8080，可以看到页面正常展示。但是打开控制台，发现index.js没加载出来，404了。是因为请求localhost:8080&#x2F;index.js 这个静态资源路径，express是不知道你要什么的。需要通过<code>express.static(pathxxx)</code>中间件，来告诉express，以pathxxx作为静态资源目录。例如我这里把index.js放在了根目录，那pathxxx就是“.”就可以了。</p>
+<p>再次重启服务，打开控制台，看到index.js正常被加载，打印出了我们想要的东西。</p>
+<p>本次暂时只实现服务端渲染的部分，后续客户端水合，且听下回分解</p>
 	
 		</div>
 		
@@ -322,12 +337,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2022/07/24/test-post/" title="test-post" rel="next">
+			<a href="/2024/04/22/%E5%9F%BA%E4%BA%8Etapable%E6%9D%A5%E6%A8%A1%E6%8B%9Fwebpack%E6%8F%92%E4%BB%B6%E6%9C%BA%E5%88%B6/" title="基于tapable来模拟webpack插件机制" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -345,6 +356,50 @@
 <div class="relate-post">
 	
 		<ul>
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">
+								从invalid hook call报错说到npm install相关			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								四月 9日, 2023				
+							</p>
+							<p class="relate-post-content">
+								遇到了invalid hook call报错上周，业务下游的同事反馈了一个生产问题，说我们传的值有问题，领导让我帮忙排查一下。我最近一直没做那个项目相关的需求，打开那个项目切到release分支，拉代码，npm i然后启动，结果就白屏...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="从invalid hook call报错说到npm install相关"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
+								React中副作用的执行时机			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 26日, 2022				
+							</p>
+							<p class="relate-post-content">
+								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
+							</a>
+						</div>
+					</li>												
 			
 					<li>
 						<div class="relate-post-text">
@@ -416,29 +471,6 @@ react不是魔法
 							<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="使用react的一些心得与感想"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" title="动手实现react ssr">
-								动手实现react ssr			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 11日, 2024				
-							</p>
-							<p class="relate-post-content">
-								关于ssr相关的介绍，可以移步之前的一篇博文，本文不再赘述
-日常工作中，我们可能都接触过ssr，不过我们可能通常是借助于框架（例如Next.js）的支持来完成ssr。今天我想尝试，摆脱高度封装的前端框架，只依赖react相关的库，来实...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" title="动手实现react ssr">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="动手实现react ssr"/>
 							</a>
 						</div>
 					</li>												
@@ -558,31 +590,6 @@ __webpack_modules是一个数组，每个元素都是一个函数，函数接受
 							<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="编写一个简单的webpack loader的踩坑"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">
-								简单通俗解释HTTP缓存			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 5日, 2023				
-							</p>
-							<p class="relate-post-content">
-								
-开始前的碎碎念
-最近加班真的很严重，组里同事们都已经苦不堪言。业务交付压力非常大，根本没时间去磨练本领，学习技术。真的很讨厌这种没有成长的日子，每天被业务需求赶着跑。每天下班之后，本来应该用于提升自我的时间也被压榨用来写业务代码。
-...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" title="简单通俗解释HTTP缓存">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="简单通俗解释HTTP缓存"/>
 							</a>
 						</div>
 					</li>												
