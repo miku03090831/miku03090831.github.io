@@ -13,7 +13,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <title>
     
-      简单通俗解释HTTP缓存 | moe&#39;s blog
+      动手实现react-ssr 2 | moe&#39;s blog
     
   </title>
   <meta name="author" content="qh_meng">
@@ -100,7 +100,7 @@
 	<!-- Page title -->
 	<p>
 		
-			「简单通俗解释HTTP缓存」
+			「动手实现react-ssr 2」
 		
 	</p>
 
@@ -242,8 +242,8 @@
 	<div id="layout-post">
 		<div class="article-title">
 			
-	<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" itemprop="url">
-		简单通俗解释HTTP缓存
+	<a href="/2024/06/16/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr-2/" itemprop="url">
+		动手实现react-ssr 2
 	</a>
 
 		</div>
@@ -259,9 +259,9 @@
 
 	更新于
 
-	<a href="/2023/06/05/%E7%AE%80%E5%8D%95%E9%80%9A%E4%BF%97%E8%A7%A3%E9%87%8AHTTP%E7%BC%93%E5%AD%98/" itemprop="url">
-		<time datetime="2023-06-04T16:40:17.000Z" itemprop="dateUpdated">
-	  		2023-06-05
+	<a href="/2024/06/16/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr-2/" itemprop="url">
+		<time datetime="2024-06-15T18:12:46.000Z" itemprop="dateUpdated">
+	  		2024-06-16
 	  </time>
 	</a> 
 
@@ -272,20 +272,20 @@
 				
 	<i class="icon-price-tags"></i>
 	
-		<a href="/tags/%E5%89%8D%E7%AB%AF/" class=" ">
-			前端
+		<a href="/tags/react/" class=" ">
+			react
 		</a>
 	
-		<a href="/tags/http/" class=" ">
-			http
+		<a href="/tags/ssr/" class=" ">
+			ssr
 		</a>
 	
-		<a href="/tags/http%E7%BC%93%E5%AD%98/" class=" ">
-			http缓存
+		<a href="/tags/%E5%8A%A8%E6%89%8B%E5%AE%9E%E8%B7%B5/" class=" ">
+			动手实践
 		</a>
 	
-		<a href="/tags/%E5%B0%8F%E7%99%BD%E9%83%BD%E8%83%BD%E6%87%82/" class=" ">
-			小白都能懂
+		<a href="/tags/%E5%90%8C%E6%9E%84%E6%B8%B2%E6%9F%93/" class=" ">
+			同构渲染
 		</a>
 	
 		
@@ -299,28 +299,19 @@
 
 		<div class="article-content" id="article-content">
 			<blockquote>
-<p>开始前的碎碎念</p>
-<p>最近加班真的很严重，组里同事们都已经苦不堪言。业务交付压力非常大，根本没时间去磨练本领，学习技术。真的很讨厌这种没有成长的日子，每天被业务需求赶着跑。每天下班之后，本来应该用于提升自我的时间也被压榨用来写业务代码。</p>
-<p>希望组里能早日摆脱现状，不然就只能润了</p>
+<p>仓库链接：<a target="_blank" rel="noopener" href="https://github.com/miku03090831/Attempting-SSR-based-on-React/tree/stage-2">本篇代码</a></p>
+<p>运行方法参考readme，请使用pnpm，因为本次使用的rspack尚未推出1.0版本，预计后续可能会有很多breakchange，所以lock文件至关重要，而我只上传了pnpm的lock，非常抱歉。</p>
+<p>环境：node 20.12.0  pnpm 8.15.5 其余依赖以lock文件为准</p>
 </blockquote>
-<p>很多人应该都听过http缓存，也是比较常问的面试题吧。还记得我当时什么也不会，刷面经的时候就看到什么http状态码里的304，然后就顺着去搜了一下，搜到了什么协商缓存，看了一下，看的云里雾里。主要还是当时真的欠缺太多基本知识了，搜到的博客里面又都没讲这些基础的点。所以我这次想来通俗的讲一讲，http缓存。注意，本文中所指的服务器，绝大部分都是前端的，返回给你html文件等等的那个服务器，而不是部署着接口的后端服务器。</p>
-<h2 id="为什么需要http缓存"><a href="#为什么需要http缓存" class="headerlink" title="为什么需要http缓存"></a>为什么需要http缓存</h2><h3 id="理解静态资源"><a href="#理解静态资源" class="headerlink" title="理解静态资源"></a>理解静态资源</h3><p>我们都知道，访问一个网站，浏览器会向网站服务器发送很多http请求，去请求html文件，css文件，js文件等等。这些文件都是静态资源。静态资源，其实就是服务器上的文件罢了，不经常变化。你写一个网站的前端代码，写好了部署上去，就不变了。除非你重新部署，上面的文件才变。不像你请求接口，去查数据库里面的数据，那是经常变化的。</p>
-<p>就因为静态资源不常变，所以我们可以把它们缓存起来。这样下次再请求的时候，缓存没过期的话，就可以直接从缓存里面读静态资源，会比从服务器再收一次静态资源快上很多。</p>
-<p>注意：http缓存通常只针对get请求。这也很合理，因为浏览器访问网站，获取静态资源时，发送的请求都是get。至于你访问接口，就由你自己控制了。我的评价是接口都可以用post访问。</p>
-<h2 id="如何判断缓存是否过期"><a href="#如何判断缓存是否过期" class="headerlink" title="如何判断缓存是否过期"></a>如何判断缓存是否过期</h2><p>http缓存有两种：强缓存和协商缓存。流程省流：先强缓存，再协商缓存，再重新向服务器请求。</p>
-<h3 id="省流"><a href="#省流" class="headerlink" title="省流"></a>省流</h3><p>通俗来说，浏览器向服务器请求静态资源的时候，服务器会说，你多久之内不要再来问我这个问题。于是这个时间内，每当浏览器需要用这个资源时，都会用第一次服务器给他的那份，这就是强缓存。</p>
-<p>过了这个时间以后，强缓存失效了。浏览器会再去问服务器要这个资源，但是它问的时候会带上两个问题:</p>
-<ol>
-<li>你上次给我的东西，哈希值是这个，你看看变了没</li>
-<li>你上次给我的东西，是某个时间更新的，你看看还是不是最新的</li>
-</ol>
-<p>服务器根据这两个问题来判断，浏览器的缓存还能不能用。如果能，服务器返回给浏览器的http状态码是304，意思就是和上次一样，我就不再给你一份了。如果不能，则服务器会重新发一份静态资源给浏览器。这就是协商缓存</p>
-<h3 id="强缓存"><a href="#强缓存" class="headerlink" title="强缓存"></a>强缓存</h3><p>强缓存就是指，你第一次请求静态资源的时候，服务器返回给你的response header里面如果带下面的两个字段之一：expires或者cache-control，则浏览器会用强缓存规则判断缓存是否过期。expires是直接写死的过期时间，下次再发请求的时候，取当前时间和过期时间比较，来判断是否过期。而cache-control下面的max-age字段则是指定了一个时长。下次请求的时候，会看距离上次过了多久，比较时长来判断是否过期。</p>
-<p>expires来自http1.0，cache-control的max-age来自http1.1 。expires的缺陷是没考虑时区问题。客户端和服务端的所处时区不一致时，expires是服务端所在时区的时间，而客户端会把它当成是自己所在时区的时间。</p>
-<p>看到这里我们可以知道，强缓存的过期时间是服务器那边人为控制的，人为指定了这个缓存能有效多久。如果缓存没过期，我直接问都不问服务器。所以这个时间设定不宜太长，不然即便这些静态资源被更新了，用户也拿不到，因为用户一直在读本地的缓存。</p>
-<h3 id="协商缓存"><a href="#协商缓存" class="headerlink" title="协商缓存"></a>协商缓存</h3><p>当强缓存失效的时候，浏览器还会再挣扎一下，走协商缓存。前提是第一次返回的静态资源的响应头里面有下面两个字段之一：etag或者last-modified。etag可以理解为是这个静态资源的哈希值，内容变化会导致etag的变化。last-modified是这个静态资源上次被修改的时间。</p>
-<p>等到第二次请求这个静态资源时，浏览器会向服务器发一个请求，这次请求头里面的if-none-match的值为上一次的response的etag，if-modified-since值为上一次response的last-modified。服务器收到这个请求，会再去看一下服务器上的静态资源，它的etag和last-modified，然后自己根据浏览器传过来的etag和last-modified，判断一下浏览器那边的缓存是否还能用。如果还能用，也就是没过期，就返回一个http code304。如果不能用，就返回最新的静态资源过去（当然http code是200）。</p>
-<p>至于服务器如何根据etag和last-modified判断，这个是看服务器具体怎么实现的，各大框架应该都已经有现成的实现了。反正单独看两个字段的话，肯定是比较etag是否一致，和last-modified值是否相同了。但是二者的优先级，是依靠具体实现的。etag的准确度肯定更高。如果在last-modified的最小时间精度内，文件被修改了多次，last-modified是区分不出来的。而且无谓的修改也会导致last-modified的改变，即使修改并没有改动到文件的内容。所以通常建议以etag为准。</p>
+<p>上一篇，我们已经完成了服务端的部分。理论上，我们这期只要补完浏览器端水合的功能，就基本完成了。但是困难总比想象的多，而且我最初的设想也太过天真</p>
+<p>因为我没有不依赖脚手架，从零搭建项目的经验，一开始想着不打包，直接运行，最多过一下babel转一下嘛，但是后面问题越来越多。。。</p>
+<h2 id="简单列一下遇到的困难"><a href="#简单列一下遇到的困难" class="headerlink" title="简单列一下遇到的困难"></a>简单列一下遇到的困难</h2><ul>
+<li>上一期为了能在node端运行，用了cjs的规范去导入和导出。但是浏览器不支持cjs规范，就很尴尬，cjs是node环境下提供的支持。平时我们的代码能跑，都是因为webpack在对代码进行打包的时候，将代码里的require转为了自己实现的导入导出方法。现在我没用webpack打包就很尴尬，浏览器不认识require，而且这个用babel转了也没用，babel只能把import转为require，但是没有给require提供polyfill，大概是因为这个本来是webpackl的工作吧</li>
+<li>而且还有问题就是不打包的话，浏览器端是拿不到react的代码的（不考虑node端的话，或许可以参考vite，对import进行处理，返回node_modules里的react包）。我改用cdn的方式引入react，node端又会报错。然后判断require存在的时候调require，也没有用，查了一下大概是条件判断引入require是没用的。。。</li>
+<li>然后还遇见的问题真的是很多很多，再加上我对早些时候的什么requirejs，seajs之类的完全不了解，感觉有点搞不定node和浏览器的同构渲染了，熊偶一最后还是决定上打包器</li>
+</ul>
+<h2 id="用Rspack"><a href="#用Rspack" class="headerlink" title="用Rspack"></a>用Rspack</h2><p>看到了字节Web Infra微信公众号的推文，Rspack在JSNation 2024获得”Breakthrough of the Year”奖项，与之前的Deno、Vite、Svelte、Astro、SolidJS 等杰出的项目共享同一份殊荣，我就突然觉得这个东西未来非常可期，所以打算在这个小demo里面尝试一下。</p>
+<p>困了，有空再写</p>
 	
 		</div>
 		
@@ -339,12 +330,8 @@
 	<span>
 		<a id="totop-post-page">返回顶部</a>
 		
-			<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑" rel="prev">
-				&laquo;上一篇
-			</a>
 		
-		
-			<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关" rel="next">
+			<a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" title="动手实现react ssr" rel="next">
 				下一篇&raquo;
 			</a>
 			
@@ -365,101 +352,6 @@
 			
 					<li>
 						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">
-								发布一个npm包的踩坑			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								三月 6日, 2023				
-							</p>
-							<p class="relate-post-content">
-								试着自己发布了一个npm包，记录一下自己踩的坑
-package.json首先npm init，然后添加type:module字段，将其定义为一个es6模块。然后在files字段设置要发布上去的内容，比如dist文件夹。
-接下来将开发用...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="发布一个npm包的踩坑"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">
-								关于SPA与SSR的简单介绍			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								二月 28日, 2023				
-							</p>
-							<p class="relate-post-content">
-								本文将简要介绍几个概念，如SPA, CSR, SSR, 前端路由。适合小白，我将用浅显又生动的话语来介绍这些概念。
-什么是SPASPA（single page application）单页应用，占了现如今web应用的绝大多数。其意思就...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/02/28/%E5%85%B3%E4%BA%8ESPA%E4%B8%8ESSR%E7%9A%84%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/" title="关于SPA与SSR的简单介绍">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="关于SPA与SSR的简单介绍"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录">
-								前端知识随手记录			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								二月 17日, 2023				
-							</p>
-							<p class="relate-post-content">
-								
-最近几个月被业务需求搞的要死，已经到了周末两天都要去加班的地步了。也没机会像之前那样，晚上下班之后到家学习一两个小时了。最近被逼急了，想着这样加班岂不是永远没有学习的时间，没有学习怎么能提升自己，于是晚上决定十一点到家也要翻翻书，哪...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/02/17/%E5%89%8D%E7%AB%AF%E7%9F%A5%E8%AF%86%E9%9A%8F%E6%89%8B%E8%AE%B0%E5%BD%95/" title="前端知识随手记录">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="前端知识随手记录"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2024/06/16/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr-2/" title="动手实现react-ssr 2">
-								动手实现react-ssr 2			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 16日, 2024				
-							</p>
-							<p class="relate-post-content">
-								
-仓库链接：本篇代码
-运行方法参考readme，请使用pnpm，因为本次使用的rspack尚未推出1.0版本，预计后续可能会有很多breakchange，所以lock文件至关重要，而我只上传了pnpm的lock，非常抱歉。
-环境：no...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2024/06/16/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr-2/" title="动手实现react-ssr 2">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="动手实现react-ssr 2"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
 							<a class="relate-post-title" href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" title="动手实现react ssr">
 								动手实现react ssr			
 							</a>
@@ -477,6 +369,124 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 							<a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" title="动手实现react ssr">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="动手实现react ssr"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">
+								从invalid hook call报错说到npm install相关			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								四月 9日, 2023				
+							</p>
+							<p class="relate-post-content">
+								遇到了invalid hook call报错上周，业务下游的同事反馈了一个生产问题，说我们传的值有问题，领导让我帮忙排查一下。我最近一直没做那个项目相关的需求，打开那个项目切到release分支，拉代码，npm i然后启动，结果就白屏...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2023/04/09/%E4%BB%8Einvalid-hook-call%E6%8A%A5%E9%94%99%E8%AF%B4%E5%88%B0npm-install%E7%9B%B8%E5%85%B3/" title="从invalid hook call报错说到npm install相关">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="从invalid hook call报错说到npm install相关"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">
+								React中副作用的执行时机			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 26日, 2022				
+							</p>
+							<p class="relate-post-content">
+								为什么一定要useEffect?之前看到过，说不要把副作用直接写在函数式组件的函数体内，需要用useEffect把副作用包裹起来。我当时的理解就是，函数组件重新渲染的话，整个函数都会被执行一遍。如果我就想让一个副作用，每次组件渲染都重...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/26/React%E4%B8%AD%E5%89%AF%E4%BD%9C%E7%94%A8%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA/" title="React中副作用的执行时机">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="React中副作用的执行时机"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">
+								聊聊react与函数式编程			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 20日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+react不是魔法
+
+今天我想来聊一聊函数式编程，和它在react中的体现。
+何为函数式编程我们可以把函数式编程理解成一种范式，一个规范。纯函数是函数式编程的关键概念，函数式编程希望我们尽可能多地使用纯函数。正是依赖于纯函数的特点，...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/20/%E8%81%8A%E8%81%8Areact%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" title="聊聊react与函数式编程">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="聊聊react与函数式编程"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">
+								react的一些坑			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 14日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+记录一些刚写react踩过的坑吧，想到多少就写多少
+
+从一个工作中的需求开始有个需求是，点击按钮出来一个弹窗。本来弹窗有个关闭按钮，但是UED在视觉稿上面加了行字，“点击关闭按钮或弹窗外的其他地方，关闭弹窗”。我想了想，合理，避免有...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/14/react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9D%91/" title="react的一些坑">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="react的一些坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">
+								使用react的一些心得与感想			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								八月 8日, 2022				
+							</p>
+							<p class="relate-post-content">
+								
+刚忙完公司的新人训练营，9个人的团队2周完成一个小项目。我负责用remax开发一个微信小程序。remax就是蚂蚁的一个开源框架，让开发者能用react的语法去开发微信小程序。开发体验整体来讲非常不错，感觉也加深了我对react的理解...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2022/08/08/%E4%BD%BF%E7%94%A8react%E7%9A%84%E4%B8%80%E4%BA%9B%E5%BF%83%E5%BE%97%E4%B8%8E%E6%84%9F%E6%83%B3/" title="使用react的一些心得与感想">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="使用react的一些心得与感想"/>
 							</a>
 						</div>
 					</li>												
@@ -573,29 +583,6 @@ __webpack_modules是一个数组，每个元素都是一个函数，函数接受
 							<a href="/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/" title="webpack动态加载原理简述">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="webpack动态加载原理简述"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">
-								编写一个简单的webpack loader的踩坑			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								六月 16日, 2023				
-							</p>
-							<p class="relate-post-content">
-								
-因为觉得hexo框架搭的博客功能一般，就有了想要自己写一个博客的想法。然后就想着如果把markdown文件也放到项目里的话，会比较方便，发现需要编写一个加载markdown的loader，于是就有了这篇博客，来记录一下踩过的坑和收获...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="编写一个简单的webpack loader的踩坑"/>
 							</a>
 						</div>
 					</li>												
