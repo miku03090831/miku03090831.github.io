@@ -49,7 +49,7 @@
 	  serverURLs: 'http' || ' '
     }
   </script>
-<meta name="generator" content="Hexo 6.2.0"></head>
+<meta name="generator" content="Hexo 6.3.0"></head>
 	<body>
 		<!-- Preloader -->
 
@@ -298,7 +298,7 @@
 <h4 id="window对象上的webpackJsonp数组"><a href="#window对象上的webpackJsonp数组" class="headerlink" title="window对象上的webpackJsonp数组"></a>window对象上的webpackJsonp数组</h4><p>细致地说，在首屏的js中，webpack会在window上挂一个数组，用来记录已被动态加载完毕的组件。最初这个数组为空。然后被动态加载的组件，所在的js文件的开头，就是向window对象上的那个数组，push自己进去。因此当动态加载的js被下载完毕时，就会立刻执行push方法，后面有讲，这个push方法被动了手脚，在真的push之前，会执行一些必要的操作（详见webpackJsonpCallback）。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">## 首屏js</span><br><span class="line"><span class="keyword">var</span> jsonpArray = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] || [];</span><br><span class="line"> 	<span class="keyword">var</span> oldJsonpFunction = jsonpArray.<span class="property">push</span>.<span class="title function_">bind</span>(jsonpArray);</span><br><span class="line"> 	jsonpArray.<span class="property">push</span> = webpackJsonpCallback;</span><br><span class="line"> 	jsonpArray = jsonpArray.<span class="title function_">slice</span>();</span><br><span class="line"> 	<span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; jsonpArray.<span class="property">length</span>; i++) <span class="title function_">webpackJsonpCallback</span>(jsonpArray[i]);</span><br><span class="line"> 	<span class="keyword">var</span> parentJsonpFunction = oldJsonpFunction;</span><br></pre></td></tr></table></figure>
 
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## 被单独打包的js</span><br><span class="line">(<span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] || []).<span class="title function_">push</span>([[<span class="number">0</span>],&#123;</span><br><span class="line">	<span class="comment">/** 被动态引入的组件，被打包后的内容 */</span></span><br><span class="line">&#125;]);</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## 被单独打包的<span class="title function_">js</span></span><br><span class="line">(<span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] = <span class="variable language_">window</span>[<span class="string">&quot;webpackJsonp&quot;</span>] || []).<span class="title function_">push</span>([[<span class="number">0</span>],&#123;</span><br><span class="line">	<span class="comment">/** 被动态引入的组件，被打包后的内容 */</span></span><br><span class="line">&#125;]);</span><br></pre></td></tr></table></figure>
 
 
 
@@ -421,6 +421,29 @@ __webpack_modules是一个数组，每个元素都是一个函数，函数接受
 							<a href="/2023/06/16/%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84webpack-loader%E7%9A%84%E8%B8%A9%E5%9D%91/" title="编写一个简单的webpack loader的踩坑">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="编写一个简单的webpack loader的踩坑"/>
+							</a>
+						</div>
+					</li>												
+			
+					<li>
+						<div class="relate-post-text">
+							<a class="relate-post-title" href="/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/" title="通俗易懂的React原理（一）：fiber架构">
+								通俗易懂的React原理（一）：fiber架构			
+							</a>
+							<p class="relate-post-date">
+								<i class="fa fa-calendar"></i>
+								七月 25日, 2025				
+							</p>
+							<p class="relate-post-content">
+								
+开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望...
+							</p>
+						</div>
+
+						<div class="relate-post-cover">
+							<a href="/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/" title="通俗易懂的React原理（一）：fiber架构">				
+								
+								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="通俗易懂的React原理（一）：fiber架构"/>
 							</a>
 						</div>
 					</li>												
@@ -562,30 +585,6 @@ __webpack_modules是一个数组，每个元素都是一个函数，函数接受
 							<a href="/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/" title="useState为什么获取不到更新后的值，如何解决">				
 								
 								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="useState为什么获取不到更新后的值，如何解决"/>
-							</a>
-						</div>
-					</li>												
-			
-					<li>
-						<div class="relate-post-text">
-							<a class="relate-post-title" href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">
-								发布一个npm包的踩坑			
-							</a>
-							<p class="relate-post-date">
-								<i class="fa fa-calendar"></i>
-								三月 6日, 2023				
-							</p>
-							<p class="relate-post-content">
-								试着自己发布了一个npm包，记录一下自己踩的坑
-package.json首先npm init，然后添加type:module字段，将其定义为一个es6模块。然后在files字段设置要发布上去的内容，比如dist文件夹。
-接下来将开发用...
-							</p>
-						</div>
-
-						<div class="relate-post-cover">
-							<a href="/2023/03/06/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AAnpm%E5%8C%85%E7%9A%84%E8%B8%A9%E5%9D%91/" title="发布一个npm包的踩坑">				
-								
-								<img class="lazy" src="/img/lazy.gif" data-src="/img/cart_cover.jpg" alt="发布一个npm包的踩坑"/>
 							</a>
 						</div>
 					</li>												
@@ -804,7 +803,7 @@ package.json首先npm init，然后添加type:module字段，将其定义为一�
 	<div class="copyright">
 		<p>
 			 
-				&copy;2017 - 2024, content by Sariay. All Rights Reserved.
+				&copy;2017 - 2025, content by Sariay. All Rights Reserved.
 			
 			
 				<a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> Theme <a href="https://github.com/Sariay/hexo-theme-Annie" title="Annie" target="_blank" rel="noopener">Annie</a> by Sariay.
