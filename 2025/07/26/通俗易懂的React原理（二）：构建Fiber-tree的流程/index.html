@@ -19,15 +19,21 @@
   <meta name="author" content="qh_meng">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="article">
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  今天开始我们开始研究React的源码。我们先关注构建Fiber tree相关的内容。 这篇要涉及到beginWork和completeWork的过程，我认为其他的教程此处讲的都比较简略，重点放在了两个方法的内部，而不是两个方法是怎么被调用的。大多数教程说，begi">
+<meta property="og:type" content="article">
 <meta property="og:title" content="通俗易懂的React原理（二）：构建Fiber tree的流程">
 <meta property="og:url" content="https://miku03090831.github.io/2025/07/26/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%9E%84%E5%BB%BAFiber-tree%E7%9A%84%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  今天开始我们开始研究React的源码。我们先关注构建Fiber tree相关的内容。 这篇要涉及到beginWork和completeWork的过程，我认为其他的教程此处讲的都比较简略，重点放在了两个方法的内部，而不是两个方法是怎么被调用的。大多数教程说，begi">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/26/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%9E%84%E5%BB%BAFiber-tree%E7%9A%84%E6%B5%81%E7%A8%8B/fiber%E6%A0%91.png">
 <meta property="article:published_time" content="2025-07-26T08:57:01.000Z">
-<meta property="article:modified_time" content="2025-07-26T08:57:01.762Z">
+<meta property="article:modified_time" content="2025-07-26T17:00:48.435Z">
 <meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="fiber">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://miku03090831.github.io/2025/07/26/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%9E%84%E5%BB%BAFiber-tree%E7%9A%84%E6%B5%81%E7%A8%8B/fiber%E6%A0%91.png">
   
   
   
@@ -220,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          0 字
+          1.9k 字
         
       </span>
     
@@ -231,7 +237,7 @@
         
         
         
-          1 分钟
+          16 分钟
         
       </span>
     
@@ -273,7 +279,43 @@
             
               <div class="markdown-body">
                 
-                
+                <blockquote>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a></p>
+</blockquote>
+<p>今天开始我们开始研究React的源码。我们先关注构建Fiber tree相关的内容。</p>
+<p>这篇要涉及到beginWork和completeWork的过程，我认为其他的教程此处讲的都比较简略，重点放在了两个方法的内部，而不是两个方法是怎么被调用的。大多数教程说，beginWork是“递”的过程，而“completeWork”是归的过程。然而二者并不是简单的先递后归，而是会交替进行。而我为了让大家能尽量抓住重点，从而快速对构建Fiber的流程有一个认知，可能不会遇到一个方法，就去详细讲它。希望我的这篇文章能对读者有所帮助</p>
+<h1 id="workLoopConcurrent-x2F-workLoopSync"><a href="#workLoopConcurrent-x2F-workLoopSync" class="headerlink" title="workLoopConcurrent&#x2F;workLoopSync"></a>workLoopConcurrent&#x2F;<strong>workLoopSync</strong></h1><p>多的不说，我们直接从<strong>workLoopConcurrent</strong>&#x2F;<strong>workLoopSync</strong>开始看，这两个就是去循环遍历Fiber tree，构建Fiber节点的方法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">workLoopSync</span>(<span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Perform work without checking if we need to yield between fiber.</span><br>  <span class="hljs-keyword">while</span> (workInProgress !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-title function_">performUnitOfWork</span>(workInProgress);<br>  &#125;<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">workLoopConcurrent</span>(<span class="hljs-params">nonIdle: boolean</span>) &#123;<br>  <span class="hljs-comment">// We yield every other &quot;frame&quot; when rendering Transition or Retries. Those are blocking</span><br>  <span class="hljs-comment">// revealing new content. The purpose of this yield is not to avoid the overhead of yielding,</span><br>  <span class="hljs-comment">// which is very low, but rather to intentionally block any frequently occuring other main</span><br>  <span class="hljs-comment">// thread work like animations from starving our work. In other words, the purpose of this</span><br>  <span class="hljs-comment">// is to reduce the framerate of animations to 30 frames per second.</span><br>  <span class="hljs-comment">// For Idle work we yield every 5ms to keep animations going smooth.</span><br>  <span class="hljs-keyword">if</span> (workInProgress !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">const</span> yieldAfter = <span class="hljs-title function_">now</span>() + (nonIdle ? <span class="hljs-number">25</span> : <span class="hljs-number">5</span>);<br>    <span class="hljs-keyword">do</span> &#123;<br>      <span class="hljs-comment">// $FlowFixMe[incompatible-call] flow doesn&#x27;t know that now() is side-effect free</span><br>      <span class="hljs-title function_">performUnitOfWork</span>(workInProgress);<br>    &#125; <span class="hljs-keyword">while</span> (workInProgress !== <span class="hljs-literal">null</span> &amp;&amp; <span class="hljs-title function_">now</span>() &lt; yieldAfter);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到，两个方法其实都是去循环执行performUnitOfWork(workInProgress)。workInProgress在我们讲的时候，可以指正在被构建的那棵Fiber tree。但是在源码里面，更多的时候，它特指workInProgress树上面<strong>当前正遍历到的那个节点</strong>。它是一个全局变量，如果这个节点遍历完了，那么就会把它赋值成刚才节点的child之类的。</p>
+<p>workInProgress !&#x3D;&#x3D; null其实就是判断当前这棵树有没有构建完毕，为null就表示构建完了，结束循环。</p>
+<p>两个方法的区别就是，workLoopConcurrent每次循环的时候，会判断一下当前是否到了预设的时间，到了就打断，等下一次再被调度，继续循环。就跟我们上一篇举例的那道面试题很像。这里workInProgress这个全局变量就记录了中断的时候，我们遍历到哪个节点。</p>
+<p>至于里面的noIdle，好像也是React最近新加的代码，就是大部分场景下，React会给自己留25ms的时间去循环。也就是注释里说的，浏览器的主线程有些工作太频繁了（例如动画），可能让React的执行在调度中被饿死，所以给自己多留点时间，大不了就让浏览器帧数低一点。而在没那么紧急的场景下，React将自己每次循环的时间上限缩短到5ms，让浏览器能渲染更多帧。</p>
+<h1 id="performUnitOfWork"><a href="#performUnitOfWork" class="headerlink" title="performUnitOfWork"></a>performUnitOfWork</h1><p>从上面我们就更可以看出，performUnitOfWork是构建Fiber tree的核心了，循环去执行这个方法嘛。从名字上来看，他就是执行了一个工作单元。这么说起来还是比较抽象，我们看下它源码的主要部分</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">performUnitOfWork</span>(<span class="hljs-params">unitOfWork: Fiber</span>): <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-comment">// The current, flushed, state of this fiber is the alternate. Ideally</span><br>  <span class="hljs-comment">// nothing should rely on this, but relying on it here means that we don&#x27;t</span><br>  <span class="hljs-comment">// need an additional field on the work in progress.</span><br>  <span class="hljs-keyword">const</span> current = unitOfWork.<span class="hljs-property">alternate</span>;<br><br>  <span class="hljs-keyword">let</span> next;<br>  <span class="hljs-keyword">if</span> (enableProfilerTimer &amp;&amp; (unitOfWork.<span class="hljs-property">mode</span> &amp; <span class="hljs-title class_">ProfileMode</span>) !== <span class="hljs-title class_">NoMode</span>) &#123;<br>    <span class="hljs-comment">// 省略，和React DevTools里面的Profiler相关。</span><br>    <span class="hljs-comment">// Profiler会记录组件渲染了多少次，每次渲染的耗时，和引起重新渲染的原因等等，对排查性能问题很有帮助</span><br>    <span class="hljs-comment">// 但是生产build不会开启这个功能</span><br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">if</span> (__DEV__) &#123;<br>      <span class="hljs-comment">// 开发环境，省略不看</span><br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      next = <span class="hljs-title function_">beginWork</span>(current, unitOfWork, entangledRenderLanes);<br>    &#125;<br>  &#125;<br><br>  unitOfWork.<span class="hljs-property">memoizedProps</span> = unitOfWork.<span class="hljs-property">pendingProps</span>;<br>  <span class="hljs-keyword">if</span> (next === <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-comment">// If this doesn&#x27;t spawn new work, complete the current work.</span><br>    <span class="hljs-title function_">completeUnitOfWork</span>(unitOfWork);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    workInProgress = next;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们对于源码抓大放小，从总体上把握流程，而不是拘泥于每个分支。因此我们主要看生产环境下会走到的代码，以及影响流程的部分。精简一下，代码变得更简单</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">performUnitOfWork</span>(<span class="hljs-params">unitOfWork: Fiber</span>): <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-keyword">const</span> current = unitOfWork.<span class="hljs-property">alternate</span>;<br><br>  <span class="hljs-keyword">let</span> next;<br>  next = <span class="hljs-title function_">beginWork</span>(current, unitOfWork, entangledRenderLanes);<br><br>  unitOfWork.<span class="hljs-property">memoizedProps</span> = unitOfWork.<span class="hljs-property">pendingProps</span>;<br>  <span class="hljs-keyword">if</span> (next === <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-title function_">completeUnitOfWork</span>(unitOfWork);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    workInProgress = next;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们利用精简后的代码，结合上一篇中的图，去体会一下上一篇理论知识中Fiber tree遍历的过程</p>
+<img src="fiber树.png" srcset="/img/loading.gif" lazyload style="display: block; margin: 0 auto;" width="300">
+
+<p>我们去梳理一下代码的意义。假设performUnitOfWork传入的Fiber node是A，然后beginWork会通过A和A.alternate（即current树中，A对应的节点），构建一个A的子节点（next）返回。对图中而言，next就是B。子节点是存在的，那么将workInProgress赋值为B，这一次循环结束，下一次循环会执行performUnitOfWork(B)</p>
+<p>也就是会先执行图中的1和2。然后当performUnitOfWork(C)是，next是null了，因为C没有子节点了。这个时候，会执行completeUnitOfWork(C)</p>
+<h1 id="completeUnitOfWork"><a href="#completeUnitOfWork" class="headerlink" title="completeUnitOfWork"></a>completeUnitOfWork</h1><p>执行到这里，想知道发生了什么，就不得不去看completeUnitOfWork的代码了。下面是精简过后的代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Attempt to complete the current unit of work, then move to the next</span><br><span class="hljs-comment">// sibling. If there are no more siblings, return to the parent fiber.</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">completeUnitOfWork</span>(<span class="hljs-params">unitOfWork: Fiber</span>): <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-keyword">let</span> <span class="hljs-attr">completedWork</span>: <span class="hljs-title class_">Fiber</span> = unitOfWork;<br>  <span class="hljs-keyword">do</span> &#123;<br>    <span class="hljs-keyword">const</span> current = completedWork.<span class="hljs-property">alternate</span>;<br>    <span class="hljs-keyword">const</span> returnFiber = completedWork.<span class="hljs-property">return</span>;<br><br>    <span class="hljs-keyword">let</span> next;<br><br>    next = <span class="hljs-title function_">completeWork</span>(current, completedWork, entangledRenderLanes);<br>    <br>	<span class="hljs-comment">// 这是针对Suspense组件的，暂时可以不看</span><br>    <span class="hljs-keyword">if</span> (next !== <span class="hljs-literal">null</span>) &#123;<br>      workInProgress = next;<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">const</span> siblingFiber = completedWork.<span class="hljs-property">sibling</span>;<br>    <span class="hljs-keyword">if</span> (siblingFiber !== <span class="hljs-literal">null</span>) &#123;<br>      workInProgress = siblingFiber;<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    completedWork = returnFiber;<br><br>    workInProgress = completedWork;<br>  &#125; <span class="hljs-keyword">while</span> (completedWork !== <span class="hljs-literal">null</span>);<br><br>  <span class="hljs-keyword">if</span> (workInProgressRootExitStatus === <span class="hljs-title class_">RootInProgress</span>) &#123;<br>    workInProgressRootExitStatus = <span class="hljs-title class_">RootCompleted</span>;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们看上述代码，是有一个循环的，也就是completedWork不为null之前一直执行。此处开始从自己往兄弟、父节点开始遍历。首先对自己执行了completeWork，然后拿到了自己的子节点。如果有子节点，那么将workInProgress赋值为自己的兄弟节点，然后结束当前循环。通常来讲，由于beginWork已经检查了是否有子节点，有的话不会进到complete的流程里面来。通常来讲，只有使用Suspense等特殊场景，才会进到这个分支里去。对于C来说，他没有子节点，不会进入这个循环。</p>
+<p>然后取C的兄弟节点，取到了D，则会将workInProgress赋值为D，结束当前循环。等下一次循环的时候，执行performUnitWork(D)，流程和前面讲过的一样。</p>
+<p>而如果当前节点没有兄弟节点了，例如E，则会将遍历的对象设为父节点，对父节点执行completeWork，重复这个循环。对于D,E这两个节点来说，顺序就是begin D-&gt;begin E-&gt;complete E-&gt;complete D。</p>
+<p>最后，构建流程会回到Fiber的根节点，构建结束。</p>
+<p>结合performUnitWork和completeUnitOfWork两个方法，用自然语言描述Fiber树的构建流程就是，有子节点就遍历子节点，没有子节点了去找右兄弟节点。兄弟节点也没有了，就回到父节点。</p>
+<p>用伪代码来描述（略去complete里重复验证子节点的那一部分），省略函数实参中可计算出来的入参和不重要的入参，可以如下表述</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs pseudocode">function performUnitOfWork(node)&#123;<br>	子节点 = beginWork(node)<br>	<br>	if(有子节点)&#123;<br>		workInProgress = 子节点<br>		return //下一次循环<br>	&#125;else&#123;<br>		do&#123;<br>			completeWork(node)<br>			if(node有兄弟节点)&#123;<br>				workInProgress = 兄弟节点<br>				return //下一次循环<br>			&#125;else&#123;<br>				node = node的父节点<br>			&#125;<br>		&#125;while(node存在)<br>	&#125;<br>&#125;<br><br>while(workInProgress)&#123;<br>	performUnitWork(workInprogress)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>再回去结合那张图，我们其实可以明白，beginWork就是向下走的过程（图中1,2,4）。向下走到头了，会对自己执行completeWork，就会先向右（图中3,6）。向右也走到头了，就会向上走（图中5,7,8）</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>这一篇，我们从整体上对React构建Fiber tree的流程有了大致的认知，但是我们其实并没有深入了解beginWork和completeWork具体干了什么。后面我们会再深入了解。</p>
+
                 
               </div>
             
@@ -281,6 +323,36 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+    </div>
   
 </div>
 
