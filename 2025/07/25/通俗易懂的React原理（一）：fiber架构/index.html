@@ -19,21 +19,23 @@
   <meta name="author" content="qh_meng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="title: 通俗易懂的React原理（一）：fiber架构date: 2025-07-25 22:21:51tags:  fiber Reactcategories: 通俗易懂的React原理   开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之">
+    <meta name="description" content="开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人  第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大">
 <meta property="og:type" content="article">
-<meta property="og:title" content="moe&#39;s blog">
+<meta property="og:title" content="通俗易懂的React原理（一）：fiber架构">
 <meta property="og:url" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
-<meta property="og:description" content="title: 通俗易懂的React原理（一）：fiber架构date: 2025-07-25 22:21:51tags:  fiber Reactcategories: 通俗易懂的React原理   开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之">
+<meta property="og:description" content="开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人  第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-07-25T14:21:51.229Z">
-<meta property="article:modified_time" content="2025-07-25T20:38:41.410Z">
+<meta property="article:published_time" content="2025-07-25T14:21:51.000Z">
+<meta property="article:modified_time" content="2025-07-26T07:59:32.867Z">
 <meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="fiber">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>moe&#39;s blog</title>
+  <title>通俗易懂的React原理（一）：fiber架构 - moe&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text=""></span>
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（一）：fiber架构"></span>
           
         </div>
 
@@ -233,7 +235,7 @@
         
         
         
-          16 分钟
+          15 分钟
         
       </span>
     
@@ -270,18 +272,12 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header"></h1>
+            <h1 id="seo-header">通俗易懂的React原理（一）：fiber架构</h1>
             
             
               <div class="markdown-body">
                 
-                <p>title: 通俗易懂的React原理（一）：fiber架构<br>date: 2025-07-25 22:21:51<br>tags:</p>
-<ul>
-<li>fiber</li>
-<li>React<br>categories:</li>
-<li>通俗易懂的React原理</li>
-</ul>
-<blockquote>
+                <blockquote>
 <p>开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人</p>
 </blockquote>
 <p>第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大家都不陌生。所谓Fiber，简单来说就是通过链表来实现的虚拟Dom tree。你写的React组件最终会被转换成Fiber Node，通过指针相连，最终得到一个虚拟Dom tree，或者我们也可以叫它叫做Fiber tree。</p>
@@ -324,6 +320,36 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+    </div>
   
 </div>
 
@@ -333,7 +359,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div></div>
+      <div>通俗易懂的React原理（一）：fiber架构</div>
       <div>http://example.com/2025/07/25/通俗易懂的React原理（一）：fiber架构/</div>
     </div>
     <div class="license-meta">
