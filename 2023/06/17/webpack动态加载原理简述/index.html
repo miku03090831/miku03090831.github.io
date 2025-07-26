@@ -22,7 +22,7 @@
     <meta name="description" content="为什么需要动态加载上一篇讲我写webpack针对markdown的loader的时候，提到了希望能动态加载以优化性能。篇幅原因没有展开说，打算单独写一篇文章讲一下。 当我们访问网站的时候，浏览器会向服务器请求页面资源。首先请求的当然是html文件。html文件里会带很多script标签，浏览器解析到这些标签的话，就会去下载这些js资源。当然有些script标签带了async或者defer属性，不会">
 <meta property="og:type" content="article">
 <meta property="og:title" content="webpack动态加载原理简述">
-<meta property="og:url" content="http://example.com/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/index.html">
+<meta property="og:url" content="https://miku03090831.github.io/2023/06/17/webpack%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86%E7%AE%80%E8%BF%B0/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="为什么需要动态加载上一篇讲我写webpack针对markdown的loader的时候，提到了希望能动态加载以优化性能。篇幅原因没有展开说，打算单独写一篇文章讲一下。 当我们访问网站的时候，浏览器会向服务器请求页面资源。首先请求的当然是html文件。html文件里会带很多script标签，浏览器解析到这些标签的话，就会去下载这些js资源。当然有些script标签带了async或者defer属性，不会">
 <meta property="og:locale" content="zh_CN">
@@ -73,7 +73,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -325,7 +325,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>webpack动态加载原理简述</div>
-      <div>http://example.com/2023/06/17/webpack动态加载原理简述/</div>
+      <div>https://miku03090831.github.io/2023/06/17/webpack动态加载原理简述/</div>
     </div>
     <div class="license-meta">
       

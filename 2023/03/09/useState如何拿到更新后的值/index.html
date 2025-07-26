@@ -22,7 +22,7 @@
     <meta name="description" content="令人困扰的问题是因为异步吗大家都知道，react的useState和useReducer，在set和dispatch之后，马上去获取值，是拿不到最新的值的。这个原因之一是useState和useReducer是异步更新的，也就是说我们刚调用完set和dispatch马上去取值，这种同步代码执行的时候，状态还没更新呢，所以拿不到。 同步如何那我们如果换成redux呢？redux不使用中间件扩展的话，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="useState为什么获取不到更新后的值，如何解决">
-<meta property="og:url" content="http://example.com/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/index.html">
+<meta property="og:url" content="https://miku03090831.github.io/2023/03/09/useState%E5%A6%82%E4%BD%95%E6%8B%BF%E5%88%B0%E6%9B%B4%E6%96%B0%E5%90%8E%E7%9A%84%E5%80%BC/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="令人困扰的问题是因为异步吗大家都知道，react的useState和useReducer，在set和dispatch之后，马上去获取值，是拿不到最新的值的。这个原因之一是useState和useReducer是异步更新的，也就是说我们刚调用完set和dispatch马上去取值，这种同步代码执行的时候，状态还没更新呢，所以拿不到。 同步如何那我们如果换成redux呢？redux不使用中间件扩展的话，">
 <meta property="og:locale" content="zh_CN">
@@ -75,7 +75,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -324,7 +324,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>useState为什么获取不到更新后的值，如何解决</div>
-      <div>http://example.com/2023/03/09/useState如何拿到更新后的值/</div>
+      <div>https://miku03090831.github.io/2023/03/09/useState如何拿到更新后的值/</div>
     </div>
     <div class="license-meta">
       

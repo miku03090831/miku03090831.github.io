@@ -22,21 +22,21 @@
     <meta name="description" content="开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人  第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大">
 <meta property="og:type" content="article">
 <meta property="og:title" content="通俗易懂的React原理（一）：fiber架构">
-<meta property="og:url" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:url" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人  第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
-<meta property="og:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91%E8%A2%AB%E6%89%93%E6%96%AD.png">
-<meta property="og:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/current.png">
-<meta property="og:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/%E5%88%87%E6%8D%A2%E5%90%8E.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91%E8%A2%AB%E6%89%93%E6%96%AD.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/current.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/%E5%88%87%E6%8D%A2%E5%90%8E.png">
 <meta property="article:published_time" content="2025-07-25T14:21:51.000Z">
-<meta property="article:modified_time" content="2025-07-26T08:37:11.474Z">
+<meta property="article:modified_time" content="2025-07-26T11:21:52.351Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
+<meta name="twitter:image" content="https://miku03090831.github.io/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
   
   
   
@@ -78,7 +78,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -240,7 +240,7 @@
         
         
         
-          15 分钟
+          16 分钟
         
       </span>
     
@@ -290,14 +290,14 @@
 <p>一个简单的Fiber tree可能就如上图所示，A~F是tree上面的Fiber Node，箭头则是将他们连接起来的指针。我们可以看到，每个Fiber Node最多有三条指针指向其他Fiber Node，分别是指向子节点（child，即第一个孩子），指向右侧兄弟（sibling），和指向父节点（return）。</p>
 <p>在Reconciliation 阶段，React会通过遍历节点的方式，去构建Fiber tree。在遍历Fiber tree的时候，React会沿着我标的数字顺序去遍历，并且每个节点一去一回，会遍历两次（后面会讲到，分别是beginWork和completeWork）。</p>
 <p>这个遍历有点像深度优先搜索。用文字概括一下遍历的顺序，先从根节点开始，正向遍历。对于任何一个节点，正向遍历它之后，都会继续正向遍历他的子节点（例如，1,2,4）。当没有子节点，即当前是叶子结点的时候，立刻反向遍历自己（未在图中标出）。然后去正向遍历当前节点的兄弟节点及其子节点（例如，3,6）。如果没有兄弟节点了，那么反向遍历父节点（例如，5,7,8）。</p>
-<h1 id="新老架构"><a href="#新老架构" class="headerlink" title="新老架构"></a>新老架构</h1><h2 id="Stack架构的不可中断"><a href="#Stack架构的不可中断" class="headerlink" title="Stack架构的不可中断"></a>Stack架构的不可中断</h2><p>Fiber架构，是React16新推出的架构。更早的React版本，是Stack架构，即通过堆栈（递归），去完整虚拟Dom tree的构建。而递归就有一个问题，它是不可中断的。一旦中断，就没办法从上一次中断的地方继续构建，因为之前层层递归的函数调用栈已经被销毁了，找不回来上一次递归进行到了哪。</p>
+<h1 id="新老架构"><a href="#新老架构" class="headerlink" title="新老架构"></a>新老架构</h1><h2 id="Stack架构的不可中断"><a href="#Stack架构的不可中断" class="headerlink" title="Stack架构的不可中断"></a>Stack架构的不可中断</h2><p>Fiber架构，是React16新推出的架构。更早的React版本，是Stack架构，即通过堆栈（递归），去完成虚拟Dom tree的构建。而递归就有一个问题，它是不可中断的。一旦中断，就没办法从上一次中断的地方继续构建，因为之前层层递归的函数调用栈已经被销毁了，找不回来上一次递归进行到了哪。</p>
 <p>所以如果当构建虚拟Dom tree花费的时间比较久的时候，就会一直占用主线程，导致浏览器无法渲染下一帧，让用户感觉到卡顿。</p>
 <h2 id="Fiber架构是可中断的"><a href="#Fiber架构是可中断的" class="headerlink" title="Fiber架构是可中断的"></a>Fiber架构是可中断的</h2><p>相比之下，Fiber架构通过链表实现，然后去遍历链表，则可以在每遍历到一个节点的时候，判断一下是否需要中断。</p>
 <p>如果要中断，那我用一个全局变量保存一下当前遍历到那个节点就好了。恢复的时候，我再从保存的节点继续遍历。</p>
 <p>例如下图，将已经遍历过的节点用红色表示。假如我刚正向遍历到D，就被中断了（可能是因为已经占用了主线程太久了），那就停止遍历，记录一下我正在遍历D。等继续的时候，我就可以从D开始继续遍历</p>
 <p><img src="fiber%E6%A0%91%E8%A2%AB%E6%89%93%E6%96%AD.png" srcset="/img/loading.gif" lazyload></p>
 <h2 id="举一道面试题的例子"><a href="#举一道面试题的例子" class="headerlink" title="举一道面试题的例子"></a>举一道面试题的例子</h2><p>碰巧我跟朋友交流，她刚遇到了一道面试题，我觉得就很像React的这个中断机制。如果单纯的语言描述难以理解的话，不妨用一个简单的场景来类比吧</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">要求：实现从<span class="hljs-number">1</span>~n的累加。为了避免长时间阻塞主线程，需要每<span class="hljs-number">15</span>ms中断一次，将后续数字的累加放到宏任务队列当中继续执行。最终返回一个promise<br></code></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">要求：实现从<span class="hljs-number">1</span>~n的累加。为了避免长时间阻塞主线程，需要每<span class="hljs-number">15</span>ms中断一次。<br>将后续数字的累加放到宏任务队列当中继续执行。最终返回一个promise<br></code></pre></td></tr></table></figure>
 
 <p>这道题如何来实现呢，首先累加，我们最优先想到是循环，然后题目要求每15ms中断一次。那我们可以每次遍历，都判断一下当前已经执行多久了。如果超过15ms，就记录一下当前的进度，然后通过setTimeout(fn, 0)来使得在下一次事件循环执行宏任务的时候，继续刚才的任务。</p>
 <p>最后，题目要求返回一个promise。那我们最后肯定是要new一个Promise，然后return这个promise的。当累加完毕的时候，使这个promise resolve即可。</p>
@@ -305,8 +305,10 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">sum</span> = (<span class="hljs-params">start, end</span>)=&gt;&#123;<br>    <span class="hljs-keyword">let</span> resolve, result = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">const</span> <span class="hljs-title function_">helper</span> = (<span class="hljs-params">start, end</span>)=&gt;&#123;<br>        <span class="hljs-keyword">const</span> startTime = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>()<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(startTime)<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i=start; i&lt;=end; i++)&#123;<br>            <span class="hljs-keyword">if</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - startTime &gt; <span class="hljs-number">15</span>)&#123;<br>                <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">()=&gt;</span>&#123;<br>                    <span class="hljs-title function_">helper</span>(i, end)<br>                &#125;, <span class="hljs-number">0</span>)<br>                <span class="hljs-keyword">return</span><br>            &#125;<br>            result += i<br>        &#125;<br>        <span class="hljs-title function_">resolve</span>(result)<br>    &#125;<br>    <br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">res</span>)=&gt;</span>&#123;<br>        resolve = res<br>        <span class="hljs-title function_">helper</span>(start, end)<br>    &#125;)<br>&#125;<br><br><span class="hljs-title function_">sum</span>(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">res</span>=&gt;</span>&#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res)<br>&#125;)<br>               <br></code></pre></td></tr></table></figure>
 
 <p>React的遍历，你也可以简单理解成这样。React在16的时候改成Fiber架构，就是为了可以在虚拟Dom tree构建到一半的时候，中止构建，结束js的执行，让主线程转而去渲染。然后等下一次事件循环，再继续去构建虚拟Dom tree。</p>
-<p>虽然React16就赚到了Fiber架构，但是React并不会中断Fiber tree的构建，而是依旧会一直遍历，直到完整的Fiber tree被构建完毕。所以React16,17更像是过渡的版本，从原本的Stack架构迁移过来。直到React18开始，React才正式启用了Concurrent模式，即<strong>在使用特定API的时候</strong>，可能根据时间在构建Fiber tree的时候中断，并且可能有多个更新的流程并发执行。在16和17版本，具体的细节我们后面源码部分再讲，前期主要做铺垫，对于React设计的原因有一个了解。</p>
-<h1 id="Fiber的双缓冲更新"><a href="#Fiber的双缓冲更新" class="headerlink" title="Fiber的双缓冲更新"></a>Fiber的双缓冲更新</h1><p>React维护了两份Fiber tree，一份叫做current，一份叫做workInProgress。这两份tree也不是永恒不变的，而是会互相切换，类似于显卡的前缓冲区和后缓冲区。current是当前被渲染出来的Fiber tree，即前缓冲区。而workInProgress则是重新渲染的时候，正在构建中的Fiber tree，即后缓冲区。</p>
+<p>虽然React16就转到了Fiber架构，但是这个版本并不会中断Fiber tree的构建，而是依旧会一直遍历，直到完整的Fiber tree被构建完毕。所以React16,17更像是过渡的版本，从原本的Stack架构迁移过来。</p>
+<p>直到React18开始，React才正式启用了Concurrent模式。即<strong>在使用特定API的时候</strong>，根据是否阻塞主线程过久，在构建Fiber tree的时候可能会中断，并且可能有多个更新的流程并发执行。具体的细节我们后面源码部分再讲，前期主要做铺垫，有一个初步的了解。</p>
+<h1 id="Fiber的双缓冲更新"><a href="#Fiber的双缓冲更新" class="headerlink" title="Fiber的双缓冲更新"></a>Fiber的双缓冲更新</h1><p>React维护了两份Fiber tree，一份叫做current，一份叫做workInProgress。记住这两个变量名，它们在后面的源码里面会经常出现。</p>
+<p>这两份tree也不是永恒不变的，而是会互相切换，类似于显卡的前缓冲区和后缓冲区。current是当前被渲染出来的Fiber tree，即前缓冲区。而workInProgress则是重新渲染的时候，正在构建中的Fiber tree，即后缓冲区。</p>
 <p>当workInProgress被构建完毕时，workInProgress和current身份互换。这样维护两份，而不是直接在原来一份上面更新，是为了避免渲染出修改了一半的Fiber tree。</p>
 <p>值得注意的是，workInProgress和current两颗tree中的对应节点，也有指针互相指着。即<code>workInProgress.alternate = current</code> ，且<code>current.alternate = workInProgress</code>。由于重新渲染的时候经常需要复用上一次渲染的部分数据，所以有alternate会方便很多，可以拿到这个Fiber Node上一次渲染时候的一些状态</p>
 <p>当正在构建workInProgress时，如图。对于下图，需要补充说明的是FiberRootNode和HostRootFiber。FiberRootNode并不属于Fiber tree当中，它管理着两颗Fiber tree，并且通过current来指向current tree，可以把它看做React应用的大本营。而HostRootFiber则是根节点</p>
@@ -362,7 +364,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>通俗易懂的React原理（一）：fiber架构</div>
-      <div>http://example.com/2025/07/25/通俗易懂的React原理（一）：fiber架构/</div>
+      <div>https://miku03090831.github.io/2025/07/25/通俗易懂的React原理（一）：fiber架构/</div>
     </div>
     <div class="license-meta">
       
@@ -405,6 +407,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/07/26/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%9E%84%E5%BB%BAFiber-tree%E7%9A%84%E6%B5%81%E7%A8%8B/" title="通俗易懂的React原理（二）：构建Fiber tree的流程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">通俗易懂的React原理（二）：构建Fiber tree的流程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
