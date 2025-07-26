@@ -26,14 +26,14 @@
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人  第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="local:fiber%E6%A0%91.png">
+<meta property="og:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
 <meta property="article:published_time" content="2025-07-25T14:21:51.000Z">
-<meta property="article:modified_time" content="2025-07-26T08:17:59.198Z">
+<meta property="article:modified_time" content="2025-07-26T08:27:48.674Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="local:fiber%E6%A0%91.png">
+<meta name="twitter:image" content="http://example.com/2025/07/25/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9Afiber%E6%9E%B6%E6%9E%84/fiber%E6%A0%91.png">
   
   
   
@@ -283,7 +283,7 @@
 <p>开个小坑，记录自己学习React源码过程中的一些心得。感觉市面上讲解React源码的书籍、视频都讲的一般，颇有照本宣科的意思。我希望能用通俗的话，把自己对React的理解记录下来。一方面是自己遗忘了之后，能回来看看，另一方面也是希望帮助到其他希望了解React源码，却又摸不着门道的人</p>
 </blockquote>
 <p>第一篇我们首先来讲一讲Fiber架构。所谓Fiber架构，是React16开始的新架构。说到虚拟DOM，相信大家都不陌生。所谓Fiber，简单来说就是通过链表来实现的虚拟Dom tree。你写的React组件最终会被转换成Fiber Node，通过指针相连，最终得到一个虚拟Dom tree，或者我们也可以叫它叫做Fiber tree。</p>
-<h1 id="Fiber-tree的结构"><a href="#Fiber-tree的结构" class="headerlink" title="Fiber tree的结构"></a>Fiber tree的结构</h1><p><img src="local:fiber树.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="Fiber-tree的结构"><a href="#Fiber-tree的结构" class="headerlink" title="Fiber tree的结构"></a>Fiber tree的结构</h1><p><img src="fiber%E6%A0%91.png" srcset="/img/loading.gif" lazyload></p>
 <p>一个简单的Fiber tree可能就如上图所示，A~F是tree上面的Fiber Node，箭头则是将他们连接起来的指针。我们可以看到，每个Fiber Node最多有三条指针指向其他Fiber Node，分别是指向子节点（child，即第一个孩子），指向右侧兄弟（sibling），和指向父节点（return）。</p>
 <p>在Reconciliation 阶段，React会通过遍历节点的方式，去构建Fiber tree。在遍历Fiber tree的时候，React会沿着我标的数字顺序去遍历，并且每个节点一去一回，会遍历两次（后面会讲到，分别是beginWork和completeWork）。</p>
 <p>这个遍历有点像深度优先搜索。用文字概括一下遍历的顺序，先从根节点开始，正向遍历。对于任何一个节点，正向遍历它之后，都会继续正向遍历他的子节点（例如，1,2,4）。当没有子节点，即当前是叶子结点的时候，立刻反向遍历自己（未在图中标出）。然后去正向遍历当前节点的兄弟节点及其子节点（例如，3,6）。如果没有兄弟节点了，那么反向遍历父节点（例如，5,7,8）。</p>
