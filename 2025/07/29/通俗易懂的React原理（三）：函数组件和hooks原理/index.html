@@ -26,13 +26,17 @@
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  上一篇我们讲了React构建fiber树的整体流程，即循环调用performUnitOfWork，里面穿插着beginWork和completeWork的调用，并且最后给出了简洁的伪代码实现。 那么这一篇呢，我们走进beginWork的内部，不过并不打算走多深。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/29/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%BB%84%E4%BB%B6%E5%92%8Chooks%E5%8E%9F%E7%90%86/%E7%AC%AC%E4%B8%80%E4%B8%AAhook.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/29/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%BB%84%E4%BB%B6%E5%92%8Chooks%E5%8E%9F%E7%90%86/%E7%AC%AC%E4%BA%8C%E4%B8%AAhook.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/07/29/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%BB%84%E4%BB%B6%E5%92%8Chooks%E5%8E%9F%E7%90%86/%E7%AC%AC%E4%B8%80%E4%B8%AAhook%E7%9A%84%E5%AD%97%E6%AE%B5.png">
 <meta property="article:published_time" content="2025-07-28T16:11:34.000Z">
-<meta property="article:modified_time" content="2025-07-31T18:27:06.754Z">
+<meta property="article:modified_time" content="2025-08-03T16:27:34.312Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
 <meta property="article:tag" content="hooks">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://miku03090831.github.io/2025/07/29/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%BB%84%E4%BB%B6%E5%92%8Chooks%E5%8E%9F%E7%90%86/%E7%AC%AC%E4%B8%80%E4%B8%AAhook.png">
   
   
   
@@ -225,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.9k 字
+          2.7k 字
         
       </span>
     
@@ -236,7 +240,7 @@
         
         
         
-          24 分钟
+          23 分钟
         
       </span>
     
@@ -317,8 +321,9 @@
 <p>还好它并不长，他只是定义了一个新的hook对象，每个字段的含义我都在注释里写了。其中baseState和baseQueue如果看不懂的话可以先略过，这个和React的并发更新有关，后面会细讲，不用现在死磕。</p>
 <p>然后workInProgressHook是一个全局对象，是一个链表。它会在合适的时候被清空。如果它是null，那就代表当前这个Fiber节点上还没有hook，那么我们就要把hook挂到Fiber节点的<code>memoizedState</code>字段上。</p>
 <p>注意，这里的memoizedState和上面hook对象里的memoizedState，并没有关系，只是同名而已。一个代表Fiber的hooks链表，一个代表hook的state。</p>
+<p><img src="%E7%AC%AC%E4%B8%80%E4%B8%AAhook.png" srcset="/img/loading.gif" lazyload></p>
 <p>如果workInProgressHook不是null，则说明这个Fiber节点上面已经有hooks了。<code>workInProgressHook = workInProgressHook.next = hook;</code>相当于<code>workInProgressHook.next = hook;workInProgressHook = workInProgressHook.next;</code>这样两句话，意思就是把刚创建好的hook插入到链表的尾部，并且更新链表的尾节点，便于下一次插入。</p>
-<p>也就是说，fiber里面的hooks的结构是这样的：<br>此处应该有一张图</p>
+<p>也就是说，fiber里面的hooks的结构是这样的：<br><img src="%E7%AC%AC%E4%BA%8C%E4%B8%AAhook.png" srcset="/img/loading.gif" lazyload></p>
 <p>最后，这个方法返回了刚才新创建好的这个hook</p>
 <p>然后再回去看</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> mountReducer&lt;S, I, A&gt;(<br>  <span class="hljs-attr">reducer</span>: <span class="hljs-function">(<span class="hljs-params">S, A</span>) =&gt;</span> S,<br>  <span class="hljs-attr">initialArg</span>: I,<br>  init?: <span class="hljs-function"><span class="hljs-params">I</span> =&gt;</span> S,<br>): [S, <span class="hljs-title class_">Dispatch</span>&lt;A&gt;] &#123;<br>  <span class="hljs-keyword">const</span> hook = <span class="hljs-title function_">mountWorkInProgressHook</span>();<br>  <span class="hljs-keyword">let</span> initialState;<br>  <span class="hljs-keyword">if</span> (init !== <span class="hljs-literal">undefined</span>) &#123;<br>    initialState = <span class="hljs-title function_">init</span>(initialArg);<br>    <span class="hljs-keyword">if</span> (shouldDoubleInvokeUserFnsInHooksDEV) &#123;<br>      <span class="hljs-title function_">setIsStrictModeForDevtools</span>(<span class="hljs-literal">true</span>);<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-title function_">init</span>(initialArg);<br>      &#125; <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-title function_">setIsStrictModeForDevtools</span>(<span class="hljs-literal">false</span>);<br>      &#125;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    initialState = ((<span class="hljs-attr">initialArg</span>: any): S);<br>  &#125;<br>  hook.<span class="hljs-property">memoizedState</span> = hook.<span class="hljs-property">baseState</span> = initialState;<br>  <span class="hljs-keyword">const</span> <span class="hljs-attr">queue</span>: <span class="hljs-title class_">UpdateQueue</span>&lt;S, A&gt; = &#123;<br>    <span class="hljs-attr">pending</span>: <span class="hljs-literal">null</span>,<br>    <span class="hljs-attr">lanes</span>: <span class="hljs-title class_">NoLanes</span>,<br>    <span class="hljs-attr">dispatch</span>: <span class="hljs-literal">null</span>,<br>    <span class="hljs-attr">lastRenderedReducer</span>: reducer,<br>    <span class="hljs-attr">lastRenderedState</span>: (<span class="hljs-attr">initialState</span>: any),<br>  &#125;;<br>  hook.<span class="hljs-property">queue</span> = queue;<br>  <span class="hljs-keyword">const</span> <span class="hljs-attr">dispatch</span>: <span class="hljs-title class_">Dispatch</span>&lt;A&gt; = (queue.<span class="hljs-property">dispatch</span> = (dispatchReducerAction.<span class="hljs-title function_">bind</span>(<br>    <span class="hljs-literal">null</span>,<br>    currentlyRenderingFiber,<br>    queue,<br>  ): any));<br>  <span class="hljs-keyword">return</span> [hook.<span class="hljs-property">memoizedState</span>, dispatch];<br>&#125;<br></code></pre></td></tr></table></figure>
@@ -331,12 +336,9 @@
 <p>然后我们看下面的dispatch方法，是给<code>dispatchReducerAction</code>方法绑死了currentlyRenderingFiber和queue参数。我们可以看看他的具体实现，略过开发环境的代码</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> dispatchReducerAction&lt;S, A&gt;(<br>  <span class="hljs-attr">fiber</span>: <span class="hljs-title class_">Fiber</span>,<br>  <span class="hljs-attr">queue</span>: <span class="hljs-title class_">UpdateQueue</span>&lt;S, A&gt;,<br>  <span class="hljs-attr">action</span>: A,<br>): <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-keyword">const</span> lane = <span class="hljs-title function_">requestUpdateLane</span>(fiber);<br><br>  <span class="hljs-keyword">const</span> <span class="hljs-attr">update</span>: <span class="hljs-title class_">Update</span>&lt;S, A&gt; = &#123;<br>    lane, <span class="hljs-comment">//优先级</span><br>    <span class="hljs-attr">revertLane</span>: <span class="hljs-title class_">NoLane</span>, <span class="hljs-comment">//revert它的优先级，和乐观更新有关</span><br>    action, <span class="hljs-comment">//具体的更新方法</span><br>    <span class="hljs-attr">hasEagerState</span>: <span class="hljs-literal">false</span>, <span class="hljs-comment">//是否可以直接复用上一次的值</span><br>    <span class="hljs-attr">eagerState</span>: <span class="hljs-literal">null</span>, <span class="hljs-comment">// 上一次的值（如果可复用，就无需再计算）</span><br>    <span class="hljs-attr">next</span>: (<span class="hljs-attr">null</span>: any), <span class="hljs-comment">// 下一个update</span><br>  &#125;;<br><br>  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">isRenderPhaseUpdate</span>(fiber)) &#123;<br>    <span class="hljs-title function_">enqueueRenderPhaseUpdate</span>(queue, update);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">const</span> root = <span class="hljs-title function_">enqueueConcurrentHookUpdate</span>(fiber, queue, update, lane);<br>    <span class="hljs-keyword">if</span> (root !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-title function_">startUpdateTimerByLane</span>(lane);<br>      <span class="hljs-title function_">scheduleUpdateOnFiber</span>(root, fiber, lane);<br>      <span class="hljs-title function_">entangleTransitionUpdate</span>(root, queue, lane);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>这个方法其实就是reducer的第二个参数，常见的dispatch，我们调用它去改变状态。他所做的事情，就是创建一个update对象，然后把这个update推到queue里面。我们看React根据这个update是否是render阶段再次更新，分了两段处理逻辑。我简要叙述一下，就不再细看代码了，不然感觉代码有点多。</p>
-<p>如果是render阶段的更新，那么直接把这个update推到queue里面去。</p>
-<p>如果不是render阶段的更新，则把<code>fiber</code>,<code>queue</code>,<code>update</code>,<code>lane</code>四个参数依次推到同一个数组里，暂存起来。就是下面这种感觉</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs javascript">concurrentQueues[concurrentQueuesIndex++] = fiber;<br>concurrentQueues[concurrentQueuesIndex++] = queue;<br>concurrentQueues[concurrentQueuesIndex++] = update;<br>concurrentQueues[concurrentQueuesIndex++] = lane;<br></code></pre></td></tr></table></figure>
-
-<p>然后等待这一次workloop因为时间到了而终止，才从暂存的数组里把参数四个一组的取出来，真正地把update推到queue里面。之所以这样，我的理解是为了防止直接修改queue，可能导致的一些问题吧，具体我还没想出来可能什么场景有问题，先略过吧，如果我后面想明白了会补充的</p>
+<p>这个方法其实就是reducer的第二个参数，常见的dispatch，我们调用它去改变状态。他所做的事情，就是创建一个update对象，然后把这个update推到queue里面。具体逻辑我们暂不深究，等后面讲到相关的部分再来细讲。</p>
+<p>也就是说，hook里面的主要结构是这样的</p>
+<p><img src="%E7%AC%AC%E4%B8%80%E4%B8%AAhook%E7%9A%84%E5%AD%97%E6%AE%B5.png" srcset="/img/loading.gif" lazyload></p>
 
                 
               </div>
