@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="qh_meng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  本篇我们继续来看beginWork里面的部分，依旧是以函数组件为例。 reconcileChildren看完了执行组件自身的部分，我们接下来要看reconcileChildren部分了。 执行组件自身，返回了他的jsx，也就是它的子组件。而我们都知道，jsx语法会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通俗易懂的React原理（五）：子节点的diff算法">
+<meta property="og:url" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="moe&#39;s blog">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  本篇我们继续来看beginWork里面的部分，依旧是以函数组件为例。 reconcileChildren看完了执行组件自身的部分，我们接下来要看reconcileChildren部分了。 执行组件自身，返回了他的jsx，也就是它的子组件。而我们都知道，jsx语法会">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-08-24T14:53:46.000Z">
+<meta property="article:modified_time" content="2025-08-24T16:44:19.480Z">
+<meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="fiber">
+<meta property="article:tag" content="diff算法">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>通俗易懂的React原理（五）：子节点的diff算法 - moe&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/miku.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（五）：子节点的diff算法"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-08-24 22:53" pubdate>
+          2025年8月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">通俗易懂的React原理（五）：子节点的diff算法</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a></p>
+</blockquote>
+<p>本篇我们继续来看beginWork里面的部分，依旧是以函数组件为例。</p>
+<h1 id="reconcileChildren"><a href="#reconcileChildren" class="headerlink" title="reconcileChildren"></a>reconcileChildren</h1><p>看完了执行组件自身的部分，我们接下来要看reconcileChildren部分了。</p>
+<p>执行组件自身，返回了他的jsx，也就是它的子组件。而我们都知道，jsx语法会被babel处理成ReactElement对象。那么reconcileChildren的工作，就是把这些ReactElement转成FiberNode，并且和当前正在构建的workInProgress这棵树连接起来。换个角度说，reconcileChildren是为workInProgress树中当前遍历到的FiberNode，构建子FiberNode的。</p>
+<p>reconcileChildren的入参包括了当前workInProgress对应的current树中的节点，当前workInProgress节点，当前workInProgress的子节点（ReactElement形式），渲染优先级。它生成当前workInProgress的子节点（以FiberNode形式），并将子节点和workInProgress连接。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">reconcileChildren</span>(<span class="hljs-params"></span><br><span class="hljs-params">  current: Fiber | <span class="hljs-literal">null</span>,</span><br><span class="hljs-params">  workInProgress: Fiber,</span><br><span class="hljs-params">  nextChildren: any,</span><br><span class="hljs-params">  renderLanes: Lanes,</span><br><span class="hljs-params"></span>) &#123;<br>	<span class="hljs-keyword">if</span> (current === <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-comment">// If this is a fresh new component that hasn&#x27;t been rendered yet, we</span><br>    <span class="hljs-comment">// won&#x27;t update its child set by applying minimal side-effects. Instead,</span><br>    <span class="hljs-comment">// we will add them all to the child before it gets rendered. That means</span><br>    <span class="hljs-comment">// we can optimize this reconciliation pass by not tracking side-effects.</span><br>    workInProgress.<span class="hljs-property">child</span> = <span class="hljs-title function_">mountChildFibers</span>(<br>      workInProgress,<br>      <span class="hljs-literal">null</span>,<br>      nextChildren,<br>      renderLanes,<br>    );<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// If the current child is the same as the work in progress, it means that</span><br>    <span class="hljs-comment">// we haven&#x27;t yet started any work on these children. Therefore, we use</span><br>    <span class="hljs-comment">// the clone algorithm to create a copy of all the current children.</span><br><br>    <span class="hljs-comment">// If we had any progressed work already, that is invalid at this point so</span><br>    <span class="hljs-comment">// let&#x27;s throw it out.</span><br>    workInProgress.<span class="hljs-property">child</span> = <span class="hljs-title function_">reconcileChildFibers</span>(<br>      workInProgress,<br>      current.<span class="hljs-property">child</span>,<br>      nextChildren,<br>      renderLanes,<br>    );<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里根据当前组件是首次mount，还是后续update，分别执行了两个方法。而这两个方法其实都来自<code>createChildReconciler</code>方法，区别只是mount不需要追踪副作用，把新增的节点插进去就行了。而update的时候是需要的，需要和原来的节点对比，做什么操作。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">export</span> <span class="hljs-type">const</span> mountChildFibers: ChildReconciler = <span class="hljs-built_in">createChildReconciler</span>(<span class="hljs-literal">false</span>);<br><span class="hljs-keyword">export</span> <span class="hljs-type">const</span> reconcileChildFibers: ChildReconciler = <span class="hljs-built_in">createChildReconciler</span>(<span class="hljs-literal">true</span>);<br></code></pre></td></tr></table></figure>
+
+<h1 id="createChildReconciler"><a href="#createChildReconciler" class="headerlink" title="createChildReconciler"></a>createChildReconciler</h1><p>我们接下来看一下createChildReconciler方法的实现。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">createChildReconciler</span>(<span class="hljs-params">shouldTrackSideEffects: boolean</span>)&#123;<br>    <span class="hljs-keyword">function</span> <span class="hljs-title function_">reconcileChildFibers</span>(<span class="hljs-params"></span><br><span class="hljs-params">    	returnFiber: Fiber,</span><br><span class="hljs-params">    	currentFirstChild: Fiber | <span class="hljs-literal">null</span>,</span><br><span class="hljs-params">    	newChild: any,</span><br><span class="hljs-params">    	lanes: Lanes,</span><br><span class="hljs-params">  	</span>): <span class="hljs-title class_">Fiber</span> | <span class="hljs-literal">null</span>&#123;<br>        <span class="hljs-comment">// xxx</span><br>    &#125;<br>    <span class="hljs-keyword">return</span> reconcileChildFibers<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>它在内部定义了一个reconcileChildFibers方法，最终return了这个方法。并且根据shouldTrackSideEffects参数的不同，reconcileChildFibers中间的很多逻辑也都有所不同，具体等后面深入的时候会讲到。</p>
+<p>我们观察<code>reconcileChildFibers</code>的声明，以及前面调用它的时候，可以看到它的入参是当前workInProgress节点，对应的current节点的第一个子节点，自身的子节点（ReactElement形式），以及渲染优先级。它最终会返回workInProgress的子节点（FiberNode形式），也可能不返回，就说明没有子节点了。</p>
+<p>除了<code>reconcileChildFibers</code>，<code>createChildReconciler</code>内部还定义了许多工具方法，用于协助创建FiberNode。为了方便后续深入学习，我们先简要了解一下这些工具方法。</p>
+<h2 id="useFiber"><a href="#useFiber" class="headerlink" title="useFiber"></a>useFiber</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">useFiber</span>(<span class="hljs-params">fiber: Fiber, pendingProps: mixed</span>): <span class="hljs-title class_">Fiber</span> &#123;<br>  <span class="hljs-comment">// We currently set sibling to null and index to 0 here because it is easy</span><br>  <span class="hljs-comment">// to forget to do before returning it. E.g. for the single child case.</span><br>  <span class="hljs-keyword">const</span> clone = <span class="hljs-title function_">createWorkInProgress</span>(fiber, pendingProps);<br>  clone.<span class="hljs-property">index</span> = <span class="hljs-number">0</span>;<br>  clone.<span class="hljs-property">sibling</span> = <span class="hljs-literal">null</span>;<br>  <span class="hljs-keyword">return</span> clone;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>useFiber方法主要用来从current树克隆FiberNode节点，通常在diff算法中判断可复用老节点时使用。所以当你看到useFiber方法的时候，你就知道是复用节点就可以了。</p>
+<h2 id="placeChild"><a href="#placeChild" class="headerlink" title="placeChild"></a>placeChild</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">placeChild</span>(<span class="hljs-params"></span><br><span class="hljs-params">  newFiber: Fiber,</span><br><span class="hljs-params">  lastPlacedIndex: number,</span><br><span class="hljs-params">  newIndex: number,</span><br><span class="hljs-params"></span>): number &#123;<br>  newFiber.<span class="hljs-property">index</span> = newIndex;<br>  <span class="hljs-keyword">if</span> (!shouldTrackSideEffects) &#123;<br>    <span class="hljs-comment">// During hydration, the useId algorithm needs to know which fibers are</span><br>    <span class="hljs-comment">// part of a list of children (arrays, iterators).</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Forked</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>  <span class="hljs-keyword">const</span> current = newFiber.<span class="hljs-property">alternate</span>;<br>  <span class="hljs-keyword">if</span> (current !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">const</span> oldIndex = current.<span class="hljs-property">index</span>;<br>    <span class="hljs-keyword">if</span> (oldIndex &lt; lastPlacedIndex) &#123;<br>      <span class="hljs-comment">// This is a move.</span><br>      newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>      <span class="hljs-keyword">return</span> lastPlacedIndex;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// This item can stay in place.</span><br>      <span class="hljs-keyword">return</span> oldIndex;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// This is an insertion.</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>placeChild</code> 用于多子节点场景下判断当前子节点是否需要<strong>移动&#x2F;插入</strong>。维护一个分界线 <code>lastPlacedIndex</code>（“截至目前无需移动的旧节点中最靠后的旧索引”）。如果复用到的旧索引 <code>oldIndex</code> <strong>小于</strong>这条分界线，就标记移动；否则不用动，并把分界线更新为 <code>oldIndex</code>。若没有复用旧节点则属于新插入。并且这个方法的返回值，会用于更新lastPlacedIndex</p>
+<h2 id="placeSingleChild"><a href="#placeSingleChild" class="headerlink" title="placeSingleChild"></a>placeSingleChild</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">placeSingleChild</span>(<span class="hljs-params">newFiber: Fiber</span>): <span class="hljs-title class_">Fiber</span> &#123;<br>  <span class="hljs-comment">// This is simpler for the single child case. We only need to do a</span><br>  <span class="hljs-comment">// placement for inserting new children.</span><br>  <span class="hljs-keyword">if</span> (shouldTrackSideEffects &amp;&amp; newFiber.<span class="hljs-property">alternate</span> === <span class="hljs-literal">null</span>) &#123;<br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>  &#125;<br>  <span class="hljs-keyword">return</span> newFiber;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>placeSingleChild方法，就是如果新插入一个节点，就要给它打上插入（placement）的标记flag。排除了组件初次mount，或者其子节点初次mount的场景</p>
+<h2 id="deleteChild"><a href="#deleteChild" class="headerlink" title="deleteChild"></a>deleteChild</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">deleteChild</span>(<span class="hljs-params">returnFiber: Fiber, childToDelete: Fiber</span>): <span class="hljs-keyword">void</span> &#123;<br>  <span class="hljs-keyword">if</span> (!shouldTrackSideEffects) &#123;<br>    <span class="hljs-comment">// Noop.</span><br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br>  <span class="hljs-keyword">const</span> deletions = returnFiber.<span class="hljs-property">deletions</span>;<br>  <span class="hljs-keyword">if</span> (deletions === <span class="hljs-literal">null</span>) &#123;<br>    returnFiber.<span class="hljs-property">deletions</span> = [childToDelete];<br>    returnFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">ChildDeletion</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    deletions.<span class="hljs-title function_">push</span>(childToDelete);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>deleteChild方法用于删除单个子节点。删除子节点的方式，是在父节点上打上删除子节点的标记flag，并且把子节点推入deletions数组。</p>
+<h2 id="deleteRemainingChildren"><a href="#deleteRemainingChildren" class="headerlink" title="deleteRemainingChildren"></a>deleteRemainingChildren</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">deleteRemainingChildren</span>(<span class="hljs-params"></span><br><span class="hljs-params">  returnFiber: Fiber,</span><br><span class="hljs-params">  currentFirstChild: Fiber | <span class="hljs-literal">null</span>,</span><br><span class="hljs-params"></span>): <span class="hljs-literal">null</span> &#123;<br>  <span class="hljs-keyword">if</span> (!shouldTrackSideEffects) &#123;<br>    <span class="hljs-comment">// Noop.</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>  &#125;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> For the shouldClone case, this could be micro-optimized a bit by</span><br>  <span class="hljs-comment">// assuming that after the first child we&#x27;ve already added everything.</span><br>  <span class="hljs-keyword">let</span> childToDelete = currentFirstChild;<br>  <span class="hljs-keyword">while</span> (childToDelete !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-title function_">deleteChild</span>(returnFiber, childToDelete);<br>    childToDelete = childToDelete.<span class="hljs-property">sibling</span>;<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>deleteRemainingChildren方法用于删除从当前子节点开始的全部子节点，实现相似于删除单个子节点。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+        <a href="/tags/diff%E7%AE%97%E6%B3%95/" class="print-no-link">#diff算法</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>通俗易懂的React原理（五）：子节点的diff算法</div>
+      <div>https://miku03090831.github.io/2025/08/24/通俗易懂的React原理（五）：子节点的diff算法/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>qh_meng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年8月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/29/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%89%EF%BC%89%EF%BC%9A%E5%87%BD%E6%95%B0%E7%BB%84%E4%BB%B6%E5%92%8Chooks%E5%8E%9F%E7%90%86/" title="通俗易懂的React原理（三）：函数组件和hooks原理">
+                        <span class="hidden-mobile">通俗易懂的React原理（三）：函数组件和hooks原理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
