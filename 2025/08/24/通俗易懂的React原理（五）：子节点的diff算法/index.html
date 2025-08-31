@@ -27,8 +27,13 @@
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。下文中展示的代码可能省略了部分不影响主题逻辑的代码，例如dev环境下才执行的代码、水合时执行的代码  本篇我们继续来看beginWork里面的部分，依旧是以函数组件为例。 reconcileChildren看完了执行组件自身的部分，我们接下来要看reconcile">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/oldIndex%E4%B8%8D%E8%BF%9E%E7%BB%AD.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/%E4%B8%8D%E9%9C%80%E8%A6%81%E7%A7%BB%E5%8A%A8.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/%E8%B4%AA%E5%BF%83%E5%AD%90%E5%BA%8F%E5%88%97.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/%E5%88%9D%E5%A7%8B%E7%8A%B6%E6%80%81.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/%E5%8F%8D%E8%BD%AC%E5%88%97%E8%A1%A8.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/%E6%B5%85%E6%8B%B7%E8%B4%9D%E8%B5%8B%E5%80%BC.png">
 <meta property="article:published_time" content="2025-08-24T14:53:46.000Z">
-<meta property="article:modified_time" content="2025-08-30T18:10:30.537Z">
+<meta property="article:modified_time" content="2025-08-31T07:12:32.534Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
@@ -227,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.1k 字
+          5.5k 字
         
       </span>
     
@@ -238,7 +243,7 @@
         
         
         
-          35 分钟
+          46 分钟
         
       </span>
     
@@ -356,11 +361,9 @@
 <p><code>updateElement</code>方法里面，还是区分了子节点的各种类型，这里我们还是只看函数组件这种场景。因为逻辑很简单就不放源码了，感兴趣可以自己去看，就是类型相同，那么就复用节点。类型不同，那么就重新生成节点（但是不会立刻就删除旧节点）</p>
 <p>接下来继续看第一部分的代码，如果新子节点是null，比如本来新子节点就是null，或者刚才<code>updateSlot</code>里Key没匹配上，那么就会跳出第一部分了。</p>
 <p>如果没有跳出，继续往下走，那么当父节点是update，而不是mount（即<code>shouldTrackSideEffects</code>为true）的时候，如果新子节点不是从旧子节点复用得到的，那么就会标记删除旧子节点。</p>
-<p>接下来，<code>lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);</code>这一行代码，就是最开始我说的，寻找保持原顺序的子序列的核心代码了。我们在这里，不得不再看一遍<code>placeChild</code>的代码。这一次，我们了解了调用<code>placeChild</code>的背景和上下文。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">placeChild</span>(<span class="hljs-params"></span><br><span class="hljs-params">  newFiber: Fiber,</span><br><span class="hljs-params">  lastPlacedIndex: number,</span><br><span class="hljs-params">  newIndex: number,</span><br><span class="hljs-params"></span>): number &#123;<br>  newFiber.<span class="hljs-property">index</span> = newIndex;<br>  <span class="hljs-keyword">if</span> (!shouldTrackSideEffects) &#123;<br>    <span class="hljs-comment">// During hydration, the useId algorithm needs to know which fibers are</span><br>    <span class="hljs-comment">// part of a list of children (arrays, iterators).</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Forked</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>  <span class="hljs-keyword">const</span> current = newFiber.<span class="hljs-property">alternate</span>;<br>  <span class="hljs-keyword">if</span> (current !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">const</span> oldIndex = current.<span class="hljs-property">index</span>;<br>    <span class="hljs-keyword">if</span> (oldIndex &lt; lastPlacedIndex) &#123;<br>      <span class="hljs-comment">// This is a move.</span><br>      newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>      <span class="hljs-keyword">return</span> lastPlacedIndex;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// This item can stay in place.</span><br>      <span class="hljs-keyword">return</span> oldIndex;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// This is an insertion.</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>当我们得到新子节点数组中的一个节点的时候，我们就会调用<code>placeChild</code>方法。对于新节点，我们会通过alternate指针，拿到对应的旧节点，从而拿到oldIndex，得知它在旧子节点数组中的顺序。</p>
-<p>如果它在旧子节点数组中的顺序，小于<code>lastPlacedIndex</code>，那么就会给他打上移动的标记。否则，将它在旧子节点数组中的顺序作为新的<code>lastPlacedIndex</code>。这在第一部分的代码里，看的并不明显，因为第一阶段，是按顺序去推进新旧两个列表的，所以不会出现<code>oldIndex&lt;lastPlacedIndex</code>的场景，而是每次进入，都命中第二个分支，去更新<code>lastPlacedIndex</code>。</p>
+<p>接下来，<code>lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);</code>。当我们得到新子节点数组中的一个节点的时候，我们就会调用<code>placeChild</code>方法。对于新节点，我们会通过alternate指针，拿到对应的旧节点，从而拿到oldIndex，得知它在旧子节点数组中的顺序。</p>
+<p>由于在第一阶段，我们是按顺序去推进新旧两个列表的，所以不会出现<code>oldIndex&lt;lastPlacedIndex</code>的场景，而是每次进入，都命中第二个分支，去更新<code>lastPlacedIndex</code>。换一个角度来理解，如果新旧子节点，key都能一一对应上，那么也不需要移动了，因为原本顺序就是对的。如下图所示，所有新节点都不需要被打上插入标记。</p>
+<p><img src="%E4%B8%8D%E9%9C%80%E8%A6%81%E7%A7%BB%E5%8A%A8.png" srcset="/img/loading.gif" lazyload></p>
 <p>以上就是第一部分的内容，在key都能匹配得上，且newFiber不是null的时候，一直往下遍历，就是第一部分的逻辑。</p>
 <p>而一旦key有不匹配了，或者newFiber是null，那么第一部分的逻辑就结束了。</p>
 <h4 id="第二部分：新旧数组长度不一致时的处理"><a href="#第二部分：新旧数组长度不一致时的处理" class="headerlink" title="第二部分：新旧数组长度不一致时的处理"></a>第二部分：新旧数组长度不一致时的处理</h4><p>接下来是第二部分的逻辑，是处理正常走完第一部分，而不是中途跳出循环的场景的。</p>
@@ -377,8 +380,46 @@
 <p>首先，将所有还没遍历到的旧节点，添加到map里面。如果旧节点有key，那么就用key来当做map的key。如果旧节点没有key，那么就用index当做map的key。然后把fiber本身当做value，就这样把<code>(key，value)</code>对存进map里。</p>
 <p>然后去遍历跳出循环后的新子节点，对于每个新子节点，从map里去找和它对应的旧子节点（依旧是有key用key，无key用index）。然后再根据新旧节点的类型是否一致，决定是复用，还是重新创建。</p>
 <p>在生成newFiber后，需要通过<code>placeChild</code>方法，把新生成的节点视情况是否打上插入标记。这里的逻辑就比较复杂了，因为新和旧的顺序完全无法保证，是通过map里key来对应的，而不是index。</p>
-<p>这里就涉及到<code>placeChild</code>真正复杂的场景了。</p>
+<p>这里就涉及到<code>placeChild</code>真正复杂的场景了。因为此前，新旧节点都是一一对应的。而到了第三部分，旧节点是从map里用key取出来的，就没办法保证顺序了。所以，这时候就需要给部分新的子节点打上插入标记。</p>
+<p>那么如何判断是否需要打插入标记，就是问题的关键了。如果说要当成两个数组的最小编辑距离来看，时间复杂度就有点不能接受了。而React则是采用了一种线性时间复杂度的贪心算法，其逻辑如下：在新的子节点数组中，一步步构建出出符合旧节点数组顺序的子序列，子序列中的这些节点就是不需要移动的，而不在子序列中的节点，则需要打上插入的标记（实际是需要移动这些节点，但是React 并不区分「这是全新的节点」还是「这是原来就有的节点、只是换了个位置」，只是把这个dom放到正确的位置上）。</p>
+<p>我们可以看结合<code>placeChild</code>的源码和下面这张图，来表示一下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">placeChild</span>(<span class="hljs-params"></span><br><span class="hljs-params">  newFiber: Fiber,</span><br><span class="hljs-params">  lastPlacedIndex: number,</span><br><span class="hljs-params">  newIndex: number,</span><br><span class="hljs-params"></span>): number &#123;<br>  newFiber.<span class="hljs-property">index</span> = newIndex;<br>  <span class="hljs-keyword">if</span> (!shouldTrackSideEffects) &#123;<br>    <span class="hljs-comment">// During hydration, the useId algorithm needs to know which fibers are</span><br>    <span class="hljs-comment">// part of a list of children (arrays, iterators).</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Forked</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>  <span class="hljs-keyword">const</span> current = newFiber.<span class="hljs-property">alternate</span>;<br>  <span class="hljs-keyword">if</span> (current !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">const</span> oldIndex = current.<span class="hljs-property">index</span>;<br>    <span class="hljs-keyword">if</span> (oldIndex &lt; lastPlacedIndex) &#123;<br>      <span class="hljs-comment">// This is a move.</span><br>      newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>      <span class="hljs-keyword">return</span> lastPlacedIndex;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// This item can stay in place.</span><br>      <span class="hljs-keyword">return</span> oldIndex;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// This is an insertion.</span><br>    newFiber.<span class="hljs-property">flags</span> |= <span class="hljs-title class_">Placement</span> | <span class="hljs-title class_">PlacementDEV</span>;<br>    <span class="hljs-keyword">return</span> lastPlacedIndex;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="%E8%B4%AA%E5%BF%83%E5%AD%90%E5%BA%8F%E5%88%97.png" srcset="/img/loading.gif" lazyload></p>
+<p>上图中，红色的节点表示被添加到子序列中的节点。而蓝色的则是没能被添加到子序列中，而被打上插入标记的节点。</p>
+<p>我们可以看到，react在遍历新子节点的时候，每遍历到一个子节点，都会看一下他能否加入到子序列的尾部，还保持原来的顺序。例如，[a,d]就是符合[a,b,c,d,e]顺序的一个子序列，所以d被加入进去了。对应的就是<code>lastPlacedIndex</code>被更新为d的<code>oldIndex</code>。而下一个新的子节点，c，没能被加入到子序列中，因为[a,d,c]不是符合[a,b,c,d,e]的顺序的子序列，所以新子节点c被打上了插入标记，b也同理。最后，[a,d,e]是符合[a,b,c,d,e]的，所以最后，a,d,e三个子节点是不需要移动的，而c和b则被打上了插入的标记，会被移动位置。这就是我认为diff算法中，最复杂的一个逻辑了。</p>
 <p>最后，如果父组件是update而不是mount，就把map里的旧子组件全部删掉，因为新子组件里没有与它们对应的，说明他们在新一次渲染中不存在了。</p>
+<h2 id="key的作用"><a href="#key的作用" class="headerlink" title="key的作用"></a>key的作用</h2><p>前面我们说过了，<code>useFiber</code>就是从旧节点clone Fiber出来，相当于是复用。而<code>createFiberFromElement</code>则是重新创建Fiber Node。那么这两个的区别，究竟有多大呢？</p>
+<p>我们可以看下<code>useFiber</code>的实现，它里面保留了旧Fiber上面的很多字段</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript">workInProgress.<span class="hljs-property">flags</span> = current.<span class="hljs-property">flags</span> &amp; <span class="hljs-title class_">StaticMask</span>;<br>workInProgress.<span class="hljs-property">childLanes</span> = current.<span class="hljs-property">childLanes</span>;<br>workInProgress.<span class="hljs-property">lanes</span> = current.<span class="hljs-property">lanes</span>;<br><br>workInProgress.<span class="hljs-property">child</span> = current.<span class="hljs-property">child</span>;<br>workInProgress.<span class="hljs-property">memoizedProps</span> = current.<span class="hljs-property">memoizedProps</span>;<br>workInProgress.<span class="hljs-property">memoizedState</span> = current.<span class="hljs-property">memoizedState</span>;<br>workInProgress.<span class="hljs-property">updateQueue</span> = current.<span class="hljs-property">updateQueue</span>;<br></code></pre></td></tr></table></figure>
+
+<p>而相应的，<code>createFiberFromElement</code>自然这些字段就都没有了。</p>
+<p>那么这给我们带来了什么思考呢？我们知道，决定是执行<code>useFiber</code>还是<code>createFiberFromElement</code>，基本就是看key是否相同，和节点类型是否一致。那么我们经常看到React在开发环境下的一个warning，提示我们列表渲染需要给子元素加上key。那么是否加key，可能对列表造成什么影响呢？</p>
+<p>我们以这个<a target="_blank" rel="noopener" href="https://github.com/miku03090831/react-confusions-explain-demo">demo</a>里的代码来做个演示，我们本地启动这个demo，然后选择<code>Key Property Demo</code></p>
+<p>我们有一个固定的list</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs javascript">[<br>  &#123; <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;a&quot;</span> &#125;,<br>  &#123; <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;b&quot;</span> &#125;,<br>  &#123; <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;c&quot;</span> &#125;,<br>  &#123; <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;d&quot;</span> &#125;,<br>]<br></code></pre></td></tr></table></figure>
+
+<p>然后分别有四个场景，每个场景都是一句这个list，去map渲染出各自的child。然而，在每个child内部，又有着child自己维护的state。这个count是每个child各自独有的，应该是互相区分的。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> <span class="hljs-title function_">Child</span> = (<span class="hljs-params">&#123; name &#125;: &#123; name: string &#125;</span>) =&gt; &#123;<br>  <span class="hljs-keyword">const</span> [count, setCount] = <span class="hljs-title function_">useState</span>(<span class="hljs-number">0</span>);<br>  <span class="hljs-keyword">return</span> (<br>    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span></span></span><br><span class="hljs-tag"><span class="language-xml">      <span class="hljs-attr">onClick</span>=<span class="hljs-string">&#123;()</span> =&gt;</span> &#123;</span><br><span class="language-xml">        setCount((count) =&gt; count + 1);</span><br><span class="language-xml">      &#125;&#125;</span><br><span class="language-xml">    &gt;&#123;`$&#123;name&#125;:$&#123;count&#125;`&#125;<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br>  );<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>然后四个场景，分别是</p>
+<ol>
+<li>无key</li>
+<li>以数组index作为key</li>
+<li>用完全随机数作为key</li>
+<li>用独特的值，这里是用name作为key</li>
+</ol>
+<p>我们首先，点击各个按钮，得到下面这个状态</p>
+<p><img src="%E5%88%9D%E5%A7%8B%E7%8A%B6%E6%80%81.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后我们点击“反转列表”的按钮，变成了下面的状态</p>
+<p><img src="%E5%8F%8D%E8%BD%AC%E5%88%97%E8%A1%A8.png" srcset="/img/loading.gif" lazyload></p>
+<p>可以看到，只有第四个场景下的值是正确的，count依旧能和name对应起来。</p>
+<p>前两个场景中，由于key使用的不正确，导致Fiber被错误的复用。Fiber复用的时候，会保留内部的hooks的状态，而它的子文本节点却在后来被单独更新掉。从而导致state维护的count，和name不能保持对应关系。</p>
+<p>而第三个场景也是很搞笑，由于它的key是个随机数，每一次他重新渲染，所有的子节点都没办法复用，从而全部重新创建，进而丢失了hooks上的全部值。所以每一次重新渲染，第三个场景子元素的count全部都会归零。</p>
+<p><img src="%E6%B5%85%E6%8B%B7%E8%B4%9D%E8%B5%8B%E5%80%BC.png" srcset="/img/loading.gif" lazyload></p>
+<p>如果你点击的是“浅拷贝重新赋值”的按钮，列表的实际内容没有变化，第三个场景也依旧会出现问题，因为子节点依旧无法匹配成功。而由于这次节点顺序没有变化，第一、二个场景是表现正确的。</p>
+<p>所以我们可以看到，如果你列表的子组件，内部是有状态的，并且顺序是可能发生改变的（包括反转、中间插入等等），那么有一个唯一的key是非常有必要的。但是如果你的列表的子组件并没有状态，甚至可能只是渲染一个文本，那么是否复用错误，或许并没有那么重要。因为即使div被错误的复用了，它的下一级的文本节点还是会被正常更新。</p>
+<p>以上，可能就是了解了diff算法原理后，对我们带来的一些启示</p>
 
                 
               </div>
