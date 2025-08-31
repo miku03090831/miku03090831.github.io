@@ -27,7 +27,7 @@
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  不知道各位读者学习React源码是为了什么？或许是好奇，或许是想学习优秀的代码，或许是想自己搞一个框架取而代之。我学习React的源码，有一部分是好奇，因为我不是特别喜欢把总是在打交道的东西只是当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-08-31T13:27:16.000Z">
-<meta property="article:modified_time" content="2025-08-31T14:05:07.835Z">
+<meta property="article:modified_time" content="2025-08-31T15:40:51.098Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          841 字
+          840 字
         
       </span>
     
@@ -287,7 +287,8 @@
 <p>包括现在很多人认为，AI的高速发展，使得人们不需要再投入大量精力去了解这些内部的实现细节，有问题可以直接问AI。实不相瞒，我学习React的源码，很大程度上也是依靠着AI，有些看不懂的代码，我会让AI去帮忙给我解释它的含义。但是我是会实际把流程串一遍的，也经常本地起一个小项目去打断点调试，来验证得到的知识和实际是否相符。</p>
 <p>试想，如果你连React的源码都没看过，你就去问AI为什么会出现这个问题，AI给出的答案你根本没有能力去判断对错，这又有什么意义呢？我一直认为，你得出一个问题的结论，至少要能说服自己。把一个自己都没有搞清楚流程的结论，当做问题的答案，这种行为我做不到。所以所谓的“AI万能论”和“源码无用论”，我是完全无法认可的。</p>
 <p>那么下面我讲一下我排查出的那个问题的原因吧。概括地讲，我认为这是由于React并发渲染模式下，不恰当的写法导致的无限循环渲染问题。</p>
-<p>可复现代码在<a target="_blank" rel="noopener" href="https://github.com/miku03090831/react-confusions-explain-demo%EF%BC%8C%E5%90%AF%E5%8A%A8%E5%90%8E%E9%80%89%E6%8B%A9%60Infinite">https://github.com/miku03090831/react-confusions-explain-demo，启动后选择`Infinite</a> Loop Demo&#96;即可。</p>
+<p>可复现代码在<a target="_blank" rel="noopener" href="https://github.com/miku03090831/react-confusions-explain-demo%EF%BC%8C">https://github.com/miku03090831/react-confusions-explain-demo，</a></p>
+<p>启动后选择<code>Infinite Loop Demo</code>即可。</p>
 <p>原理todo</p>
 
                 
