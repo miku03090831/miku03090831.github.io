@@ -19,15 +19,15 @@
   <meta name="author" content="qh_meng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  不知道各位读者学习React源码是为了什么？或许是好奇，或许是想学习优秀的代码，或许是想自己搞一个框架取而代之。我学习React的源码，有一部分是好奇，因为我不是特别喜欢把总是在打交道的东西只是当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其">
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  写在前面不知道各位读者学习React源码是为了什么。我学习React的源码，有一部分是好奇，因为我不想把总打交道的东西当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其所以然。还有一部分原因就是，我相信日常的学习积累，总有一天会派上用场。机会总">
 <meta property="og:type" content="article">
 <meta property="og:title" content="通俗易懂的React原理（番外篇之一）：学习React源码有什么用">
 <meta property="og:url" content="https://miku03090831.github.io/2025/08/31/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AD%A6%E4%B9%A0React%E6%BA%90%E7%A0%81%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
-<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  不知道各位读者学习React源码是为了什么？或许是好奇，或许是想学习优秀的代码，或许是想自己搞一个框架取而代之。我学习React的源码，有一部分是好奇，因为我不是特别喜欢把总是在打交道的东西只是当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  写在前面不知道各位读者学习React源码是为了什么。我学习React的源码，有一部分是好奇，因为我不想把总打交道的东西当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其所以然。还有一部分原因就是，我相信日常的学习积累，总有一天会派上用场。机会总">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-08-31T13:27:16.000Z">
-<meta property="article:modified_time" content="2025-08-31T15:40:51.098Z">
+<meta property="article:modified_time" content="2025-09-01T17:08:26.341Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          840 字
+          2.8k 字
         
       </span>
     
@@ -236,7 +236,7 @@
         
         
         
-          8 分钟
+          24 分钟
         
       </span>
     
@@ -281,15 +281,61 @@
                 <blockquote>
 <p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a> 。</p>
 </blockquote>
-<p>不知道各位读者学习React源码是为了什么？或许是好奇，或许是想学习优秀的代码，或许是想自己搞一个框架取而代之。我学习React的源码，有一部分是好奇，因为我不是特别喜欢把总是在打交道的东西只是当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其所以然。还有一部分原因就是，我相信日常的学习积累，总有一天会有用武之地。现在的学习，就是给以后的机会做好准备。</p>
-<p>之所以写一篇番外，是前几天碰巧，解决了一个公司项目偶现的问题。问题的现象是，一个React组件一直在不停的重复渲染，而并没有state和props、context之类的一直在改变。这个问题困扰了我们组差不多半年时间，看起来非常玄乎。最初我也看着一头雾水，而在最近几个月入门了解了React的源码之后，偶然间我又复现了这个问题。凭借对React源码的一些浅薄理解，我尝试打断点去排查问题。当时自己从晚上七点，初步定位到问题，一直到凌晨十二点半，找到问题根因。然后第二天上午，重新理一遍流程，写出最小可复现demo，心情非常舒畅。</p>
-<p>如果说不了解React的源码，我认为是讲不清楚这个问题的原因的。从写代码的角度来说，是同事写的代码不够规范。但是通常来讲，不至于导致这么严重的后果，你说出去也不会有人信。只有从源码的角度来解释，才能理解问题的真相。</p>
+<h1 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h1><p>不知道各位读者学习React源码是为了什么。我学习React的源码，有一部分是好奇，因为我不想把总打交道的东西当成一个黑盒。了解它的实现，不仅可以在用的时候更少踩坑，还可以知其所以然。还有一部分原因就是，我相信日常的学习积累，总有一天会派上用场。机会总是给有准备的人。</p>
+<p>之所以写一篇番外，是前几天解决了一个公司项目偶现的问题。问题的现象是，一个React组件一直在不停的重复渲染，但是找不出重复渲染的原因。我们通过埋点，在发现短时间高频次重复渲染时，上报数据，但是也排查不出问题。这个问题困扰了我们组差不多半年时间，看起来非常玄乎，因为state，props，context全都没有发生变化。</p>
+<p>最初我也看着一头雾水，而在最近几个月入门了解了React的源码之后，偶然间我又复现了这个问题。由于对React代码不再是完全陌生，我尝试打断点去排查问题。当时自己从晚上七点，初步定位到问题，一直到凌晨十二点半，找到问题根因。然后第二天上午，重新理一遍流程，写出最小可复现demo，心情非常舒畅。</p>
+<p>如果说不了解React的源码，我认为是讲不清楚这个问题的原因的。从避免问题的角度来说，代码写规范一点就不会遇到这个问题。但是通常来讲，不规范的写法不至于导致这么奇特的后果，你说出去也很难令人相信。只有从源码的角度来解释，才能理解问题的真相。</p>
 <p>包括现在很多人认为，AI的高速发展，使得人们不需要再投入大量精力去了解这些内部的实现细节，有问题可以直接问AI。实不相瞒，我学习React的源码，很大程度上也是依靠着AI，有些看不懂的代码，我会让AI去帮忙给我解释它的含义。但是我是会实际把流程串一遍的，也经常本地起一个小项目去打断点调试，来验证得到的知识和实际是否相符。</p>
 <p>试想，如果你连React的源码都没看过，你就去问AI为什么会出现这个问题，AI给出的答案你根本没有能力去判断对错，这又有什么意义呢？我一直认为，你得出一个问题的结论，至少要能说服自己。把一个自己都没有搞清楚流程的结论，当做问题的答案，这种行为我做不到。所以所谓的“AI万能论”和“源码无用论”，我是完全无法认可的。</p>
 <p>那么下面我讲一下我排查出的那个问题的原因吧。概括地讲，我认为这是由于React并发渲染模式下，不恰当的写法导致的无限循环渲染问题。</p>
 <p>可复现代码在<a target="_blank" rel="noopener" href="https://github.com/miku03090831/react-confusions-explain-demo%EF%BC%8C">https://github.com/miku03090831/react-confusions-explain-demo，</a></p>
 <p>启动后选择<code>Infinite Loop Demo</code>即可。</p>
-<p>原理todo</p>
+<h1 id="问题介绍"><a href="#问题介绍" class="headerlink" title="问题介绍"></a>问题介绍</h1><p>问题发生在React18，一个基于Remix1.x的流式渲染项目中，项目使用<code>react-dom</code>的新API，支持并发渲染。在某种情况下，水合的时候会产生一个低优先级的更新。很可惜的是，我还没有看到水合的部分，因此还不清楚这个低优先级的更新具体是怎么产生的。所以我的demo中，是使用<code>useTransition</code>来产生一个低优先级的更新。</p>
+<p>我们看一下demo里的代码</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">const</span> initialObj = &#123; <span class="hljs-attr">count</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">text</span>: <span class="hljs-string">&quot;hello&quot;</span> &#125;;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">reducer</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">obj</span>: <span class="hljs-keyword">typeof</span> initialObj,</span><br><span class="hljs-params">  <span class="hljs-attr">action</span>: &#123; <span class="hljs-keyword">type</span>: <span class="hljs-built_in">string</span>; payload?: <span class="hljs-built_in">any</span> &#125;</span><br><span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">switch</span> (action.<span class="hljs-property">type</span>) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;increment&quot;</span>:<br>      <span class="hljs-keyword">return</span> &#123; ...obj, <span class="hljs-attr">count</span>: obj.<span class="hljs-property">count</span> + <span class="hljs-number">1</span> &#125;;<br>    <span class="hljs-attr">default</span>:<br>      <span class="hljs-keyword">return</span> obj;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>首先，定义一个<code>reducer</code>，其实这个demo里不用<code>useReducer</code>，用<code>useState</code>也可以。只需要保证，我们用到的状态是个对象类型，不是基本类型，即可。</p>
+<p>然后组件里面的逻辑也很简单</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">const</span> [isPending, startTransition] = <span class="hljs-title function_">useTransition</span>();<br><span class="hljs-keyword">const</span> [ok, setOk] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>);<br><span class="hljs-keyword">const</span> [obj, dispatch] = <span class="hljs-title function_">useReducer</span>(reducer, initialObj);<br><br><span class="hljs-title function_">useEffect</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-title function_">setOk</span>(<span class="hljs-literal">false</span>);<br>&#125;, [obj]);<br><br><span class="hljs-keyword">const</span> <span class="hljs-title function_">onClick</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>  <span class="hljs-title function_">startTransition</span>(<span class="hljs-function">() =&gt;</span> &#123;<br>    <span class="hljs-title function_">dispatch</span>(&#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;increment&quot;</span> &#125;);<br>  &#125;);<br>  <span class="hljs-title function_">dispatch</span>(&#123; <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;increment&quot;</span> &#125;);<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>我们看下，当触发<code>onClick</code>后，会去执行两次<code>dispatch</code>，一次低优先级，一次高优先级。而<code>dispatch</code>会改变<code>obj</code>，进而在重新渲染的时候，执行<code>useEffect</code>里面的逻辑。</p>
+<p>而<code>useEffect</code>里面的逻辑就更简单了，将<code>ok</code>恒设为false。那我们直觉看上去，是不是觉得点一下按钮，得到了<code>increment</code>两次的一个<code>obj</code>，和值是<code>false</code>的<code>ok</code>，然后一切就结束了呢？</p>
+<p>然而，当你本地运行，点击按钮，触发<code>onClick</code>后，打开控制台，你会发现这个组件一直在重新渲染。每渲染一次，他就会输出一条console.log，而控制台此刻正在不停地打印日志。</p>
+<h1 id="解释原因"><a href="#解释原因" class="headerlink" title="解释原因"></a>解释原因</h1><p>和这个问题相关的React源码部分有，<code>useReducer</code>的实现、<code>dispatch</code>的实现、<code>useEffect</code>的实现、<code>scheduler</code>调度。以上内容虽然我没有全部讲过，但是看过前几篇文章的读者，如果能理解并发更新，可中断，以及hooks的原理，那么对于听懂这个问题的原因是有很大帮助的。</p>
+<p>由于两次<code>dispatch</code>的优先级不同，React会优先执行高优先级的更新。在高优先级的更新执行完毕后，等到下一个宏任务，再执行低优先级的更新。</p>
+<p>当你去dispatch的时候，会执行<code>scheduleUpdateOnFiber</code>，进而去触发React的重新渲染。</p>
+<h2 id="useReducer的优先级处理"><a href="#useReducer的优先级处理" class="headerlink" title="useReducer的优先级处理"></a>useReducer的优先级处理</h2><p>我们前面dispatch了两次，第一次低优先级，第二次高优先级。那么在并发模式下，React会如何处理呢？</p>
+<p>React会优先取更高的优先级，去重新渲染。</p>
+<p>在重新渲染的时候，执行到<code>useReducer</code>，React会根据此次渲染的优先级，去计算最终的State。大致描述为，执行高优先级的更新，跳过低优先级的更新。</p>
+<p>具体逻辑如下：优先级符合的更新被执行，低优先级的更新被跳过并保留起来。最重要的是，排在低优先级更新后的更新（例如第二个dispatch，它排在第一个dispatch后面，但它优先级更高），<strong>不论是否执行，都会被一并保留</strong>。具体原因详见上一篇对于<code>useReducer</code>的详解。</p>
+<p>而第一次高优先级的更新渲染完毕后，由于<code>obj</code>发生了变化，那么<code>useEffect</code>里面的代码会被执行，执行<code>setOk(false)</code>。</p>
+<h2 id="useState的eagerState优化失效"><a href="#useState的eagerState优化失效" class="headerlink" title="useState的eagerState优化失效"></a>useState的eagerState优化失效</h2><p>这次<code>setOk(false)</code>是否会导致重新渲染呢？</p>
+<p>理论上<code>ok</code>的值一直从最开始就是<code>false</code>，那么将它改成<code>false</code>按照经验来说应该无事发生。这是依赖<code>useState</code>的<code>eagerState</code>优化机制，即结果不变则不触发重新渲染。</p>
+<p>但是这个优化是有条件的，要求wip和current当前不能有待执行的更新，也就是<code>lanes</code>要是<code>NoLanes</code>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">if</span> (<br>  fiber.<span class="hljs-property">lanes</span> === <span class="hljs-title class_">NoLanes</span> &amp;&amp;<br>  (alternate === <span class="hljs-literal">null</span> || alternate.<span class="hljs-property">lanes</span> === <span class="hljs-title class_">NoLanes</span>)<br>) &#123;<br>  <span class="hljs-keyword">const</span> lastRenderedReducer = queue.<span class="hljs-property">lastRenderedReducer</span>;<br>  <span class="hljs-keyword">if</span> (lastRenderedReducer !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">let</span> prevDispatcher = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">if</span> (__DEV__) &#123;<br>      prevDispatcher = <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">H</span>;<br>      <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">H</span> = <span class="hljs-title class_">InvalidNestedHooksDispatcherOnUpdateInDEV</span>;<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">const</span> <span class="hljs-attr">currentState</span>: S = (queue.<span class="hljs-property">lastRenderedState</span>: any);<br>      <span class="hljs-keyword">const</span> eagerState = <span class="hljs-title function_">lastRenderedReducer</span>(currentState, action);<br>      update.<span class="hljs-property">hasEagerState</span> = <span class="hljs-literal">true</span>;<br>      update.<span class="hljs-property">eagerState</span> = eagerState;<br>      <span class="hljs-comment">// 如果state没变则不重新渲染。前提是能进入最上面的if分支</span><br>      <span class="hljs-keyword">if</span> (<span class="hljs-title function_">is</span>(eagerState, currentState)) &#123;<br>        <span class="hljs-title function_">enqueueConcurrentHookUpdateAndEagerlyBailout</span>(fiber, queue, update);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (error) &#123;<br>      <span class="hljs-comment">// Suppress the error. It will throw again in the render phase.</span><br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>      <span class="hljs-keyword">if</span> (__DEV__) &#123;<br>        <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">H</span> = prevDispatcher;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>而此刻，<code>obj</code>还有一个低优先级更新等待执行。所以不满足条件，React依旧会重新渲染，并且这次重新渲染是由<code>setOk</code>触发的，优先级依旧是高。</p>
+<h2 id="浅拷贝导致obj变化"><a href="#浅拷贝导致obj变化" class="headerlink" title="浅拷贝导致obj变化"></a>浅拷贝导致obj变化</h2><p>由于这一次渲染的优先级还是高，那么针对<code>obj</code>的低优先级的dispatch还是会被跳过。</p>
+<p>在这次渲染中，<code>useReducer</code>会执行一遍上次被执行过的更新（具体原理详见上一节），这一执行就出问题了，得到了一个内容虽然没有变化，但是发生了浅拷贝的对象。因为我们的reducer里面就是这么写的，返回<code>&#123; ...obj, count: obj.count + 1 &#125;</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// updateReducerImpl的实现</span><br><span class="hljs-comment">// Process this update.</span><br><span class="hljs-keyword">const</span> action = update.<span class="hljs-property">action</span>;<br><span class="hljs-keyword">if</span> (shouldDoubleInvokeUserFnsInHooksDEV) &#123;<br>  <span class="hljs-title function_">reducer</span>(newState, action);<br>&#125;<br><span class="hljs-keyword">if</span> (update.<span class="hljs-property">hasEagerState</span>) &#123;<br>  newState = ((update.<span class="hljs-property">eagerState</span>: any): S);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-comment">// 走到这个分支</span><br>  newState = <span class="hljs-title function_">reducer</span>(newState, action);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>那么我们继续看，这一次高优先级的渲染完成后，依旧是到处理副作用的阶段，由于<code>useEffect</code>的依赖发生了变化，里面的<code>setOk(false)</code>又会被执行。进而，如上面已经所讲过的一样，又重新触发一次高优先级的渲染。</p>
+<p>至此，这个流程已经陷入了死循环了。因为针对<code>obj</code>的低优先级渲染永远不会被执行到，每一次跳过它之后，都会触发<code>useEffect</code>，然后又产生了一个高优先级的更新。然后，就会不断重复上述的过程</p>
+<h2 id="流程梳理"><a href="#流程梳理" class="headerlink" title="流程梳理"></a>流程梳理</h2><p>我偷懒了不想画流程图，简要表述一下，就像这样</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs isbl">点击按钮<br>  → <span class="hljs-variable">dispatch</span> 高优先级更新<br>    → 渲染 → <span class="hljs-variable">useEffect</span> → <span class="hljs-function"><span class="hljs-title">setOk</span>(<span class="hljs-variable"><span class="hljs-literal">false</span></span>)</span><br>      → 再次渲染（高优先级）<br>        → 低优先级更新继续挂起<br>          → <span class="hljs-variable">reducer</span> 返回浅拷贝对象<br>            → <span class="hljs-variable">useEffect</span> 再次执行 <span class="hljs-function"><span class="hljs-title">setOk</span>(<span class="hljs-variable"><span class="hljs-literal">false</span></span>)</span><br>              → 再次渲染（高优先级）<br>                → 低优先级更新继续挂起<br>                  → <span class="hljs-variable">reducer</span> 返回浅拷贝对象<br>                    → ……<br><br></code></pre></td></tr></table></figure>
+
+<p>这个无限渲染的根因是三个机制叠加：</p>
+<ol>
+<li><strong>优先级处理</strong>：高优先级更新先执行，低优先级更新被挂起；</li>
+<li><strong>eagerState 失效</strong>：由于仍存在挂起更新（<code>lanes</code> 非 <code>NoLanes</code>），<code>setOk(false)</code> <strong>不会被“结果相同则跳过”优化</strong>拦下，仍触发渲染；</li>
+<li><strong>对象引用变化</strong>：<code>reducer</code> 返回的新对象（以及可能的值变化）使依赖判定为变化，<code>useEffect</code> 再次触发 <code>setOk(false)</code>。</li>
+</ol>
+<p>三者循环往复，形成死循环。</p>
+<h1 id="解决问题"><a href="#解决问题" class="headerlink" title="解决问题"></a>解决问题</h1><p>那其实找到原因了，解决起来自然就是非常简单，打破循环就可以了。</p>
+<p>比如，我们不让每一次重新渲染后，都触发<code>useEffect</code>里面逻辑的执行，将<code>useEffect</code>的依赖项，从<code>obj</code>这么一个对象，改成<code>obj.count</code>这样一个具体的值。本身<code>useEffect</code>去依赖一个对象，就要考虑到对象容易变化这个风险，因此写依赖项的时候更要结合实际，看你是真的需要依赖整个对象是否变化，还是依赖对象上面的具体字段是否变化。</p>
+<p>再比如，退一步说，你真的就是要判断<code>obj</code>对象本身是否发生变化。那你也可以手动地去判一下，<code>setOk</code>的目标值，和当前<code>ok</code>的值是否有变化，如果没变化，不执行<code>setOk</code>就好了</p>
+<p>以上两种都可以打破这个死循环</p>
+<h1 id="最终感悟"><a href="#最终感悟" class="headerlink" title="最终感悟"></a>最终感悟</h1><p>你只管去学，你的积累总有一天会带给你意想不到的惊喜。</p>
 
                 
               </div>
