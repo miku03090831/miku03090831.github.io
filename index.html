@@ -227,6 +227,71 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
+          通俗易懂的React原理（六）：一次状态更新如何触发渲染
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
+        <div>
+          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0  在本系列第二篇文章中，我们介绍了React是如何在一次渲染中，构建Fiber tree的。只不过我们当时是直接从workLoopConcurrentByScheduler&#x2F;workLoopConcurrent&#x2F;workLoopSync开始讲的，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-09-04 00:24" pubdate>
+              2025-09-04
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/React/">#React</a>
+            
+              <a href="/tags/Fiber/">#Fiber</a>
+            
+              <a href="/tags/%E6%B8%B2%E6%9F%93%E6%B5%81%E7%A8%8B/">#渲染流程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/08/31/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AD%A6%E4%B9%A0React%E6%BA%90%E7%A0%81%E6%9C%89%E4%BB%80%E4%B9%88%E7%94%A8/" target="_self">
           通俗易懂的React原理（番外篇之一）：学习React源码有什么用
         </a>
@@ -715,46 +780,6 @@
               <a href="/tags/%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87/">#执行上下文</a>
             
               <a href="/tags/%E6%89%A7%E8%A1%8C%E6%A0%88/">#执行栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2023/06/27/webpack%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BB%A3%E7%A0%81%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90/" target="_self">
-          webpack运行时代码简要分析
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/06/27/webpack%E8%BF%90%E8%A1%8C%E6%97%B6%E4%BB%A3%E7%A0%81%E7%AE%80%E8%A6%81%E5%88%86%E6%9E%90/" target="_self">
-        <div>
-          开个坑，主要也是怕自己后面忘了 简单写写，有空了补上 __webpack_modules是一个数组，每个元素都是一个函数，函数接受三个参数：第一个参数module好像没用到，第二个是一个对象（会把本模块要导出的属性，赋值给这个对象），第三个是__webpack_require方法（用于引入其他的模块）。函数体里面就是原本这个模块的代码，然后会通过__webpack_require.d方法（类似ob
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-06-27 01:35" pubdate>
-              2023-06-27
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/webpack/">#webpack</a>
             
           </div>
         
