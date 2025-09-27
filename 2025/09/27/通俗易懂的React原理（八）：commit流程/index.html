@@ -1,0 +1,671 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="qh_meng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  前面我们基本讲完了render阶段，也就是React生成新的fiber tree的过程。后面我们就该看commit阶段了，这是根据新的Fiber tree去修改真实dom的过程。 我们之前说的可中断，也仅仅是针对render阶段的。因为render阶段，只是修改内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通俗易懂的React原理（八）：commit流程">
+<meta property="og:url" content="https://miku03090831.github.io/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="moe&#39;s blog">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0  前面我们基本讲完了render阶段，也就是React生成新的fiber tree的过程。后面我们就该看commit阶段了，这是根据新的Fiber tree去修改真实dom的过程。 我们之前说的可中断，也仅仅是针对render阶段的。因为render阶段，只是修改内">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-27T13:19:51.000Z">
+<meta property="article:modified_time" content="2025-09-27T14:49:02.360Z">
+<meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="fiber">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>通俗易懂的React原理（八）：commit流程 - moe&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/miku.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（八）：commit流程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-27 21:19" pubdate>
+          2025年9月27日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">通俗易懂的React原理（八）：commit流程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a></p>
+</blockquote>
+<p>前面我们基本讲完了render阶段，也就是React生成新的fiber tree的过程。后面我们就该看commit阶段了，这是根据新的Fiber tree去修改真实dom的过程。</p>
+<p>我们之前说的可中断，也仅仅是针对render阶段的。因为render阶段，只是修改内存中，后缓冲区的那个workInProgress fiber tree。而commit阶段，则是要去修改dom了，为了保证页面上展示的不是半新半老的，commit阶段是不可被打断，同步执行下来的。</p>
+<p>commit阶段的入口，就在<code>performWorkOnRoot</code>里面，当渲染逻辑结束后，如果一次渲染正常结束，会执行<code>finishConcurrentRender</code>方法，进而沿着<code>finishConcurrentRender</code>-&gt;<code>commitRootWhenReady</code>-&gt;<code>commitRoot</code>这个路径，进入到commitRoot的逻辑里。</p>
+<h1 id="commitRoot方法"><a href="#commitRoot方法" class="headerlink" title="commitRoot方法"></a>commitRoot方法</h1><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">commitRoot</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">root</span>: <span class="hljs-title class_">FiberRoot</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">finishedWork</span>: <span class="hljs-literal">null</span> | <span class="hljs-title class_">Fiber</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">lanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">recoverableErrors</span>: <span class="hljs-literal">null</span> | <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">CapturedValue</span>&lt;mixed&gt;&gt;,</span><br><span class="hljs-params">  <span class="hljs-attr">transitions</span>: <span class="hljs-title class_">Array</span>&lt;<span class="hljs-title class_">Transition</span>&gt; | <span class="hljs-literal">null</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">didIncludeRenderPhaseUpdate</span>: <span class="hljs-built_in">boolean</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">spawnedLane</span>: <span class="hljs-title class_">Lane</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">updatedLanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">suspendedRetryLanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">exitStatus</span>: <span class="hljs-title class_">RootExitStatus</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">suspendedCommitReason</span>: <span class="hljs-title class_">SuspendedCommitReason</span>, <span class="hljs-comment">// Profiling-only</span></span><br><span class="hljs-params">  <span class="hljs-attr">completedRenderStartTime</span>: <span class="hljs-built_in">number</span>, <span class="hljs-comment">// Profiling-only</span></span><br><span class="hljs-params">  <span class="hljs-attr">completedRenderEndTime</span>: <span class="hljs-built_in">number</span>, <span class="hljs-comment">// Profiling-only</span></span><br><span class="hljs-params"></span>): <span class="hljs-built_in">void</span> &#123;<br><br>  <span class="hljs-keyword">do</span> &#123;<br>    <span class="hljs-comment">// `flushPassiveEffects` will call `flushSyncUpdateQueue` at the end, which</span><br>    <span class="hljs-comment">// means `flushPassiveEffects` will sometimes result in additional</span><br>    <span class="hljs-comment">// passive effects. So we need to keep flushing in a loop until there are</span><br>    <span class="hljs-comment">// no more pending effects.</span><br>    <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Might be better if `flushPassiveEffects` did not automatically</span><br>    <span class="hljs-comment">// flush synchronous work at the end, to avoid factoring hazards like this.</span><br>    <span class="hljs-title function_">flushPendingEffects</span>();<br>  &#125; <span class="hljs-keyword">while</span> (pendingEffectsStatus !== <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>);<br>  <span class="hljs-title function_">flushRenderPhaseStrictModeWarningsInDEV</span>();  <span class="hljs-comment">// Check which lanes no longer have any work scheduled on them, and mark</span><br>  <span class="hljs-keyword">let</span> passiveSubtreeMask;<br><br>  passiveSubtreeMask = <span class="hljs-title class_">PassiveMask</span>;<br><br>  <span class="hljs-keyword">if</span> (<br>    (enableProfilerTimer &amp;&amp;<br>      enableComponentPerformanceTrack &amp;&amp;<br>      finishedWork.<span class="hljs-property">actualDuration</span> !== <span class="hljs-number">0</span>) ||<br>    (finishedWork.<span class="hljs-property">subtreeFlags</span> &amp; passiveSubtreeMask) !== <span class="hljs-title class_">NoFlags</span> ||<br>    (finishedWork.<span class="hljs-property">flags</span> &amp; passiveSubtreeMask) !== <span class="hljs-title class_">NoFlags</span><br>  ) &#123;<br>    <span class="hljs-keyword">if</span> (enableYieldingBeforePassive) &#123;<br>      <span class="hljs-comment">// We don&#x27;t schedule a separate task for flushing passive effects.</span><br>      <span class="hljs-comment">// Instead, we just rely on ensureRootIsScheduled below to schedule</span><br>      <span class="hljs-comment">// a callback for us to flush the passive effects.</span><br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// So we can clear these now to allow a new callback to be scheduled.</span><br>      root.<span class="hljs-property">callbackNode</span> = <span class="hljs-literal">null</span>;<br>      root.<span class="hljs-property">callbackPriority</span> = <span class="hljs-title class_">NoLane</span>;<br>      <span class="hljs-title function_">scheduleCallback</span>(<span class="hljs-title class_">NormalSchedulerPriority</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>        <span class="hljs-keyword">if</span> (enableProfilerTimer &amp;&amp; enableComponentPerformanceTrack) &#123;<br>          <span class="hljs-comment">// Track the currently executing event if there is one so we can ignore this</span><br>          <span class="hljs-comment">// event when logging events.</span><br>          <span class="hljs-title function_">trackSchedulerEvent</span>();<br>        &#125;<br>        <span class="hljs-title function_">flushPassiveEffects</span>(<span class="hljs-literal">true</span>);<br>        <span class="hljs-comment">// This render triggered passive effects: release the root cache pool</span><br>        <span class="hljs-comment">// *after* passive effects fire to avoid freeing a cache pool that may</span><br>        <span class="hljs-comment">// be referenced by a node in the tree (HostRoot, Cache boundary etc)</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>      &#125;);<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-comment">// If we don&#x27;t have passive effects, we&#x27;re not going to need to perform more work</span><br>    <span class="hljs-comment">// so we can clear the callback now.</span><br>    root.<span class="hljs-property">callbackNode</span> = <span class="hljs-literal">null</span>;<br>    root.<span class="hljs-property">callbackPriority</span> = <span class="hljs-title class_">NoLane</span>;<br>  &#125;<br><br>  pendingEffectsStatus = <span class="hljs-variable constant_">PENDING_MUTATION_PHASE</span>;<br>  <span class="hljs-comment">// Flush synchronously.</span><br>  <span class="hljs-title function_">flushMutationEffects</span>();<br>  <span class="hljs-title function_">flushLayoutEffects</span>();<br>  <span class="hljs-comment">// Skip flushAfterMutationEffects</span><br>  <span class="hljs-title function_">flushSpawnedWork</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>commitRoot的核心代码大致如上所示。其中finishedWork这个参数，后面也会多次出现，对应的是render阶段的workInProgress，都表示当前遍历到，正在处理的那个Fiber节点。</p>
+<p>首先要保证执行下面的代码时，没有pending状态的副作用（注释里写了为什么可能这时会有副作用），所以需要不停地执行<code>flushPendingEffects</code>，里面会把所有类型的副作用都执行一遍。</p>
+<p>然后，如果整个fiber树中有passive类型的副作用（即<code>useEffect</code>产生的副作用），那么会通过Scheduler，注册一个宏任务，在下一个宏任务里执行整棵树上所有的passive类型副作用。</p>
+<p>然后我们跳过了一个beforeMutationEffect的处理，因为这个跟函数组件没什么关系了，所以不是我们关注的重点。</p>
+<p>最后，按顺序处理三个任务：MutationEffect类型的副作用，LayoutEffect类型的副作用，以及处理前面的任务过程中，新出现的任务即SpawnedWork</p>
+<h1 id="MutationEffect"><a href="#MutationEffect" class="headerlink" title="MutationEffect"></a>MutationEffect</h1><p>mutationEffect，即改变dom的effect。删除dom节点，新增dom节点之类的，都是在这个阶段完成。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flushMutationEffects</span>(<span class="hljs-params"></span>): <span class="hljs-built_in">void</span> &#123;<br>  <span class="hljs-keyword">if</span> (pendingEffectsStatus !== <span class="hljs-variable constant_">PENDING_MUTATION_PHASE</span>) &#123;<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br>  pendingEffectsStatus = <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>;<br><br>  <span class="hljs-keyword">const</span> root = pendingEffectsRoot;<br>  <span class="hljs-keyword">const</span> finishedWork = pendingFinishedWork;<br>  <span class="hljs-keyword">const</span> lanes = pendingEffectsLanes;<br>  <span class="hljs-keyword">const</span> subtreeMutationHasEffects =<br>    (finishedWork.<span class="hljs-property">subtreeFlags</span> &amp; <span class="hljs-title class_">MutationMask</span>) !== <span class="hljs-title class_">NoFlags</span>;<br>  <span class="hljs-keyword">const</span> rootMutationHasEffect = (finishedWork.<span class="hljs-property">flags</span> &amp; <span class="hljs-title class_">MutationMask</span>) !== <span class="hljs-title class_">NoFlags</span>;<br><br>  <span class="hljs-keyword">if</span> (subtreeMutationHasEffects || rootMutationHasEffect) &#123;<br>    <span class="hljs-keyword">const</span> prevTransition = <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">T</span>;<br>    <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">T</span> = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">const</span> previousPriority = <span class="hljs-title function_">getCurrentUpdatePriority</span>();<br>    <span class="hljs-title function_">setCurrentUpdatePriority</span>(<span class="hljs-title class_">DiscreteEventPriority</span>);<br>    <span class="hljs-keyword">const</span> prevExecutionContext = executionContext;<br>    executionContext |= <span class="hljs-title class_">CommitContext</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// The next phase is the mutation phase, where we mutate the host tree.</span><br>      <span class="hljs-title function_">commitMutationEffects</span>(root, finishedWork, lanes);<br><br>      <span class="hljs-keyword">if</span> (enableCreateEventHandleAPI) &#123;<br>        <span class="hljs-keyword">if</span> (shouldFireAfterActiveInstanceBlur) &#123;<br>          <span class="hljs-title function_">afterActiveInstanceBlur</span>();<br>        &#125;<br>      &#125;<br>      <span class="hljs-title function_">resetAfterCommit</span>(root.<span class="hljs-property">containerInfo</span>);<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>      <span class="hljs-comment">// Reset the priority to the previous non-sync value.</span><br>      executionContext = prevExecutionContext;<br>      <span class="hljs-title function_">setCurrentUpdatePriority</span>(previousPriority);<br>      <span class="hljs-title class_">ReactSharedInternals</span>.<span class="hljs-property">T</span> = prevTransition;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// The work-in-progress tree is now the current tree. This must come after</span><br>  <span class="hljs-comment">// the mutation phase, so that the previous tree is still current during</span><br>  <span class="hljs-comment">// componentWillUnmount, but before the layout phase, so that the finished</span><br>  <span class="hljs-comment">// work is current during componentDidMount/Update.</span><br>  root.<span class="hljs-property">current</span> = finishedWork;<br>  pendingEffectsStatus = <span class="hljs-variable constant_">PENDING_LAYOUT_PHASE</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>由上面可见，这段代码的核心逻辑是在<code>commitMutationEffects</code>里的。而<code>commitMutationEffects</code>方法里，几乎就是直接执行了<code>commitMutationEffectsOnFiber</code>方法，所以我们只看<code>commitMutationEffectsOnFiber</code>方法就可以了。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">commitMutationEffectsOnFiber</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">finishedWork</span>: <span class="hljs-title class_">Fiber</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">root</span>: <span class="hljs-title class_">FiberRoot</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">lanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params"></span>)&#123;<br>  <span class="hljs-keyword">switch</span> (finishedWork.<span class="hljs-property">tag</span>) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">FunctionComponent</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">ForwardRef</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">MemoComponent</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">SimpleMemoComponent</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseMutationEffects</span>(root, finishedWork, lanes);<br>      <span class="hljs-title function_">commitReconciliationEffects</span>(finishedWork, lanes);<br><br>      <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Update</span>) &#123;<br>        <span class="hljs-title function_">commitHookEffectListUnmount</span>(<br>          <span class="hljs-title class_">HookInsertion</span> | <span class="hljs-title class_">HookHasEffect</span>,<br>          finishedWork,<br>          finishedWork.<span class="hljs-property">return</span>,<br>        );<br>        <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Use a commitHookInsertionUnmountEffects wrapper to record timings.</span><br>        <span class="hljs-title function_">commitHookEffectListMount</span>(<span class="hljs-title class_">HookInsertion</span> | <span class="hljs-title class_">HookHasEffect</span>, finishedWork);<br>        <span class="hljs-title function_">commitHookLayoutUnmountEffects</span>(<br>          finishedWork,<br>          finishedWork.<span class="hljs-property">return</span>,<br>          <span class="hljs-title class_">HookLayout</span> | <span class="hljs-title class_">HookHasEffect</span>,<br>        );<br>      &#125;<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">HostComponent</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseMutationEffects</span>(root, finishedWork, lanes);<br><br>      <span class="hljs-title function_">commitReconciliationEffects</span>(finishedWork, lanes);<br><br>      <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Ref</span>) &#123;<br>        <span class="hljs-keyword">if</span> (!offscreenSubtreeWasHidden &amp;&amp; current !== <span class="hljs-literal">null</span>) &#123;<br>          <span class="hljs-title function_">safelyDetachRef</span>(current, current.<span class="hljs-property">return</span>);<br>        &#125;<br>      &#125;<br>      <span class="hljs-keyword">if</span> (supportsMutation) &#123;<br>        <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> ContentReset gets cleared by the children during the commit</span><br>        <span class="hljs-comment">// phase. This is a refactor hazard because it means we must read</span><br>        <span class="hljs-comment">// flags the flags after `commitReconciliationEffects` has already run;</span><br>        <span class="hljs-comment">// the order matters. We should refactor so that ContentReset does not</span><br>        <span class="hljs-comment">// rely on mutating the flag during commit. Like by setting a flag</span><br>        <span class="hljs-comment">// during the render phase instead.</span><br>        <span class="hljs-keyword">if</span> (finishedWork.<span class="hljs-property">flags</span> &amp; <span class="hljs-title class_">ContentReset</span>) &#123;<br>          <span class="hljs-title function_">commitHostResetTextContent</span>(finishedWork);<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Update</span>) &#123;<br>          <span class="hljs-keyword">const</span> <span class="hljs-attr">instance</span>: <span class="hljs-title class_">Instance</span> = finishedWork.<span class="hljs-property">stateNode</span>;<br>          <span class="hljs-keyword">if</span> (instance != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-comment">// Commit the work prepared earlier.</span><br>            <span class="hljs-comment">// For hydration we reuse the update path but we treat the oldProps</span><br>            <span class="hljs-comment">// as the newProps. The updatePayload will contain the real change in</span><br>            <span class="hljs-comment">// this case.</span><br>            <span class="hljs-keyword">const</span> newProps = finishedWork.<span class="hljs-property">memoizedProps</span>;<br>            <span class="hljs-keyword">const</span> oldProps =<br>              current !== <span class="hljs-literal">null</span> ? current.<span class="hljs-property">memoizedProps</span> : newProps;<br>            <span class="hljs-title function_">commitHostUpdate</span>(finishedWork, newProps, oldProps);<br>          &#125;<br>        &#125;<br>      &#125;<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">HostText</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseMutationEffects</span>(root, finishedWork, lanes);<br>      <span class="hljs-title function_">commitReconciliationEffects</span>(finishedWork, lanes);<br><br>      <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Update</span>) &#123;<br>        <span class="hljs-keyword">if</span> (supportsMutation) &#123;<br>          <span class="hljs-keyword">if</span> (finishedWork.<span class="hljs-property">stateNode</span> === <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<br>              <span class="hljs-string">&#x27;This should have a text node initialized. This error is likely &#x27;</span> +<br>                <span class="hljs-string">&#x27;caused by a bug in React. Please file an issue.&#x27;</span>,<br>            );<br>          &#125;<br><br>          <span class="hljs-keyword">const</span> <span class="hljs-attr">newText</span>: <span class="hljs-built_in">string</span> = finishedWork.<span class="hljs-property">memoizedProps</span>;<br>          <span class="hljs-comment">// For hydration we reuse the update path but we treat the oldProps</span><br>          <span class="hljs-comment">// as the newProps. The updatePayload will contain the real change in</span><br>          <span class="hljs-comment">// this case.</span><br>          <span class="hljs-keyword">const</span> <span class="hljs-attr">oldText</span>: <span class="hljs-built_in">string</span> =<br>            current !== <span class="hljs-literal">null</span> ? current.<span class="hljs-property">memoizedProps</span> : newText;<br><br>          <span class="hljs-title function_">commitHostTextUpdate</span>(finishedWork, newText, oldText);<br>        &#125;<br>      &#125;<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>commitMutationEffectsOnFiber</code>方法里面，主要是根据fiber.tag的不同类型，做不同的操作。我们主要关注三种类型，即<code>FunctionComponent</code>（函数组件），<code>HostComponent</code>（dom的html标签，如<code>&lt;div&gt;</code>之类的对应的fiber node）和<code>HostText</code>（dom里面的文本节点对应的fiber node）</p>
+<p>我们可以看到，对于三种类型的节点，首先都要执行<code>recursivelyTraverseMutationEffects</code>方法，而后才是真正的当前节点的处理逻辑。所以我们先看一下<code>recursivelyTraverseMutationEffects</code>方法，都干了什么。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">recursivelyTraverseMutationEffects</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">root</span>: <span class="hljs-title class_">FiberRoot</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">parentFiber</span>: <span class="hljs-title class_">Fiber</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">lanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params"></span>) &#123;<br>  <span class="hljs-comment">// Deletions effects can be scheduled on any fiber type. They need to happen</span><br>  <span class="hljs-comment">// before the children effects have fired.</span><br>  <span class="hljs-keyword">const</span> deletions = parentFiber.<span class="hljs-property">deletions</span>;<br>  <span class="hljs-keyword">if</span> (deletions !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; deletions.<span class="hljs-property">length</span>; i++) &#123;<br>      <span class="hljs-keyword">const</span> childToDelete = deletions[i];<br>      <span class="hljs-title function_">commitDeletionEffects</span>(root, parentFiber, childToDelete);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">if</span> (<br>    parentFiber.<span class="hljs-property">subtreeFlags</span> &amp;<br>    (enablePersistedModeClonedFlag ? <span class="hljs-title class_">MutationMask</span> | <span class="hljs-title class_">Cloned</span> : <span class="hljs-title class_">MutationMask</span>)<br>  ) &#123;<br>    <span class="hljs-keyword">let</span> child = parentFiber.<span class="hljs-property">child</span>;<br>    <span class="hljs-keyword">while</span> (child !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-title function_">commitMutationEffectsOnFiber</span>(child, root, lanes);<br>      child = child.<span class="hljs-property">sibling</span>;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>顾名思义，这是个递归的辅助方法。不难发现，它最后又会调用<code>commitMutationEffectsOnFiber</code>方法，整体上形成了<code>commitMutationEffectsOnFiber</code> -&gt; <code>recursivelyTraverseMutationEffects</code> -&gt; <code>commitMutationEffectsOnFiber</code>这样的递归逻辑。这个递归的含义，就是先处理子节点，然后处理子节点的兄弟节点，最后再处理自身。</p>
+<p>不过Mutation阶段比较特殊，在<code>recursivelyTraverseMutationEffects</code> 方法里，首先还需要处理删除dom的逻辑。之前讲diff算法那一篇，我们讲过，一个节点的deletions字段，记录了它下面待删除的子节点。而在<code>recursivelyTraverseMutationEffects</code> 方法开头，就要逐个取出当前节点待删除的子节点，执行<code>commitDeletionEffects</code>方法来删除。删除这一逻辑，我们在下一小节里讲解。</p>
+<p>而在下面处理完所有子节点的逻辑后（因为是递归，所以具体如何处理还要等下面才能讲），我们就回到了对当前节点的处理过程中。</p>
+<p>我们不妨从<code>HostComponent</code>和<code>HostText</code>类型开始讲起</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>通俗易懂的React原理（八）：commit流程</div>
+      <div>https://miku03090831.github.io/2025/09/27/通俗易懂的React原理（八）：commit流程/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>qh_meng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" title="通俗易懂的React原理（六）：一次状态更新如何触发渲染">
+                        <span class="hidden-mobile">通俗易懂的React原理（六）：一次状态更新如何触发渲染</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
