@@ -227,15 +227,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B/" target="_self">
-          通俗易懂的React原理（八）：commit流程
+        <a href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E4%B9%8BflushMutationEffects/" target="_self">
+          通俗易懂的React原理（八）：commit流程之flushMutationEffects
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E4%B9%8BflushMutationEffects/" target="_self">
         <div>
-          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0  前面我们基本讲完了render阶段，也就是React生成新的fiber tree的过程。后面我们就该看commit阶段了，这是根据新的Fiber tree去修改真实dom的过程。 我们之前说的可中断，也仅仅是针对render阶段的。因为render阶段，只是修改内
+          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  前面我们基本讲完了render阶段，也就是React生成新的fiber tree的过程。后面我们就该看commit阶段了，这是根据新的Fiber tree去修改真实dom的过程。 我们之前说的可中断，也仅仅是针对
         </div>
       </a>
 
