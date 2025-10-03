@@ -1,0 +1,677 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="qh_meng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  1234567function commitRoot()&amp;#123;    &#x2F;&#x2F; 前略    flushMutationEffects();    flushLayoutEffects();    &#x2F;&#x2F; Skip">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通俗易懂的React原理（九）：commit流程后续">
+<meta property="og:url" content="https://miku03090831.github.io/2025/10/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B9%9D%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E5%90%8E%E7%BB%AD/index.html">
+<meta property="og:site_name" content="moe&#39;s blog">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  1234567function commitRoot()&amp;#123;    &#x2F;&#x2F; 前略    flushMutationEffects();    flushLayoutEffects();    &#x2F;&#x2F; Skip">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-03T10:28:56.000Z">
+<meta property="article:modified_time" content="2025-10-03T15:07:27.166Z">
+<meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="fiber">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>通俗易懂的React原理（九）：commit流程后续 - moe&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/miku.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（九）：commit流程后续"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-03 18:28" pubdate>
+          2025年10月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">通俗易懂的React原理（九）：commit流程后续</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a> ，并且经过简化，仅保留了关键的逻辑，以便于理解流程</p>
+</blockquote>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">commitRoot</span>(<span class="hljs-params"></span>)&#123;<br>    <span class="hljs-comment">// 前略</span><br>    <span class="hljs-title function_">flushMutationEffects</span>();<br>    <span class="hljs-title function_">flushLayoutEffects</span>();<br>    <span class="hljs-comment">// Skip flushAfterMutationEffects</span><br>    <span class="hljs-title function_">flushSpawnedWork</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>上一篇，我们已经看完了<code>flushMutationEffects</code>的逻辑，那么我们就该继续看<code>flushLayoutEffects</code>和<code>flushSpawnedWork</code>的逻辑了。</p>
+<h1 id="flushLayoutEffects"><a href="#flushLayoutEffects" class="headerlink" title="flushLayoutEffects"></a>flushLayoutEffects</h1><p>这一部分的主要目的，就是处理useLayoutEffect的逻辑。</p>
+<p>和mutation阶段一样，layout这部分的核心逻辑在里层的方法里，名为<code>commitLayoutEffectOnFiber</code>。</p>
+<p>也是根据fiber.tag的不同类型，执行不同的逻辑。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">commitLayoutEffectOnFiber</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">finishedRoot</span>: <span class="hljs-title class_">FiberRoot</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">current</span>: <span class="hljs-title class_">Fiber</span> | <span class="hljs-literal">null</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">finishedWork</span>: <span class="hljs-title class_">Fiber</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">committedLanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params"></span>): <span class="hljs-built_in">void</span> &#123;<br>  <span class="hljs-keyword">const</span> flags = finishedWork.<span class="hljs-property">flags</span>;<br>  <span class="hljs-keyword">switch</span> (finishedWork.<span class="hljs-property">tag</span>) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">FunctionComponent</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">ForwardRef</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">SimpleMemoComponent</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseLayoutEffects</span>(<br>        finishedRoot,<br>        finishedWork,<br>        committedLanes,<br>      );<br>      <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Update</span>) &#123;<br>        <span class="hljs-title function_">commitHookLayoutEffects</span>(finishedWork, <span class="hljs-title class_">HookLayout</span> | <span class="hljs-title class_">HookHasEffect</span>);<br>      &#125;<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">HostHoistable</span>:<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">HostComponent</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseLayoutEffects</span>(<br>        finishedRoot,<br>        finishedWork,<br>        committedLanes,<br>      );<br><br>      <span class="hljs-comment">// Renderers may schedule work to be done after host components are mounted</span><br>      <span class="hljs-comment">// (eg DOM renderer may schedule auto-focus for inputs and form controls).</span><br>      <span class="hljs-comment">// These effects should only be committed when components are first mounted,</span><br>      <span class="hljs-comment">// aka when there is no current/alternate.</span><br>      <span class="hljs-keyword">if</span> (current === <span class="hljs-literal">null</span> &amp;&amp; flags &amp; <span class="hljs-title class_">Update</span>) &#123;<br>        <span class="hljs-title function_">commitHostMount</span>(finishedWork);<br>      &#125;<br><br>      <span class="hljs-keyword">if</span> (flags &amp; <span class="hljs-title class_">Ref</span>) &#123;<br>        <span class="hljs-title function_">safelyAttachRef</span>(finishedWork, finishedWork.<span class="hljs-property">return</span>);<br>      &#125;<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>    <span class="hljs-comment">// Fallthrough</span><br>    <span class="hljs-attr">default</span>: &#123;<br>      <span class="hljs-title function_">recursivelyTraverseLayoutEffects</span>(<br>        finishedRoot,<br>        finishedWork,<br>        committedLanes,<br>      );<br>      <span class="hljs-keyword">break</span>;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>和mutation阶段的逻辑很相似，layout阶段也是先递归执行子节点的逻辑。<code>recursivelyTraverseLayoutEffects</code>方法会遍历子节点，所有的子节点，如果flags包含layout(Update | Callback | Ref | Visibility)，则直接对子节点执行<code>commitLayoutEffectOnFiber</code>。比mutation阶段简单的多，不需要先递归删除，逻辑清晰了不少。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">recursivelyTraverseLayoutEffects</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">root</span>: <span class="hljs-title class_">FiberRoot</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">parentFiber</span>: <span class="hljs-title class_">Fiber</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">lanes</span>: <span class="hljs-title class_">Lanes</span>,</span><br><span class="hljs-params"></span>) &#123;<br>  <span class="hljs-keyword">if</span> (parentFiber.<span class="hljs-property">subtreeFlags</span> &amp; <span class="hljs-title class_">LayoutMask</span>) &#123;<br>    <span class="hljs-keyword">let</span> child = parentFiber.<span class="hljs-property">child</span>;<br>    <span class="hljs-keyword">while</span> (child !== <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">const</span> current = child.<span class="hljs-property">alternate</span>;<br>      <span class="hljs-title function_">commitLayoutEffectOnFiber</span>(root, current, child, lanes);<br>      child = child.<span class="hljs-property">sibling</span>;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="处理函数组件"><a href="#处理函数组件" class="headerlink" title="处理函数组件"></a>处理函数组件</h2><p>递归处理子节点完毕后，回到对当前节点的处理。如果当前节点是函数组件，并且flags包含Update，那么就要执行useLayoutEffect里面的逻辑（return的逻辑已经在mutation阶段执行）,<code>commitHookLayoutEffects(finishedWork, HookLayout | HookHasEffect)</code></p>
+<h2 id="处理host组件"><a href="#处理host组件" class="headerlink" title="处理host组件"></a>处理host组件</h2><p>由于useLayoutEffect只在React组件里才能有，所以host类型的组件是不会有layout阶段的副作用的。在这个阶段，host组件只需要处理一些问题，例如对于autofocus的元素，让它们focus（<code>commitHostMount</code>）。以及将React的ref绑定到dom上。</p>
+<h1 id="flushSpawnedWork"><a href="#flushSpawnedWork" class="headerlink" title="flushSpawnedWork"></a>flushSpawnedWork</h1><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flushSpawnedWork</span>(<span class="hljs-params"></span>): <span class="hljs-built_in">void</span> &#123;<br>  <span class="hljs-keyword">if</span> (<br>    pendingEffectsStatus !== <span class="hljs-variable constant_">PENDING_SPAWNED_WORK</span> &amp;&amp;<br>    <span class="hljs-comment">// If a startViewTransition times out, we might flush this earlier than</span><br>    <span class="hljs-comment">// after mutation phase. In that case, we just skip the after mutation phase.</span><br>    pendingEffectsStatus !== <span class="hljs-variable constant_">PENDING_AFTER_MUTATION_PHASE</span><br>  ) &#123;<br>    <span class="hljs-keyword">return</span>;<br>  &#125;<br>  pendingEffectsStatus = <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>;<br><br>  <span class="hljs-keyword">const</span> root = pendingEffectsRoot;<br>  <span class="hljs-keyword">const</span> finishedWork = pendingFinishedWork;<br>  <span class="hljs-keyword">const</span> lanes = pendingEffectsLanes;<br>  <span class="hljs-keyword">const</span> didIncludeRenderPhaseUpdate = pendingDidIncludeRenderPhaseUpdate;<br><br>  <span class="hljs-keyword">const</span> passiveSubtreeMask = <span class="hljs-title class_">PassiveMask</span>;<br>  <span class="hljs-keyword">const</span> rootDidHavePassiveEffects = <span class="hljs-comment">// If this subtree rendered with profiling this commit, we need to visit it to log it.</span><br>    (finishedWork.<span class="hljs-property">subtreeFlags</span> &amp; passiveSubtreeMask) !== <span class="hljs-title class_">NoFlags</span> ||<br>    (finishedWork.<span class="hljs-property">flags</span> &amp; passiveSubtreeMask) !== <span class="hljs-title class_">NoFlags</span>;<br><br>  <span class="hljs-keyword">if</span> (rootDidHavePassiveEffects) &#123;<br>    pendingEffectsStatus = <span class="hljs-variable constant_">PENDING_PASSIVE_PHASE</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    pendingEffectsStatus = <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>;<br>    pendingEffectsRoot = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>    pendingFinishedWork = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>  &#125;<br><br>  <span class="hljs-comment">// Read this again, since an effect might have updated it</span><br>  <span class="hljs-keyword">let</span> remainingLanes = root.<span class="hljs-property">pendingLanes</span>;<br><br>  <span class="hljs-keyword">if</span> (<br>    <span class="hljs-title function_">includesSyncLane</span>(pendingEffectsLanes) &amp;&amp;<br>    (disableLegacyMode || root.<span class="hljs-property">tag</span> !== <span class="hljs-title class_">LegacyRoot</span>)<br>  ) &#123;<br>    <span class="hljs-title function_">flushPendingEffects</span>();<br>  &#125;<br><br>  <span class="hljs-comment">// Always call this before exiting `commitRoot`, to ensure that any</span><br>  <span class="hljs-comment">// additional work on this root is scheduled.</span><br>  <span class="hljs-title function_">ensureRootIsScheduled</span>(root);<br><br>  <span class="hljs-comment">// Read this again, since a passive effect might have updated it</span><br>  remainingLanes = root.<span class="hljs-property">pendingLanes</span>;<br><br>  <span class="hljs-comment">// Check if this render scheduled a cascading synchronous update. This is a</span><br>  <span class="hljs-comment">// heurstic to detect infinite update loops. We are intentionally excluding</span><br>  <span class="hljs-comment">// hydration lanes in this check, because render triggered by selective</span><br>  <span class="hljs-comment">// hydration is conceptually not an update.</span><br>  <span class="hljs-keyword">if</span> (<br>    (enableInfiniteRenderLoopDetection &amp;&amp;<br>      (didIncludeRenderPhaseUpdate || didIncludeCommitPhaseUpdate)) ||<br>    (<span class="hljs-title function_">includesSomeLane</span>(lanes, <span class="hljs-title class_">UpdateLanes</span>) &amp;&amp;<br>      <span class="hljs-title function_">includesSomeLane</span>(remainingLanes, <span class="hljs-title class_">SyncUpdateLanes</span>))<br>  ) &#123;<br>    <span class="hljs-keyword">if</span> (root === rootWithNestedUpdates) &#123;<br>      nestedUpdateCount++;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      nestedUpdateCount = <span class="hljs-number">0</span>;<br>      rootWithNestedUpdates = root;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    nestedUpdateCount = <span class="hljs-number">0</span>;<br>  &#125;<br><br>  <span class="hljs-title function_">flushSyncWorkOnAllRoots</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>flushSpawnedWork</code>阶段，主要是处理前面阶段里，派生出来的问题。比如在<code>useLayoutEffect</code>里面如果使用了<code>useState</code>的dispatch，那么这个这个dispatch对应的工作就会在<code>flushSpawnedWork</code>阶段被处理。</p>
+<p>其实去掉了一堆试验阶段的特性和日志后，这部分的逻辑也比较简单。比较重要的一点就是，如果当前有同步优先级的更新（syncLane），那么会立刻同步的执行<code>flushPendingEffects</code>方法。里面会同步的执行<code>flushMutationEffects</code>，<code>flushLayoutEffects</code>和<code>flushPassiveEffects</code>。</p>
+<p>最值得注意的就是会同步执行<code>flushPassiveEffects</code>了。这部分是处理passive effect的，即<code>useEffect</code>里面的内容。通常情况下，<code>useEffect</code>是在commit阶段结束后，下一个宏任务里去执行的，这个在上一篇<code>commitRoot</code>方法的源码里我们能够看到。但是当<code>pendingEffectsLanes</code>包含了同步优先级（在commitRoot里给<code>pendingEffectsLanes</code>赋值），则会改为同步执行。</p>
+<p>值得注意的是，React项目初次渲染，组件mount的时候，优先级是DefaultLane，是低于同步优先级的。所以第一次的useEffect会异步执行。而如果是点击事件触发了状态更新，进而产生了passive effect，那么这次useEffect即passive effect，会同步执行。这对应这个解释<a target="_blank" rel="noopener" href="https://github.com/reactwg/react-18/discussions/128">useEffect fires synchronously when it’s the result of a discrete input</a>.</p>
+<p>接下来，React会检测处理副作用时候产生的新的更新，是否有导致无限的循环渲染。</p>
+<p>最后，<code>flushSyncWorkAcrossRoots_impl</code>去把当前root上的所有同步的更新，执行一遍这可能会重新走一遍render的阶段。至于重新渲染一遍的逻辑，在前面已经讲过了，这里不再赘述。</p>
+<h1 id="flushPassiveEffects"><a href="#flushPassiveEffects" class="headerlink" title="flushPassiveEffects"></a>flushPassiveEffects</h1><p><code>commitRoot</code>里面的关键方法还剩<code>flushPassiveEffects</code>没讲。上面提到过，这个是执行<code>useEffect</code>里面的副作用的代码。</p>
+<p>它的主要逻辑在<code>flushPassiveEffectsImpl</code>里，并且可以被简要提炼为下面几行</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flushPassiveEffectsImpl</span>(<span class="hljs-params"><span class="hljs-attr">wasDelayedCommit</span>: <span class="hljs-built_in">void</span> | <span class="hljs-built_in">boolean</span></span>) &#123;<br>  <span class="hljs-comment">// Cache and clear the transitions flag</span><br>  <span class="hljs-keyword">const</span> transitions = pendingPassiveTransitions;<br>  pendingPassiveTransitions = <span class="hljs-literal">null</span>;<br><br>  <span class="hljs-keyword">const</span> root = pendingEffectsRoot;<br>  <span class="hljs-keyword">const</span> lanes = pendingEffectsLanes;<br>  pendingEffectsStatus = <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>;<br>  pendingEffectsRoot = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>  pendingFinishedWork = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>  pendingEffectsLanes = <span class="hljs-title class_">NoLanes</span>;<br><br>  <span class="hljs-title function_">commitPassiveUnmountEffects</span>(root.<span class="hljs-property">current</span>);<br>  <span class="hljs-title function_">commitPassiveMountEffects</span>(<br>    root,<br>    root.<span class="hljs-property">current</span>,<br>    lanes,<br>    transitions,<br>    pendingEffectsRenderEndTime,<br>  );<br><br>  <span class="hljs-title function_">flushSyncWorkOnAllRoots</span>();<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>首先<code>commitPassiveUnmountEffects</code>，这个前面看了mutation阶段和layout阶段，我们其实都能猜到了，从根节点开始，递归遍历全部子节点，把每个子节点上面的passive effect的return方法都执行一遍，且是先执行子节点的，再行父节点的。</p>
+<p>而<code>commitPassiveMountEffects</code>方法，则是递归遍历所有子节点，把他们的passive effect的内容都执行一遍。</p>
+<p>这样我们其实也能看出来，useEffect的执行顺序，先是把所有Fiber上面的return按先子后父的顺序执行完，然后再按先子后父的顺序把原本的副作用执行一遍。</p>
+<p>最后，再执行<code>flushSyncWorkOnAllRoots</code>方法，把所有的同步任务都清一遍。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>以上就是commitRoot阶段，React的主要流程。后续我们会了解一下Scheduler的工作逻辑。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>通俗易懂的React原理（九）：commit流程后续</div>
+      <div>https://miku03090831.github.io/2025/10/03/通俗易懂的React原理（九）：commit流程后续/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>qh_meng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E4%B9%8BflushMutationEffects/" title="通俗易懂的React原理（八）：commit流程之flushMutationEffects">
+                        <span class="hidden-mobile">通俗易懂的React原理（八）：commit流程之flushMutationEffects</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
