@@ -353,13 +353,13 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
+        <a href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%83%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
           通俗易懂的React原理（六）：一次状态更新如何触发渲染
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/04/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B8%83%EF%BC%89%EF%BC%9A%E4%B8%80%E6%AC%A1%E7%8A%B6%E6%80%81%E6%9B%B4%E6%96%B0%E5%A6%82%E4%BD%95%E8%A7%A6%E5%8F%91%E6%B8%B2%E6%9F%93/" target="_self">
         <div>
           代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0  在本系列第二篇文章中，我们介绍了React是如何在一次渲染中，构建Fiber tree的。只不过我们当时是直接从workLoopConcurrentByScheduler&#x2F;workLoopConcurrent&#x2F;workLoopSync开始讲的，
         </div>
@@ -405,6 +405,71 @@
               <a href="/tags/Fiber/">#Fiber</a>
             
               <a href="/tags/%E6%B8%B2%E6%9F%93%E6%B5%81%E7%A8%8B/">#渲染流程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/09/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9AcompleteWork%E6%B5%81%E7%A8%8B/" target="_self">
+          通俗易懂的React原理（六）：completeWork流程
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AD%EF%BC%89%EF%BC%9AcompleteWork%E6%B5%81%E7%A8%8B/" target="_self">
+        <div>
+          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程 completeWork在前面我们讲构建Fiber tree的时候，我们知道每个节点都需要先经过beginWork方法正向遍历。然后等从子节点反向遍历，回到当前节点的时候，会调用completeWork方法。 beg
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-09-03 14:13" pubdate>
+              2025-09-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/React/">#React</a>
+            
+              <a href="/tags/Fiber/">#Fiber</a>
+            
+              <a href="/tags/completeWork/">#completeWork</a>
             
           </div>
         
@@ -757,52 +822,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2024-06-16 02:12" pubdate>
               2024-06-16
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/react/">#react</a>
-            
-              <a href="/tags/ssr/">#ssr</a>
-            
-              <a href="/tags/%E5%8A%A8%E6%89%8B%E5%AE%9E%E8%B7%B5/">#动手实践</a>
-            
-              <a href="/tags/%E5%90%8C%E6%9E%84%E6%B8%B2%E6%9F%93/">#同构渲染</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" target="_self">
-          动手实现react ssr
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/06/11/%E5%8A%A8%E6%89%8B%E5%AE%9E%E7%8E%B0react-ssr/" target="_self">
-        <div>
-          关于ssr相关的介绍，可以移步之前的一篇博文，本文不再赘述 日常工作中，我们可能都接触过ssr，不过我们可能通常是借助于框架（例如Next.js）的支持来完成ssr。今天我想尝试，摆脱高度封装的前端框架，只依赖react相关的库，来实现ssr。 本篇代码 pnpm i安装依赖，npm run server启动服务 环境：node 20.12.0 react和react-dom版本均为18.3.1
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-06-11 01:42" pubdate>
-              2024-06-11
             </time>
           </div>
         
