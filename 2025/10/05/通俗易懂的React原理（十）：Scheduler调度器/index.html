@@ -1,0 +1,678 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="qh_meng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  所谓调度，就是有一个任务，不一定会立刻执行，而是安排在某个时机再去执行。 前面几篇也多次提到过了，React会通过调度器来执行一些任务。例如并发渲染被中断后的恢复执行，useEffect部分场景下的执行，都是由S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通俗易懂的React原理（十）：Scheduler调度器">
+<meta property="og:url" content="https://miku03090831.github.io/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/index.html">
+<meta property="og:site_name" content="moe&#39;s blog">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  所谓调度，就是有一个任务，不一定会立刻执行，而是安排在某个时机再去执行。 前面几篇也多次提到过了，React会通过调度器来执行一些任务。例如并发渲染被中断后的恢复执行，useEffect部分场景下的执行，都是由S">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-10-05T14:03:17.000Z">
+<meta property="article:modified_time" content="2025-10-05T16:34:38.010Z">
+<meta property="article:author" content="qh_meng">
+<meta property="article:tag" content="React">
+<meta property="article:tag" content="Scheduler">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>通俗易懂的React原理（十）：Scheduler调度器 - moe&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"miku03090831.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/miku.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（十）：Scheduler调度器"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-10-05 22:03" pubdate>
+          2025年10月5日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">通俗易懂的React原理（十）：Scheduler调度器</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a> ，并且经过简化，仅保留了关键的逻辑，以便于理解流程</p>
+</blockquote>
+<p>所谓调度，就是有一个任务，不一定会立刻执行，而是安排在某个时机再去执行。</p>
+<p>前面几篇也多次提到过了，React会通过调度器来执行一些任务。例如并发渲染被中断后的恢复执行，<code>useEffect</code>部分场景下的执行，都是由Scheduler调度执行的。React团队自己实现了一个Scheduler调度器，单独把逻辑放到一个npm包里。这个调度器是有泛用性的，而React只是通过这个Scheduler包，来完成自己的调度需求。</p>
+<h1 id="unstable-scheduleCallback"><a href="#unstable-scheduleCallback" class="headerlink" title="unstable_scheduleCallback"></a>unstable_scheduleCallback</h1><p><code>react-reconciler</code>包里面，需要用调度器安排一个任务的时候，会调用<code>scheduleCallback</code>方法，并且把需要执行的任务传给这个方法。</p>
+<p>回顾一下之前commitRoot里，用调度器安排useEffect的执行的时候，是这样写的。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-title function_">scheduleCallback</span>(<span class="hljs-title class_">NormalSchedulerPriority</span>, <span class="hljs-function">() =&gt;</span> &#123;<br>  <span class="hljs-title function_">flushPassiveEffects</span>(<span class="hljs-literal">true</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>执行这个方法，意思就是说，我有个工作要做，你看看什么时候有空，你安排个时间做一下。</p>
+<p><code>scheduleCallback</code>对应着Scheduler npm包里面，<code>unstable_scheduleCallback</code>方法。</p>
+<p>我们分段来看一下这个方法的逻辑</p>
+<h2 id="调度准备"><a href="#调度准备" class="headerlink" title="调度准备"></a>调度准备</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">unstable_scheduleCallback</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">priorityLevel</span>: <span class="hljs-title class_">PriorityLevel</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">callback</span>: <span class="hljs-title class_">Callback</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">options</span>?: &#123;delay: <span class="hljs-built_in">number</span>&#125;,</span><br><span class="hljs-params"></span>): <span class="hljs-title class_">Task</span> &#123;<br>  <span class="hljs-keyword">var</span> currentTime = <span class="hljs-title function_">getCurrentTime</span>();<br><br>  <span class="hljs-keyword">var</span> startTime;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> options === <span class="hljs-string">&#x27;object&#x27;</span> &amp;&amp; options !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">var</span> delay = options.<span class="hljs-property">delay</span>;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> delay === <span class="hljs-string">&#x27;number&#x27;</span> &amp;&amp; delay &gt; <span class="hljs-number">0</span>) &#123;<br>      startTime = currentTime + delay;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      startTime = currentTime;<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    startTime = currentTime;<br>  &#125;<br><br>  <span class="hljs-keyword">var</span> timeout;<br>  <span class="hljs-keyword">switch</span> (priorityLevel) &#123;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">ImmediatePriority</span>:<br>      <span class="hljs-comment">// Times out immediately</span><br>      timeout = -<span class="hljs-number">1</span>;<br>      <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">UserBlockingPriority</span>:<br>      <span class="hljs-comment">// Eventually times out</span><br>      timeout = userBlockingPriorityTimeout;<br>      <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">IdlePriority</span>:<br>      <span class="hljs-comment">// Never times out</span><br>      timeout = maxSigned31BitInt;<br>      <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">LowPriority</span>:<br>      <span class="hljs-comment">// Eventually times out</span><br>      timeout = lowPriorityTimeout;<br>      <span class="hljs-keyword">break</span>;<br>    <span class="hljs-keyword">case</span> <span class="hljs-title class_">NormalPriority</span>:<br>    <span class="hljs-attr">default</span>:<br>      <span class="hljs-comment">// Eventually times out</span><br>      timeout = normalPriorityTimeout;<br>      <span class="hljs-keyword">break</span>;<br>  &#125;<br><br>  <span class="hljs-keyword">var</span> expirationTime = startTime + timeout;<br><br>  <span class="hljs-keyword">var</span> <span class="hljs-attr">newTask</span>: <span class="hljs-title class_">Task</span> = &#123;<br>    <span class="hljs-attr">id</span>: taskIdCounter++,<br>    callback,<br>    priorityLevel,<br>    startTime,<br>    expirationTime,<br>    <span class="hljs-attr">sortIndex</span>: -<span class="hljs-number">1</span>,<br>  &#125;;<br>  <span class="hljs-comment">// 后略</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>方法的入参，分别是<code>priorityLevel</code>，表示callback的紧急程度，粗略的理解就是紧急的任务会被优先调度。这个优先级和前面render和commit提到的lanes不完全相同，而是有着一定的对应关系。对应逻辑如下</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">switch</span> (<span class="hljs-title function_">lanesToEventPriority</span>(nextLanes)) &#123;<br>  <span class="hljs-comment">// Scheduler does have an &quot;ImmediatePriority&quot;, but now that we use</span><br>  <span class="hljs-comment">// microtasks for sync work we no longer use that. Any sync work that</span><br>  <span class="hljs-comment">// reaches this path is meant to be time sliced.</span><br>  <span class="hljs-keyword">case</span> <span class="hljs-title class_">DiscreteEventPriority</span>:<br>  <span class="hljs-keyword">case</span> <span class="hljs-title class_">ContinuousEventPriority</span>:<br>    schedulerPriorityLevel = <span class="hljs-title class_">UserBlockingSchedulerPriority</span>;<br>    <span class="hljs-keyword">break</span>;<br>  <span class="hljs-keyword">case</span> <span class="hljs-title class_">DefaultEventPriority</span>:<br>    schedulerPriorityLevel = <span class="hljs-title class_">NormalSchedulerPriority</span>;<br>    <span class="hljs-keyword">break</span>;<br>  <span class="hljs-keyword">case</span> <span class="hljs-title class_">IdleEventPriority</span>:<br>    schedulerPriorityLevel = <span class="hljs-title class_">IdleSchedulerPriority</span>;<br>    <span class="hljs-keyword">break</span>;<br>  <span class="hljs-attr">default</span>:<br>    schedulerPriorityLevel = <span class="hljs-title class_">NormalSchedulerPriority</span>;<br>    <span class="hljs-keyword">break</span>;<br>&#125;<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">lanesToEventPriority</span>(<span class="hljs-params"><span class="hljs-attr">lanes</span>: <span class="hljs-title class_">Lanes</span></span>): <span class="hljs-title class_">EventPriority</span> &#123;<br>  <span class="hljs-keyword">const</span> lane = <span class="hljs-title function_">getHighestPriorityLane</span>(lanes);<br>  <span class="hljs-keyword">if</span> (!<span class="hljs-title function_">isHigherEventPriority</span>(<span class="hljs-title class_">DiscreteEventPriority</span>, lane)) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">DiscreteEventPriority</span>;<br>  &#125;<br>  <span class="hljs-keyword">if</span> (!<span class="hljs-title function_">isHigherEventPriority</span>(<span class="hljs-title class_">ContinuousEventPriority</span>, lane)) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">ContinuousEventPriority</span>;<br>  &#125;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">includesNonIdleWork</span>(lane)) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-title class_">DefaultEventPriority</span>;<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-title class_">IdleEventPriority</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>第二个入参是<code>callback</code>，就是要被安排执行的任务。第三个参数是可选参数，可以传入<code>delay</code>字段，表示延时，具体作用我们马上就能见到。</p>
+<p>如果没有传入<code>delay</code>，那么<code>startTime</code>就是开始调度的时间。如果传入了大于0的<code>delay</code>，则<code>startTime</code>是当前时加伤<code>delay</code></p>
+<p>接下来，要将传入的<code>priorityLevel</code>，转换成对应的<code>timeout</code>。<code>timeout</code>会和<code>startTime</code>相加，得到<code>expirationTime</code>作为过期时限。调度器的设计思想是，如果任务过期了，那么任务会被更优先的执行。</p>
+<p><code>startTime</code>和<code>experationTime</code>是两个关键的概念，在后面还会多次出现。它们分别表示这个任务开始的时间，和过期的时间。</p>
+<p>我们可以看到，<code>ImmediatePriority</code>优先级的，timeout是-1，确保这个任务已经过期，从而被优先执行。而如果是用户交互级别的优先级，则过期时间设为<code>userBlockingPriorityTimeout</code>，值是250ms，以此类推，不逐个介绍。</p>
+<p>接下来，当执行这个调度的时候，会生成一个<code>Task</code>对象，用于存放被调度的任务。具体每个字段的命名都是自解释的，我们直接看后半部分。</p>
+<h2 id="安排调度"><a href="#安排调度" class="headerlink" title="安排调度"></a>安排调度</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">unstable_scheduleCallback</span>(<span class="hljs-params"></span><br><span class="hljs-params">  <span class="hljs-attr">priorityLevel</span>: <span class="hljs-title class_">PriorityLevel</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">callback</span>: <span class="hljs-title class_">Callback</span>,</span><br><span class="hljs-params">  <span class="hljs-attr">options</span>?: &#123;delay: <span class="hljs-built_in">number</span>&#125;,</span><br><span class="hljs-params"></span>): <span class="hljs-title class_">Task</span> &#123;<br>  <span class="hljs-comment">// 前略</span><br>  <span class="hljs-keyword">if</span> (startTime &gt; currentTime) &#123;<br>    <span class="hljs-comment">// This is a delayed task.</span><br>    newTask.<span class="hljs-property">sortIndex</span> = startTime;<br>    <span class="hljs-title function_">push</span>(timerQueue, newTask);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-title function_">peek</span>(taskQueue) === <span class="hljs-literal">null</span> &amp;&amp; newTask === <span class="hljs-title function_">peek</span>(timerQueue)) &#123;<br>      <span class="hljs-comment">// All tasks are delayed, and this is the task with the earliest delay.</span><br>      <span class="hljs-keyword">if</span> (isHostTimeoutScheduled) &#123;<br>        <span class="hljs-comment">// Cancel an existing timeout.</span><br>        <span class="hljs-title function_">cancelHostTimeout</span>();<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        isHostTimeoutScheduled = <span class="hljs-literal">true</span>;<br>      &#125;<br>      <span class="hljs-comment">// Schedule a timeout.</span><br>      <span class="hljs-title function_">requestHostTimeout</span>(handleTimeout, startTime - currentTime);<br>    &#125;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    newTask.<span class="hljs-property">sortIndex</span> = expirationTime;<br>    <span class="hljs-title function_">push</span>(taskQueue, newTask);<br>    <span class="hljs-comment">// Schedule a host callback, if needed. If we&#x27;re already performing work,</span><br>    <span class="hljs-comment">// wait until the next time we yield.</span><br>    <span class="hljs-keyword">if</span> (!isHostCallbackScheduled &amp;&amp; !isPerformingWork) &#123;<br>      isHostCallbackScheduled = <span class="hljs-literal">true</span>;<br>      <span class="hljs-title function_">requestHostCallback</span>();<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> newTask;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>安排调度，分为了两个情况处理。</p>
+<h3 id="非延时任务"><a href="#非延时任务" class="headerlink" title="非延时任务"></a>非延时任务</h3><p>我们先看else里的逻辑，即新任务不是延时任务。那么<code>Task</code>对象上的<code>sortIndex</code>会被赋值为<code>experationTime</code>，然后推到<code>taskQueue</code>里。</p>
+<p><code>taskQueue</code>从数据结构上来说，是一个以<code>sortIndex</code>来排序的最小堆。从含义上来说，它以最小堆的形式，以过期时间为依据，存放着所有超过了<code>startTime</code>的任务，并且堆顶的元素是过期时间最早的。</p>
+<p>推入最小堆后，如果当前不是正在调度中，则会调用<code>requestHostCallback</code>方法，取一个任务去执行。</p>
+<h3 id="延时任务"><a href="#延时任务" class="headerlink" title="延时任务"></a>延时任务</h3><p>如果是延时任务，那么<code>Task</code>对象上的<code>sortIndex</code>会赋值为<code>startTime</code>，然后推到<code>timerQueue</code>里。<code>timerQueue</code>和<code>taskQueue</code>类似，也是个最小堆。只不过它的排序依据是开始时间，而不是过期时间。含义上来讲，它存放的是所有没到开始时间的任务。</p>
+<p><code>taskQueue</code>里面的任务，都是优先于<code>timerQueue</code>的，因为<code>timerQueue</code>里面的任务都还没到开始时间。</p>
+<p>如果此时，<code>taskQueue</code>空了，并且<code>timerQueue</code>的堆顶是刚创建的这个任务，那么说明当前最优先的任务就是刚创建的这个任务了。</p>
+<p>如果<code>isHostTimeoutScheduled</code>为true，表示已经有延时任务已被调度但尚未执行，那么应该取消这个调度，转而去调度刚创建的任务。它才是最高优先级。如果<code>isHostTimeoutScheduled</code>为false，则置为true。</p>
+<p>然后调用<code>requestHostTimeout(handleTimeout, startTime - currentTime);</code>去安排在一定的时机去执行刚创建的任务</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/React/" class="print-no-link">#React</a>
+      
+        <a href="/tags/Scheduler/" class="print-no-link">#Scheduler</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>通俗易懂的React原理（十）：Scheduler调度器</div>
+      <div>https://miku03090831.github.io/2025/10/05/通俗易懂的React原理（十）：Scheduler调度器/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>qh_meng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年10月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/10/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B9%9D%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E5%90%8E%E7%BB%AD/" title="通俗易懂的React原理（九）：commit流程后续">
+                        <span class="hidden-mobile">通俗易懂的React原理（九）：commit流程后续</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
