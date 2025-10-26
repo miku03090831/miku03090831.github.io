@@ -21,13 +21,13 @@
   
     <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  1234567function commitRoot()&amp;#123;    &#x2F;&#x2F; 前略    flushMutationEffects();    flushLayoutEffects();    &#x2F;&#x2F; Skip">
 <meta property="og:type" content="article">
-<meta property="og:title" content="通俗易懂的React原理（九）：commit流程后续">
-<meta property="og:url" content="https://miku03090831.github.io/2025/10/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B9%9D%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E5%90%8E%E7%BB%AD/index.html">
+<meta property="og:title" content="通俗易懂的React原理（九）：commit流程（下）">
+<meta property="og:url" content="https://miku03090831.github.io/2025/10/03/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%B9%9D%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%8B%EF%BC%89/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  1234567function commitRoot()&amp;#123;    &#x2F;&#x2F; 前略    flushMutationEffects();    flushLayoutEffects();    &#x2F;&#x2F; Skip">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-03T10:28:56.000Z">
-<meta property="article:modified_time" content="2025-10-03T15:07:27.166Z">
+<meta property="article:modified_time" content="2025-10-26T06:35:31.684Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="fiber">
@@ -35,7 +35,7 @@
   
   
   
-  <title>通俗易懂的React原理（九）：commit流程后续 - moe&#39;s blog</title>
+  <title>通俗易懂的React原理（九）：commit流程（下） - moe&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="通俗易懂的React原理（九）：commit流程后续"></span>
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（九）：commit流程（下）"></span>
           
         </div>
 
@@ -272,7 +272,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">通俗易懂的React原理（九）：commit流程后续</h1>
+            <h1 id="seo-header">通俗易懂的React原理（九）：commit流程（下）</h1>
             
             
               <div class="markdown-body">
@@ -300,7 +300,7 @@
 <p>最值得注意的就是会同步执行<code>flushPassiveEffects</code>了。这部分是处理passive effect的，即<code>useEffect</code>里面的内容。通常情况下，<code>useEffect</code>是在commit阶段结束后，下一个宏任务里去执行的，这个在上一篇<code>commitRoot</code>方法的源码里我们能够看到。但是当<code>pendingEffectsLanes</code>包含了同步优先级（在commitRoot里给<code>pendingEffectsLanes</code>赋值），则会改为同步执行。</p>
 <p>值得注意的是，React项目初次渲染，组件mount的时候，优先级是DefaultLane，是低于同步优先级的。所以第一次的useEffect会异步执行。而如果是点击事件触发了状态更新，进而产生了passive effect，那么这次useEffect即passive effect，会同步执行。这对应这个解释<a target="_blank" rel="noopener" href="https://github.com/reactwg/react-18/discussions/128">useEffect fires synchronously when it’s the result of a discrete input</a>.</p>
 <p>接下来，React会检测处理副作用时候产生的新的更新，是否有导致无限的循环渲染。</p>
-<p>最后，<code>flushSyncWorkAcrossRoots_impl</code>去把当前root上的所有同步的更新，执行一遍这可能会重新走一遍render的阶段。至于重新渲染一遍的逻辑，在前面已经讲过了，这里不再赘述。</p>
+<p>最后，<code>flushSyncWorkAcrossRoots_impl</code>去把当前root上的所有同步的更新，执行一遍。也就是说，这里会直接<strong>同步地</strong>去重新渲染。即，如果<code>useLayoutEffect</code>里面有更新，那么React会在commit阶段的末尾，同步重新进入一遍render阶段</p>
 <h1 id="flushPassiveEffects"><a href="#flushPassiveEffects" class="headerlink" title="flushPassiveEffects"></a>flushPassiveEffects</h1><p><code>commitRoot</code>里面的关键方法还剩<code>flushPassiveEffects</code>没讲。上面提到过，这个是执行<code>useEffect</code>里面的副作用的代码。</p>
 <p>它的主要逻辑在<code>flushPassiveEffectsImpl</code>里，并且可以被简要提炼为下面几行</p>
 <figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">flushPassiveEffectsImpl</span>(<span class="hljs-params"><span class="hljs-attr">wasDelayedCommit</span>: <span class="hljs-built_in">void</span> | <span class="hljs-built_in">boolean</span></span>) &#123;<br>  <span class="hljs-comment">// Cache and clear the transitions flag</span><br>  <span class="hljs-keyword">const</span> transitions = pendingPassiveTransitions;<br>  pendingPassiveTransitions = <span class="hljs-literal">null</span>;<br><br>  <span class="hljs-keyword">const</span> root = pendingEffectsRoot;<br>  <span class="hljs-keyword">const</span> lanes = pendingEffectsLanes;<br>  pendingEffectsStatus = <span class="hljs-variable constant_">NO_PENDING_EFFECTS</span>;<br>  pendingEffectsRoot = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>  pendingFinishedWork = (<span class="hljs-attr">null</span>: <span class="hljs-built_in">any</span>); <span class="hljs-comment">// Clear for GC purposes.</span><br>  pendingEffectsLanes = <span class="hljs-title class_">NoLanes</span>;<br><br>  <span class="hljs-title function_">commitPassiveUnmountEffects</span>(root.<span class="hljs-property">current</span>);<br>  <span class="hljs-title function_">commitPassiveMountEffects</span>(<br>    root,<br>    root.<span class="hljs-property">current</span>,<br>    lanes,<br>    transitions,<br>    pendingEffectsRenderEndTime,<br>  );<br><br>  <span class="hljs-title function_">flushSyncWorkOnAllRoots</span>();<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
@@ -357,8 +357,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>通俗易懂的React原理（九）：commit流程后续</div>
-      <div>https://miku03090831.github.io/2025/10/03/通俗易懂的React原理（九）：commit流程后续/</div>
+      <div>通俗易懂的React原理（九）：commit流程（下）</div>
+      <div>https://miku03090831.github.io/2025/10/03/通俗易懂的React原理（九）：commit流程（下）/</div>
     </div>
     <div class="license-meta">
       
@@ -412,8 +412,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%E4%B9%8BflushMutationEffects/" title="通俗易懂的React原理（八）：commit流程之flushMutationEffects">
-                        <span class="hidden-mobile">通俗易懂的React原理（八）：commit流程之flushMutationEffects</span>
+                      <a href="/2025/09/27/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%85%AB%EF%BC%89%EF%BC%9Acommit%E6%B5%81%E7%A8%8B%EF%BC%88%E4%B8%8A%EF%BC%89/" title="通俗易懂的React原理（八）：commit流程（上）">
+                        <span class="hidden-mobile">通俗易懂的React原理（八）：commit流程（上）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
