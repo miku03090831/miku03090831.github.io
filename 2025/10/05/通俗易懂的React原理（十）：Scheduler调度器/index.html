@@ -26,14 +26,14 @@
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  所谓调度，就是有一个任务，不一定会立刻执行，而是安排在某个时机再去执行。 前面几篇也多次提到过了，React会通过调度器来执行一些任务。例如并发渲染被中断后的恢复执行，useEffect部分场景下的执行，都是由S">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://miku03090831.github.io/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
 <meta property="article:published_time" content="2025-10-05T14:03:17.000Z">
 <meta property="article:modified_time" content="2025-10-08T16:50:02.860Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
 <meta property="article:tag" content="Scheduler">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://miku03090831.github.io/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta name="twitter:image" content="https://miku03090831.github.io/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
   
   
   
@@ -376,7 +376,7 @@
 <figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">advanceTimers</span>(<span class="hljs-params"><span class="hljs-attr">currentTime</span>: <span class="hljs-built_in">number</span></span>) &#123;<br>  <span class="hljs-comment">// Check for tasks that are no longer delayed and add them to the queue.</span><br>  <span class="hljs-keyword">let</span> timer = <span class="hljs-title function_">peek</span>(timerQueue);<br>  <span class="hljs-keyword">while</span> (timer !== <span class="hljs-literal">null</span>) &#123;<br>    <span class="hljs-keyword">if</span> (timer.<span class="hljs-property">callback</span> === <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-comment">// Timer was cancelled.</span><br>      <span class="hljs-title function_">pop</span>(timerQueue);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (timer.<span class="hljs-property">startTime</span> &lt;= currentTime) &#123;<br>      <span class="hljs-comment">// Timer fired. Transfer to the task queue.</span><br>      <span class="hljs-title function_">pop</span>(timerQueue);<br>      timer.<span class="hljs-property">sortIndex</span> = timer.<span class="hljs-property">expirationTime</span>;<br>      <span class="hljs-title function_">push</span>(taskQueue, timer);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// Remaining timers are pending.</span><br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br>    timer = <span class="hljs-title function_">peek</span>(timerQueue);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>可以看到，完整的scheduler调度流程，调用链路还是比较长的。我们将主要的流程画成一张流程图，就如下图所示。里面略过了详细的处理逻辑，只保留了大致调用路径，来帮助理清整体流程。而想要了解详细逻辑，还是要看上面分段的讲解。</p>
-<p><img src="%E6%B5%81%E7%A8%8B%E5%9B%BE.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/%E6%B5%81%E7%A8%8B%E5%9B%BE.png" srcset="/img/loading.gif" lazyload></p>
 
                 
               </div>
