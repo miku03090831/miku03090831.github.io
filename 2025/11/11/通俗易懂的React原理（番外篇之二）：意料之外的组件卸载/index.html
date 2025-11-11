@@ -19,23 +19,24 @@
   <meta name="author" content="qh_meng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  前面我们一直在讲React渲染的流程，但是我们并不是从我们最初的调用开始讲的。回顾前面的十篇文章，我们是先讲了React渲染的流程，先跳过了触发渲染这一步。然后讲了一个setState或者说是dispatch的行">
+    <meta name="description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  最近又在工作中遇到了一个比较怪的问题，排查的时候也是用到了前面学习React源码的知识。今天再写一篇番外来记录一下。 问题介绍背景是，在一个商品列表里，有很多折叠状态的商品卡片。当我点击商品卡片的时候，会调接口获取商品详情，和推荐的低价商品。接口返回后，卡片状">
 <meta property="og:type" content="article">
-<meta property="og:title" content="通俗易懂的React原理（十一）：从createRoot说起">
-<meta property="og:url" content="https://miku03090831.github.io/2025/10/22/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%E4%B8%80%EF%BC%89%EF%BC%9A%E4%BB%8EcreateRoot%E8%AF%B4%E8%B5%B7/index.html">
+<meta property="og:title" content="通俗易懂的React原理（番外篇之二）：意料之外的组件卸载">
+<meta property="og:url" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/index.html">
 <meta property="og:site_name" content="moe&#39;s blog">
-<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 ，并且经过简化，仅保留了关键的逻辑，以便于理解流程  前面我们一直在讲React渲染的流程，但是我们并不是从我们最初的调用开始讲的。回顾前面的十篇文章，我们是先讲了React渲染的流程，先跳过了触发渲染这一步。然后讲了一个setState或者说是dispatch的行">
+<meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  最近又在工作中遇到了一个比较怪的问题，排查的时候也是用到了前面学习React源码的知识。今天再写一篇番外来记录一下。 问题介绍背景是，在一个商品列表里，有很多折叠状态的商品卡片。当我点击商品卡片的时候，会调接口获取商品详情，和推荐的低价商品。接口返回后，卡片状">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-10-21T16:14:34.000Z">
-<meta property="article:modified_time" content="2025-10-21T16:35:04.654Z">
+<meta property="article:published_time" content="2025-11-11T15:57:36.000Z">
+<meta property="article:modified_time" content="2025-11-11T16:43:20.474Z">
 <meta property="article:author" content="qh_meng">
 <meta property="article:tag" content="React">
-<meta property="article:tag" content="react-dom">
+<meta property="article:tag" content="fiber">
+<meta property="article:tag" content="React源码">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>通俗易懂的React原理（十一）：从createRoot说起 - moe&#39;s blog</title>
+  <title>通俗易懂的React原理（番外篇之二）：意料之外的组件卸载 - moe&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="通俗易懂的React原理（十一）：从createRoot说起"></span>
+            <span id="subtitle" data-typed-text="通俗易懂的React原理（番外篇之二）：意料之外的组件卸载"></span>
           
         </div>
 
@@ -212,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-10-22 00:14" pubdate>
-          2025年10月22日 凌晨
+        <time datetime="2025-11-11 23:57" pubdate>
+          2025年11月11日 晚上
         </time>
       </span>
     
@@ -224,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          309 字
+          684 字
         
       </span>
     
@@ -235,7 +236,7 @@
         
         
         
-          3 分钟
+          6 分钟
         
       </span>
     
@@ -272,18 +273,28 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">通俗易懂的React原理（十一）：从createRoot说起</h1>
+            <h1 id="seo-header">通俗易懂的React原理（番外篇之二）：意料之外的组件卸载</h1>
             
             
               <div class="markdown-body">
                 
                 <blockquote>
-<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a> ，并且经过简化，仅保留了关键的逻辑，以便于理解流程</p>
+<p>代码以React v19.1.0为例，<a target="_blank" rel="noopener" href="https://github.com/facebook/react/tree/v19.1.0">https://github.com/facebook/react/tree/v19.1.0</a> 。</p>
 </blockquote>
-<p>前面我们一直在讲React渲染的流程，但是我们并不是从我们最初的调用开始讲的。回顾前面的十篇文章，我们是先讲了React渲染的流程，先跳过了触发渲染这一步。然后讲了一个<code>setState</code>或者说是<code>dispatch</code>的行为是怎么触发渲染的，然后又讲了Scheduler在其中起到了什么作用。</p>
-<p>而现在，我们还没有说到最初，比如说浏览器刚拿到js资源的时候，他是怎么把React应用渲染成页面的。那么今天，我们就来看一看。</p>
-<h1 id="createRoot"><a href="#createRoot" class="headerlink" title="createRoot"></a>createRoot</h1><p>React18开始，<code>react-dom</code>有了<code>createRoot</code>这个API。在React17及以前，我们通常是这样写：<code>ReactDom.render(&lt;App /&gt;, document.getElementById(&#39;root&#39;))</code>。而现在有了新的API，React更推荐这样写：<code>createRoot(document.getElementById(&#39;root&#39;)).render(&lt;APP /&gt;)</code></p>
-<p>通过新写法来生成的React应用，才可以使用并发特性。新写法分成了两部，先是从一个dom节点，生成一个root，然后调用<code>root.render</code>方法，把React应用渲染出来。</p>
+<p>最近又在工作中遇到了一个比较怪的问题，排查的时候也是用到了前面学习React源码的知识。今天再写一篇番外来记录一下。</p>
+<h2 id="问题介绍"><a href="#问题介绍" class="headerlink" title="问题介绍"></a>问题介绍</h2><p>背景是，在一个商品列表里，有很多折叠状态的商品卡片。当我点击商品卡片的时候，会调接口获取商品详情，和推荐的低价商品。接口返回后，卡片状态从折叠变为展开，下面会渲染出商品的详情。此外，列表中的其他某个商品，会被打上低价商品的标签。</p>
+<p>代码实现的思路是，在商品卡片组件内部，维护一个折叠&#x2F;展开的state。在商品列表里，维护一个低价商品的id的state。然后，列表组件将修改id的dispatch方法，通过context传递给商品卡片。当点击商品卡片后，调用接口，拿到接口数据后，修改卡片内部的折叠&#x2F;展开状态，并且通过dispatch去修改列表中维护低价商品id的状态。</p>
+<p>你看我上面的描述，可能以为代码就是这样</p>
+<figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs tsx"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title function_">List</span> = (<span class="hljs-params"></span>)=&gt;&#123;<br>	<span class="hljs-keyword">const</span> [lowId, setLowId] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>)<br>	<span class="hljs-comment">// 中间省略</span><br>	<span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">ListContextProvider</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&#123;setLowId&#125;</span>&gt;</span></span><br><span class="language-xml">        	   &#123;</span><br><span class="language-xml">            	   list.map(item=&gt; <span class="hljs-tag">&lt;<span class="hljs-name">Card</span> /&gt;</span>)</span><br><span class="language-xml">        	   &#125;</span><br><span class="language-xml">    	   <span class="hljs-tag">&lt;/<span class="hljs-name">ListContextProvider</span>&gt;</span></span><br>&#125;<br><br><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title function_">Card</span> = (<span class="hljs-params"></span>)=&gt;&#123;<br>    <span class="hljs-keyword">const</span> [expanded, setExpanded] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">false</span>)<br>    <span class="hljs-keyword">const</span> &#123;setLowId&#125; = <span class="hljs-title function_">useListContext</span>()<br>    <span class="hljs-comment">// 中间省略</span><br>    <span class="hljs-keyword">const</span> <span class="hljs-title function_">queryDetail</span> = (<span class="hljs-params"></span>)=&gt;&#123;<br>        <span class="hljs-title function_">fetch</span>().<span class="hljs-title function_">then</span>(<br>        	<span class="hljs-title function_">setLowId</span>(xx)<br>            <span class="hljs-title function_">setExpanded</span>(<span class="hljs-literal">true</span>)<br>        )<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">onClick</span> = <span class="hljs-string">&#123;queryDetail&#125;</span>&gt;</span></span><br><span class="language-xml">    			&#123;expanded &amp;&amp; <span class="hljs-tag">&lt;<span class="hljs-name">Detail</span> /&gt;</span>&#125;</span><br><span class="language-xml">    	   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>按上面的代码来实现这个功能，不会有任何问题。</p>
+<p>但是实际上的代码要更复杂很多，这就是我们容易犯的毛病，我们容易过度简化问题，略去的复杂度里有些不关键，但有些很关键。</p>
+<p>不重要的复杂度，最后接受点击事件的只是Card里的一个按钮组件，它其实和外面的List隔了好几层，这导致了我排查问题的时候多花了点时间，因为我要一层一层往外查，才能知道问题出在了哪。</p>
+<p>而重要的复杂度在于，List组件根本就不是这样的。由于列表本身内容也比较多，所以列表组件其实分为了header，body，footer三部分，而上面我们写的其实只是body的部分。并且最为关键的一点是，header，body，footer三部分，都是被定义在List组件里面的。也就是说List的代码是这样的</p>
+<figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs tsx"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-title function_">List</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>    <span class="hljs-keyword">const</span> [lowId, setLowId] = <span class="hljs-title function_">useState</span>(<span class="hljs-literal">null</span>)<br>    <br>    <span class="hljs-keyword">const</span> <span class="hljs-title function_">ListHeader</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>        <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Header<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span><br>    &#125;<br>    <br>    <span class="hljs-keyword">const</span> <span class="hljs-title function_">ListBody</span> = (<span class="hljs-params"></span>) =&gt; &#123;<br>        <span class="hljs-keyword">return</span> <span class="language-xml"><span class="hljs-tag">&lt;&gt;</span></span><br><span class="language-xml">        		   &#123;list.map(item=&gt; <span class="hljs-tag">&lt;<span class="hljs-name">Card</span> /&gt;</span>)&#125;</span><br><span class="language-xml">        	   <span class="hljs-tag">&lt;/&gt;</span></span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+
 
                 
               </div>
@@ -319,7 +330,9 @@
       
         <a href="/tags/React/" class="print-no-link">#React</a>
       
-        <a href="/tags/react-dom/" class="print-no-link">#react-dom</a>
+        <a href="/tags/fiber/" class="print-no-link">#fiber</a>
+      
+        <a href="/tags/React%E6%BA%90%E7%A0%81/" class="print-no-link">#React源码</a>
       
     </div>
   
@@ -331,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>通俗易懂的React原理（十一）：从createRoot说起</div>
-      <div>https://miku03090831.github.io/2025/10/22/通俗易懂的React原理（十一）：从createRoot说起/</div>
+      <div>通俗易懂的React原理（番外篇之二）：意料之外的组件卸载</div>
+      <div>https://miku03090831.github.io/2025/11/11/通俗易懂的React原理（番外篇之二）：意料之外的组件卸载/</div>
     </div>
     <div class="license-meta">
       
@@ -344,7 +357,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年10月22日</div>
+          <div>2025年11月11日</div>
         </div>
       
       
@@ -376,18 +389,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/" title="通俗易懂的React原理（番外篇之二）：意料之外的组件卸载">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">通俗易懂的React原理（番外篇之二）：意料之外的组件卸载</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/10/05/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%EF%BC%89%EF%BC%9AScheduler%E8%B0%83%E5%BA%A6%E5%99%A8/" title="通俗易懂的React原理（十）：Scheduler调度器">
-                        <span class="hidden-mobile">通俗易懂的React原理（十）：Scheduler调度器</span>
+                      <a href="/2025/10/22/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%E4%B8%80%EF%BC%89%EF%BC%9A%E4%BB%8EcreateRoot%E8%AF%B4%E8%B5%B7/" title="通俗易懂的React原理（十一）：从createRoot说起">
+                        <span class="hidden-mobile">通俗易懂的React原理（十一）：从createRoot说起</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
