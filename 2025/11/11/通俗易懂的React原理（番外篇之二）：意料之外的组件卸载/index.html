@@ -26,9 +26,9 @@
 <meta property="og:site_name" content="moe&#39;s blog">
 <meta property="og:description" content="代码以React v19.1.0为例，https:&#x2F;&#x2F;github.com&#x2F;facebook&#x2F;react&#x2F;tree&#x2F;v19.1.0 。  最近又在工作中遇到了一个比较怪的问题，排查的时候也是用到了前面学习React源码的知识。今天再写一篇番外来记录一下。 问题介绍背景是，在一个商品列表里，有很多折叠状态的商品卡片。当我点击商品卡片的时候，会调接口获取商品详情，和推荐的低价商品。接口返回后，卡片状">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/key%E7%9B%B8%E5%90%8C.png">
-<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E9%87%8D%E6%96%B0%E5%88%9B%E5%BB%BA.png">
-<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E5%88%A0%E9%99%A4%E6%97%A7%E7%9A%84.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/key%E7%9B%B8%E5%90%8C.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E9%87%8D%E6%96%B0%E5%88%9B%E5%BB%BA.png">
+<meta property="og:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E5%88%A0%E9%99%A4%E6%97%A7%E7%9A%84.png">
 <meta property="article:published_time" content="2025-11-11T15:57:36.000Z">
 <meta property="article:modified_time" content="2025-11-16T16:13:39.427Z">
 <meta property="article:author" content="qh_meng">
@@ -36,7 +36,7 @@
 <meta property="article:tag" content="fiber">
 <meta property="article:tag" content="React源码">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/key%E7%9B%B8%E5%90%8C.png">
+<meta name="twitter:image" content="https://miku03090831.github.io/2025/11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/key%E7%9B%B8%E5%90%8C.png">
   
   
   
@@ -307,11 +307,11 @@
 <h1 id="原因解析"><a href="#原因解析" class="headerlink" title="原因解析"></a>原因解析</h1><p>我们可以看到ListBody是在List组件中，用const定义的一个组件。说他是组件吧，它里面内容还挺简单的，直接返回了一段jsx，没有任何多余的代码。但是他被调用的时候，是<code>&lt;ListBody /&gt;</code>这样被调用的，那说明我们这里是把他当成一个组件来看待的。</p>
 <p>而他不管说是个函数组件也好，是个普通方法也好，或者说就是个被const定义的变量也好，他都是在List这个方法的作用域里的。每次List这个函数组件一重新渲染，ListBody就被重新定义了一遍。也就是说两次的ListBody是不同的函数，他们在内存里面的地址是不同的。而前面我们讲diff算法的那篇文章里，提到了React是如何去判断Fiber能否复用的。如果没有key的时候，Fiber的key是null，在重新渲染前后会被认为是相等的。而key相等的时候，就回去判断它们的elementType是否相等，如果相等，就服用这个Fiber。如果不相等，就卸载掉这个Fiber，重新创建一个新的Fiber。对应这里，多个子节点diff的场景，应该是这段代码</p>
 <p>key相同：</p>
-<p><img src="11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/key%E7%9B%B8%E5%90%8C.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="key%E7%9B%B8%E5%90%8C.png" srcset="/img/loading.gif" lazyload></p>
 <p>elementType不同的时候重新创建Fiber（useFiber就是复用，没进这个分支就是重新创建）:</p>
-<p><img src="11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E9%87%8D%E6%96%B0%E5%88%9B%E5%BB%BA.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="%E9%87%8D%E6%96%B0%E5%88%9B%E5%BB%BA.png" srcset="/img/loading.gif" lazyload></p>
 <p>删除未被复用的Fiber:</p>
-<p><img src="11/11/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%BA%8C%EF%BC%89%EF%BC%9A%E6%84%8F%E6%96%99%E4%B9%8B%E5%A4%96%E7%9A%84%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/%E5%88%A0%E9%99%A4%E6%97%A7%E7%9A%84.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="%E5%88%A0%E9%99%A4%E6%97%A7%E7%9A%84.png" srcset="/img/loading.gif" lazyload></p>
 <p>而很不巧，对于函数组件来说，它的elementType就是这个函数定义本身。那前面说过了，List每一次重新渲染，里面定义的ListBody都是一个新的函数，所以elementType比较这一步他是无法通过的。也就是说，他会被React的diff算法判定是一个新组件，执行mount操作。而老的组件会被unmount。</p>
 <p>到这里，我们也就明白了，当我们实现了给指定商品打上低价标签的功能的时候，我们修改到了List组件里面的<code>lowId</code>，引起了List组件的重新渲染。进而由于ListBody是定义在List里面的组件，导致ListBody被反复地卸载挂载，连带着子组件Card也被卸载后重新挂载。这才有了Card里面的<code>expanded</code>值一直是初始值的现象。</p>
 <h1 id="修复问题，以及反思"><a href="#修复问题，以及反思" class="headerlink" title="修复问题，以及反思"></a>修复问题，以及反思</h1><p>修复这个问题很简单，问题出在ListBody被React卸载掉了。那我们只要不把它当做一个组件，不就好了吗？我前面说它可以被当成一个组件来调用，但是这是否有必要呢？它里面没有使用任何的hooks，那他和一个普通的函数有什么区别呢？我当然也可以把他当做一个普通的函数来调用。也就是说，从<code>&lt;ListBody /&gt;</code>改为<code>&#123;ListBody()&#125;</code>。这样的话，React就不会管它了，因为在React眼里他并不是个组件。它相当于被替换成它return的那一段jsx，而不是被替换成<code>React.createElement</code>。</p>
