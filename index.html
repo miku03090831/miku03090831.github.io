@@ -227,6 +227,69 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/12/10/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%B8%89%EF%BC%89%EF%BC%9A%E5%8F%88%E9%81%87%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/" target="_self">
+          通俗易懂的React原理（番外篇之三）：又遇组件卸载
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/10/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E7%95%AA%E5%A4%96%E7%AF%87%E4%B9%8B%E4%B8%89%EF%BC%89%EF%BC%9A%E5%8F%88%E9%81%87%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD/" target="_self">
+        <div>
+          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0 。此版本React的RSC功能近期被发现有致命漏洞，我们研究源码不涉及相关功能，但此版本应该严禁在生产使用。  这一篇写得随意一点，不打算贴太多源码。与其说是技术文章，更像是一个排坑故事，记录我为了查清这个 bug 花了整整两天时间，最后终于定位的过程。 没想到吧
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-10 00:04" pubdate>
+              2025-12-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/React/">#React</a>
+            
+              <a href="/tags/Fiber/">#Fiber</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/11/30/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E5%8D%81%E4%BA%8C%EF%BC%89%EF%BC%9AReact%E7%9A%84%E5%90%88%E6%88%90%E4%BA%8B%E4%BB%B6%E7%B3%BB%E7%BB%9F/" target="_self">
           通俗易懂的React原理（十二）：React的合成事件系统
         </a>
@@ -789,71 +852,6 @@
               <a href="/tags/fiber/">#fiber</a>
             
               <a href="/tags/React%E6%BA%90%E7%A0%81/">#React源码</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/" target="_self">
-          通俗易懂的React原理（五）：子节点的diff算法
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/08/24/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86%EF%BC%88%E4%BA%94%EF%BC%89%EF%BC%9A%E5%AD%90%E8%8A%82%E7%82%B9%E7%9A%84diff%E7%AE%97%E6%B3%95/" target="_self">
-        <div>
-          代码以React v19.1.0为例，https://github.com/facebook/react/tree/v19.1.0 。下文中展示的代码可能省略了部分不影响主题逻辑的代码，例如dev环境下才执行的代码、水合时执行的代码  本篇我们继续来看beginWork里面的部分，依旧是以函数组件为例。 reconcileChildren看完了执行组件自身的部分，我们接下来要看reconcile
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-08-24 22:53" pubdate>
-              2025-08-24
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E9%80%9A%E4%BF%97%E6%98%93%E6%87%82%E7%9A%84React%E5%8E%9F%E7%90%86/" class="category-chain-item">通俗易懂的React原理</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/React/">#React</a>
-            
-              <a href="/tags/fiber/">#fiber</a>
-            
-              <a href="/tags/diff%E7%AE%97%E6%B3%95/">#diff算法</a>
             
           </div>
         
